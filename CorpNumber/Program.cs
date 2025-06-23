@@ -1,3 +1,6 @@
+﻿using CorpNumber.Models; // добавь пространство имён, где находится твой DbContext
+using Microsoft.EntityFrameworkCore;
+
 namespace CorpNumber
 {
     public class Program
@@ -5,6 +8,13 @@ namespace CorpNumber
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // ⬇️ Добавим строку подключения из appsettings.json
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            // ⬇️ Регистрируем контекст базы данных с этой строкой подключения
+            builder.Services.AddDbContext<CorpNumberDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -15,7 +25,6 @@ namespace CorpNumber
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
