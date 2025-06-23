@@ -32,6 +32,8 @@ namespace CorpNumber.Models
         public DbSet<PostCategory> PostCategories { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<TaskItem> Tasks { get; set; }
+        public DbSet<Status> Statuses { get; set; }
+        public DbSet<InternetService> InternetServices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

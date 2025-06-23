@@ -18,21 +18,27 @@ public class PhonesController : Controller
             .Include(p => p.TariffNavigation)
             .Include(p => p.StatusNavigation)
             .Include(p => p.InternetNavigation)
-            .Select(p => new PhoneViewModel
-            {
-                CodePhone = p.CodePhone,
-                Number = p.Number.ToString(),
-                ICCID = p.ICCID,
-                Operator = p.OperatorNavigation.Title,
-                Account = p.Account.ToString(), // при наличии отдельной таблицы - сделай Include
-                Tariff = p.TariffNavigation.Title,
-                Status = p.StatusNavigation.StatusText,
-                Internet = p.InternetNavigation.Service,
-                Limit = p.Limit,
-                Corporative = p.Corporative ?? false
-            })
             .ToListAsync();
 
-        return View(phones);
+        // Временный вывод в консоль или отладчик
+        System.Diagnostics.Debug.WriteLine($"Phones count: {phones.Count}");
+
+        var phoneViewModels = phones.Select(p => new PhoneViewModel
+        {
+            CodePhone = p.CodePhone,
+            Number = p.Number?.ToString() ?? "—",
+            ICCID = p.ICCID ?? "—",
+            Operator = p.OperatorNavigation?.Title ?? "—",
+            Account = p.Account?.ToString() ?? "—",
+            Tariff = p.TariffNavigation?.Title ?? "—",
+            Status = p.StatusNavigation?.StatusText ?? "—",
+            Internet = p.InternetNavigation?.Service ?? "—",
+            Limit = p.Limit,
+            Corporative = p.Corporative ?? false
+        }).ToList();
+
+        System.Diagnostics.Debug.WriteLine($"PhoneViewModels count: {phoneViewModels.Count}");
+
+        return View(phoneViewModels);
     }
 }
