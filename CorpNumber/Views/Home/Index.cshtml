@@ -1,8 +1,133 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewBag.Title = "Список телефонных номеров";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Укажите правильный путь к вашему Layout
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid mt-3">
+    <h2>Телефонные номера</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <strong>Кол-во номеров:</strong> <span class="badge bg-primary">1837</span>
+        </div>
+        <div class="input-group w-25">
+            <input type="text" class="form-control" placeholder="Поиск номера">
+            <button class="btn btn-outline-secondary">🔍</button>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <button class="btn btn-success">Установка на паузу ⏸</button>
+            <button class="btn btn-secondary">Снятие с паузы</button>
+            <button class="btn btn-warning">Изменение лимита 🔒</button>
+            <button class="btn btn-info">Восстановление ♻️</button>
+        </div>
+        <div class="col">
+            <button class="btn btn-outline-primary">Подключ. интернета 🌐</button>
+            <button class="btn btn-outline-danger">Отключ. интернета ❌</button>
+            <button class="btn btn-outline-secondary">Изменение тарифа 📶</button>
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-md-3">
+            <label>Оператор:</label>
+            <select class="form-select">
+                <option>Все</option>
+                <option>O!</option>
+                <!-- Добавьте другие -->
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Категория:</label>
+            <input type="text" class="form-control" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" checked>
+                <label class="form-check-label">Только корп. группа</label>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>№</th>
+                <th>Номер</th>
+                <th>ICCID</th>
+                <th>Оператор</th>
+                <th>Счёт</th>
+                <th>Тарифный план</th>
+                <th>Состояние</th>
+                <th>Интернет</th>
+                <th>Лимит</th>
+                <th>Корпоративный</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-primary">
+                <td>1</td>
+                <td><a href="#">705025831</a></td>
+                <td>899960900104162594</td>
+                <td>O!</td>
+                <td>Личный</td>
+                <td>Premium VIP Алтынкен</td>
+                <td>Активный</td>
+                <td>Smart Unlim</td>
+                <td></td>
+                <td><input type="checkbox" checked></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><a href="#">701886255</a></td>
+                <td>899960900111996974</td>
+                <td>O!</td>
+                <td>Личный</td>
+                <td>Premium VIP Алтынкен</td>
+                <td>Активный</td>
+                <td>Нет</td>
+                <td>5000</td>
+                <td><input type="checkbox" checked></td>
+            </tr>
+            <!-- Добавьте другие строки по аналогии -->
+        </tbody>
+    </table>
+
+    <h4 class="mt-4">Владелец</h4>
+    <div class="border p-3">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label>Категория владельца</label>
+                <input type="text" class="form-control" value="Кыргызский сотрудник" readonly />
+            </div>
+            <div class="col-md-3">
+                <label>Организация</label>
+                <input type="text" class="form-control" value='ОсОО "Алтынкен"' readonly />
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <label>Сотрудник</label>
+                <input type="text" class="form-control" value="Джамгырчиев Султангазы Дуганаевич 貢媛裕尔" readonly />
+            </div>
+            <div class="col-md-3">
+                <label>Управление</label>
+                <input type="text" class="form-control" value="ДК 采矿厂" readonly />
+            </div>
+            <div class="col-md-2">
+                <label>Таб. №</label>
+                <input type="text" class="form-control" value="00505" readonly />
+            </div>
+            <div class="col-md-3">
+                <label>Должность</label>
+                <input type="text" class="form-control" value="п/з водитель 井下司机" readonly />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <img src="/images/placeholder.png" class="img-thumbnail" alt="Фото сотрудника">
+            </div>
+        </div>
+    </div>
 </div>
