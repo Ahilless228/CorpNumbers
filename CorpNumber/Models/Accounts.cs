@@ -5,5 +5,5 @@ public class Accounts
 {
     [Key]
     public int Code { get; set; }
-    public string Type { get; set; }
+    public string ?Type { get; set; }
 }

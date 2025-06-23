@@ -20,6 +20,7 @@ public class PhonesController : Controller
             .Include(p => p.TariffNavigation)
             .Include(p => p.StatusNavigation)
             .Include(p => p.InternetNavigation)
+            .Include(p => p.AccountNavigation)
             .ToListAsync();
 
         // Временный вывод в консоль или отладчик
@@ -31,13 +32,15 @@ public class PhonesController : Controller
             Number = p.Number?.ToString() ?? "—",
             ICCID = p.ICCID ?? "—",
             Operator = p.OperatorNavigation?.Title ?? "—",
-            Account = p.Account?.ToString() ?? "—",
+            Account = p.AccountNavigation?.Type ?? "—",  // <- здесь отображай название
             Tariff = p.TariffNavigation?.Title ?? "—",
             Status = p.StatusNavigation?.StatusText ?? "—",
             Internet = p.InternetNavigation?.Service ?? "—",
             Limit = p.Limit,
             Corporative = p.Corporative ?? false
         }).ToList();
+
+
 
         System.Diagnostics.Debug.WriteLine($"PhoneViewModels count: {phoneViewModels.Count}");
 

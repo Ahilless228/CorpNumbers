@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CorpNumber.Models
 {
@@ -25,5 +26,7 @@ namespace CorpNumber.Models
         public virtual Tariff? TariffNavigation { get; set; }
         public virtual Status? StatusNavigation { get; set; }
         public virtual InternetService? InternetNavigation { get; set; }
+        [ForeignKey(nameof(Account))]
+        public virtual Accounts ?AccountNavigation { get; set; }
     }
 }
