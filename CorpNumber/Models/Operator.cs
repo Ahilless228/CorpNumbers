@@ -1,7 +1,10 @@
-﻿namespace CorpNumber.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CorpNumber.Models
 {
     public class Operator
     {
+        [Key]
         public int CodeOperator { get; set; }
         public string ?Title { get; set; }
         public string ?Company { get; set; }

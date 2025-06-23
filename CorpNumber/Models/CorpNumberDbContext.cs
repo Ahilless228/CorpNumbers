@@ -21,7 +21,7 @@ namespace CorpNumber.Models
         public DbSet<Operator> Operators { get; set; }
         public DbSet<Quota> Quotas { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
-        public DbSet<Citizenships> Citizenships { get; set; }
+        public DbSet<Citizenship> Citizenships { get; set; }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<OtherOwner> OtherOwners { get; set; }
         public DbSet<Operation> Operations { get; set; }
@@ -34,6 +34,8 @@ namespace CorpNumber.Models
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<InternetService> InternetServices { get; set; }
+        public DbSet<OperationType> OperationTypes { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,6 +55,22 @@ namespace CorpNumber.Models
                 .WithMany(t => t.Phones)
                 .HasForeignKey(p => p.Tariff)
                 .HasPrincipalKey(t => t.CodeTariff)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Связь между Phone и Status
+            modelBuilder.Entity<Phone>()
+                .HasOne(p => p.StatusNavigation)
+                .WithMany(s => s.Phones)
+                .HasForeignKey(p => p.Status)
+                .HasPrincipalKey(s => s.Code)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Связь между Phone и InternetService
+            modelBuilder.Entity<Phone>()
+                .HasOne(p => p.InternetNavigation)
+                .WithMany(i => i.Phones)
+                .HasForeignKey(p => p.Internet)
+                .HasPrincipalKey(i => i.CodeServ)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Если появятся модели Status и InternetService:

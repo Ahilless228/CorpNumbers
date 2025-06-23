@@ -1,7 +1,10 @@
-﻿namespace CorpNumber.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CorpNumber.Models
 {
     public class CompanyDocs
     {
+        [Key]
         public int Code { get; set; }
         public string Type { get; set; }
         public string Title { get; set; }

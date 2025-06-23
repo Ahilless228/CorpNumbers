@@ -37,7 +37,8 @@ namespace CorpNumber
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Phones}/{action=Index}/{id?}");
+
 
             app.Run();
         }

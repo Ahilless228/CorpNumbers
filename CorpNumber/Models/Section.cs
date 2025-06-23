@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CorpNumber.Models
 {
     public class Section
     {
+        [Key]
         public int CodeSection { get; set; }
         [Column]
         public string Sectionn { get; set; }

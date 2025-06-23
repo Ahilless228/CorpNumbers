@@ -1,7 +1,10 @@
-﻿namespace CorpNumber.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CorpNumber.Models
 {
     public class Phone
     {
+        [Key]
         public int CodePhone { get; set; }
         public int? Number { get; set; }
         public string? ICCID { get; set; }

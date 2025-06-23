@@ -13,6 +13,8 @@ public class PhonesController : Controller
 
     public async Task<IActionResult> Index()
     {
+        System.Diagnostics.Debug.WriteLine("Index method started");
+
         var phones = await _context.Phones
             .Include(p => p.OperatorNavigation)
             .Include(p => p.TariffNavigation)

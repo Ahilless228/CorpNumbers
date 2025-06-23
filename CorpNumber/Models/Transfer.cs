@@ -1,7 +1,10 @@
-﻿namespace CorpNumber.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CorpNumber.Models
 {
     public class Transfer
     {
+        [Key]
         public int CodeTransfer { get; set; }
         public int? ProcType { get; set; }
         public int? CodeEmp { get; set; }

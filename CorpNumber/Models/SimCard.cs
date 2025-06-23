@@ -1,7 +1,10 @@
-﻿namespace CorpNumber.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CorpNumber.Models
 {
     public class SimCard
     {
+        [Key]
         public int CodeCard { get; set; }
         public string ICCID { get; set; }
         public int? Operator { get; set; }
