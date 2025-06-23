@@ -26,7 +26,7 @@ public class PhonesController : Controller
                 Operator = p.OperatorNavigation.Title,
                 Account = p.Account.ToString(), // при наличии отдельной таблицы - сделай Include
                 Tariff = p.TariffNavigation.Title,
-                Status = p.StatusNavigation.Status,
+                Status = p.StatusNavigation.StatusText,
                 Internet = p.InternetNavigation.Service,
                 Limit = p.Limit,
                 Corporative = p.Corporative ?? false
