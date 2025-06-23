@@ -17,5 +17,10 @@
         public bool? Router { get; set; }
         public bool? Phonebook { get; set; }
         public byte[]? SSMA_TimeStamp { get; set; }
+        // Навигационные свойства:
+        public virtual Operator? OperatorNavigation { get; set; }
+        public virtual Tariff? TariffNavigation { get; set; }
+        public virtual Status? StatusNavigation { get; set; }
+        public virtual InternetService? InternetNavigation { get; set; }
     }
 }

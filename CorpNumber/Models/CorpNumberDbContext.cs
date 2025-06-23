@@ -14,7 +14,7 @@ namespace CorpNumber.Models
         {
         }
 
-        // Пример таблиц
+        // DbSet-свойства для таблиц
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Phone> Phones { get; set; }
@@ -32,5 +32,39 @@ namespace CorpNumber.Models
         public DbSet<PostCategory> PostCategories { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<TaskItem> Tasks { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Связь между Phone и Operator
+            modelBuilder.Entity<Phone>()
+                .HasOne(p => p.OperatorNavigation)
+                .WithMany(o => o.Phones)
+                .HasForeignKey(p => p.Operator)
+                .HasPrincipalKey(o => o.CodeOperator)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Связь между Phone и Tariff
+            modelBuilder.Entity<Phone>()
+                .HasOne(p => p.TariffNavigation)
+                .WithMany(t => t.Phones)
+                .HasForeignKey(p => p.Tariff)
+                .HasPrincipalKey(t => t.CodeTariff)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Если появятся модели Status и InternetService:
+            // modelBuilder.Entity<Phone>()
+            //     .HasOne(p => p.StatusNavigation)
+            //     .WithMany()
+            //     .HasForeignKey(p => p.Status)
+            //     .OnDelete(DeleteBehavior.Restrict);
+
+            // modelBuilder.Entity<Phone>()
+            //     .HasOne(p => p.InternetNavigation)
+            //     .WithMany()
+            //     .HasForeignKey(p => p.Internet)
+            //     .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
