@@ -35,6 +35,9 @@ namespace CorpNumber.Models
         public DbSet<Status> Statuses { get; set; }
         public DbSet<InternetService> InternetServices { get; set; }
         public DbSet<OperationType> OperationTypes { get; set; }
+        public DbSet<OwnerCategory> OwnerCategories { get; set; }
+      
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -72,6 +75,21 @@ namespace CorpNumber.Models
                 .HasForeignKey(p => p.Internet)
                 .HasPrincipalKey(i => i.CodeServ)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Owner>()
+                .HasOne(o => o.CategoryNavigation)
+                .WithMany(c => c.Owners)
+                .HasForeignKey(o => o.CodeCategory)
+                .HasPrincipalKey(c => c.CodeCategory)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Phone>()
+                .HasOne(p => p.CodeOwnerNavigation)
+                .WithMany(o => o.Phones)  // В модели Owner должно быть ICollection<Phone> Phones { get; set; }
+                .HasForeignKey(p => p.CodeOwner)
+                .HasPrincipalKey(o => o.CodeOwner)  // Код владельца в Owner
+    .OnDelete(DeleteBehavior.Restrict);
+
 
             // Если появятся модели Status и InternetService:
             // modelBuilder.Entity<Phone>()

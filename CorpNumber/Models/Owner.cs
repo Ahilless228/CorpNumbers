@@ -11,6 +11,11 @@ namespace CorpNumber.Models
         public int? CodeTempOwner { get; set; }
         public int? CodeOthers { get; set; }
         public int? CodeStationary { get; set; }
+
+        
+        public virtual OwnerCategory? CategoryNavigation { get; set; }
+        public virtual ICollection<Phone> Phones { get; set; } = new List<Phone>();
+
     }
 
 }

@@ -28,5 +28,6 @@ namespace CorpNumber.Models
         public virtual InternetService? InternetNavigation { get; set; }
         [ForeignKey(nameof(Account))]
         public virtual Accounts ?AccountNavigation { get; set; }
+        public virtual Owner ?CodeOwnerNavigation { get; set; }
     }
 }

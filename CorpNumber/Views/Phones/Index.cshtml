@@ -3,6 +3,8 @@
 @{
     ViewBag.Title = "Список телефонных номеров";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int selectedOperator = ViewBag.SelectedOperator ?? 0;
+    int selectedCategory = ViewBag.SelectedCategory ?? 0;
 }
 
 <div class="container-fluid mt-3">
@@ -14,44 +16,77 @@
             <span class="badge bg-primary">@Model?.Count() ?? 0</span>
         </div>
         <div class="input-group w-25">
-            <input type="text" class="form-control" placeholder="Поиск номера">
+            <input type="text" class="form-control" placeholder="Поиск номера" />
             <button class="btn btn-outline-secondary">🔍</button>
         </div>
     </div>
 
-    <!-- 🔘 Кнопка перехода на страницу с редактированием -->
     <div class="mb-3">
         <a class="btn btn-outline-dark" asp-controller="Phones" asp-action="EditPanel">Редактирование ⚙️</a>
     </div>
 
-    <!-- ✅ Форма фильтрации -->
+    <!-- Форма фильтрации -->
     <form method="get" asp-controller="Phones" asp-action="Index">
         <div class="row mb-2">
+            <!-- Оператор -->
             <div class="col-md-3">
                 <label>Оператор:</label>
                 <select class="form-select" name="operatorId" onchange="this.form.submit()">
-                    <option value="0">Все операторы</option>
-                    @if (ViewBag.Operators != null)
+                    @if (selectedOperator == 0)
                     {
-                        @foreach (var op in ViewBag.Operators)
+                        <option value="0" selected>Все операторы</option>
+                    }
+                    else
+                    {
+                        <option value="0">Все операторы</option>
+                    }
+
+                    @foreach (var op in ViewBag.Operators)
+                    {
+                        if (op.CodeOperator == selectedOperator)
                         {
-                            <option value="@op.CodeOperator"
-                                    selected="@(ViewContext.HttpContext.Request.Query["operatorId"] == op.CodeOperator.ToString() ? "selected" : null)">
-                                @op.Title
-                            </option>
+                            <option value="@op.CodeOperator" selected>@op.Title</option>
                         }
-
-
+                        else
+                        {
+                            <option value="@op.CodeOperator">@op.Title</option>
+                        }
                     }
                 </select>
             </div>
+
+            <!-- Категория -->
             <div class="col-md-3">
                 <label>Категория:</label>
-                <input type="text" class="form-control" />
+                <select class="form-select" name="categoryId" onchange="this.form.submit()">
+                    @if (selectedCategory == 0)
+                    {
+                        <option value="0" selected>Все категории</option>
+                    }
+                    else
+                    {
+                        <option value="0">Все категории</option>
+                    }
+
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        if (cat.CodeCategory == selectedCategory)
+                        {
+                            <option value="@cat.CodeCategory" selected>@cat.Category</option>
+                        }
+                        else
+                        {
+                            <option value="@cat.CodeCategory">@cat.Category</option>
+                        }
+                    }
+                </select>
             </div>
+
+            <!-- Корпоративный чекбокс -->
             <div class="col-md-3 d-flex align-items-end">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" checked>
+                    <input class="form-check-input" type="checkbox" name="onlyCorp" value="true" onchange="this.form.submit()"
+                           @(ViewBag.OnlyCorp == true ? "checked" : "") />
                     <label class="form-check-label">Только корп. группа</label>
                 </div>
             </div>
