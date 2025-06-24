@@ -5,6 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     int selectedOperator = ViewBag.SelectedOperator ?? 0;
     int selectedCategory = ViewBag.SelectedCategory ?? 0;
+    bool onlyCorp = ViewBag.OnlyCorp ?? false;
 }
 
 <div class="container-fluid mt-3">
@@ -32,25 +33,11 @@
             <div class="col-md-3">
                 <label>Оператор:</label>
                 <select class="form-select" name="operatorId" onchange="this.form.submit()">
-                    @if (selectedOperator == 0)
-                    {
-                        <option value="0" selected>Все операторы</option>
-                    }
-                    else
-                    {
-                        <option value="0">Все операторы</option>
-                    }
-
+                    @Html.Raw($"<option value='0' {(selectedOperator == 0 ? "selected" : "")}>Все операторы</option>")
                     @foreach (var op in ViewBag.Operators)
                     {
-                        if (op.CodeOperator == selectedOperator)
-                        {
-                            <option value="@op.CodeOperator" selected>@op.Title</option>
-                        }
-                        else
-                        {
-                            <option value="@op.CodeOperator">@op.Title</option>
-                        }
+                        var selectedAttr = op.CodeOperator == selectedOperator ? "selected" : "";
+                        @Html.Raw($"<option value='{op.CodeOperator}' {selectedAttr}>{op.Title}</option>")
                     }
                 </select>
             </div>
@@ -59,25 +46,11 @@
             <div class="col-md-3">
                 <label>Категория:</label>
                 <select class="form-select" name="categoryId" onchange="this.form.submit()">
-                    @if (selectedCategory == 0)
-                    {
-                        <option value="0" selected>Все категории</option>
-                    }
-                    else
-                    {
-                        <option value="0">Все категории</option>
-                    }
-
+                    @Html.Raw($"<option value='0' {(selectedCategory == 0 ? "selected" : "")}>Все категории</option>")
                     @foreach (var cat in ViewBag.Categories)
                     {
-                        if (cat.CodeCategory == selectedCategory)
-                        {
-                            <option value="@cat.CodeCategory" selected>@cat.Category</option>
-                        }
-                        else
-                        {
-                            <option value="@cat.CodeCategory">@cat.Category</option>
-                        }
+                        var selectedAttr = cat.CodeCategory == selectedCategory ? "selected" : "";
+                        @Html.Raw($"<option value='{cat.CodeCategory}' {selectedAttr}>{cat.Category}</option>")
                     }
                 </select>
             </div>
@@ -85,8 +58,12 @@
             <!-- Корпоративный чекбокс -->
             <div class="col-md-3 d-flex align-items-end">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="onlyCorp" value="true" onchange="this.form.submit()"
-                           @(ViewBag.OnlyCorp == true ? "checked" : "") />
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="onlyCorp"
+                           value="true"
+                           onchange="this.form.submit()"
+                           @(onlyCorp ? "checked" : "") />
                     <label class="form-check-label">Только корп. группа</label>
                 </div>
             </div>

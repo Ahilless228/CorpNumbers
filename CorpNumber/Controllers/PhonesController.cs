@@ -13,7 +13,7 @@ public class PhonesController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(int? operatorId, int? categoryId)
+    public async Task<IActionResult> Index(int? operatorId, int? categoryId, bool? onlyCorp)
     {
         var query = _context.Phones
             .Include(p => p.OperatorNavigation)
@@ -26,16 +26,14 @@ public class PhonesController : Controller
             .AsQueryable();
 
         if (operatorId.HasValue && operatorId.Value != 0)
-        {
-            int opId = operatorId.Value;
-            query = query.Where(p => p.Operator == opId);
-        }
+            query = query.Where(p => p.Operator == operatorId);
 
         if (categoryId.HasValue && categoryId.Value != 0)
-        {
-            int catId = categoryId.Value;
-            query = query.Where(p => p.CodeOwnerNavigation != null && p.CodeOwnerNavigation.CodeCategory == catId);
-        }
+            query = query.Where(p => p.CodeOwnerNavigation != null &&
+                                     p.CodeOwnerNavigation.CodeCategory == categoryId);
+
+        if (onlyCorp.HasValue && onlyCorp.Value)
+            query = query.Where(p => p.Corporative == true);
 
         var phones = await query.ToListAsync();
 
@@ -57,6 +55,7 @@ public class PhonesController : Controller
         ViewBag.Categories = await _context.OwnerCategories.ToListAsync();
         ViewBag.SelectedOperator = operatorId ?? 0;
         ViewBag.SelectedCategory = categoryId ?? 0;
+        ViewBag.OnlyCorp = onlyCorp ?? false;
 
         return View(phoneViewModels);
     }
