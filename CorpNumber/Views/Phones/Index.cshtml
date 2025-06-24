@@ -16,9 +16,9 @@
             <strong>Кол-во номеров:</strong>
             <span class="badge bg-primary">@((int?)ViewBag.PhoneCount ?? 0)</span>
         </div>
-        <div class="input-group w-25">
-            <input type="text" class="form-control" placeholder="Поиск номера" />
-            <button class="btn btn-outline-secondary">🔍</button>
+        <div class="input-group w-25 mb-3">
+            <input type="text" id="phoneSearch" class="form-control" placeholder="Поиск номера" />
+            <button class="btn btn-outline-secondary" id="resetFiltersBtn">Сбросить</button>
         </div>
     </div>
 
@@ -109,8 +109,6 @@
                                        style="transform: scale(1.5); accent-color: #0d6efd;" />
                             </div>
                         </td>
-
-
                     </tr>
                 }
             }
@@ -123,3 +121,54 @@
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Живой поиск по номеру
+            $('#phoneSearch').on('input', function () {
+                var searchValue = $(this).val().toLowerCase();
+                let anyVisible = false;
+
+                $('table tbody tr').each(function () {
+                    const number = $(this).find('td:nth-child(2)').text().toLowerCase();
+
+                    if (number.startsWith(searchValue)) {
+                        $(this).show();
+                        anyVisible = true;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                if (!anyVisible) {
+                    if ($('#noResultsRow').length === 0) {
+                        $('table tbody').append('<tr id="noResultsRow"><td colspan="10" class="text-center text-danger">Совпадений не найдено</td></tr>');
+                    }
+                } else {
+                    $('#noResultsRow').remove();
+                }
+            });
+
+            // Кнопка "Сбросить"
+            $('#resetFiltersBtn').click(function () {
+                $('#phoneSearch').val('');
+                $('#noResultsRow').remove();
+                $('table tbody tr').show();
+
+                // Сбросить выпадающие списки
+                $('select').each(function () {
+                    this.selectedIndex = 0;
+                });
+
+                // Сброс чекбокса
+                $('input[type="checkbox"][name="onlyCorp"]').prop('checked', false);
+
+                // Перезапуск формы фильтрации
+                $('form').submit();
+            });
+        });
+    </script>
+}
