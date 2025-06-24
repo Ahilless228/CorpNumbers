@@ -51,6 +51,9 @@ public class PhonesController : Controller
             Corporative = p.Corporative ?? false
         }).ToList();
 
+        // Передаем количество телефонов в ViewBag для корректного отображения
+        ViewBag.PhoneCount = phoneViewModels.Count;
+
         ViewBag.Operators = await _context.Operators.ToListAsync();
         ViewBag.Categories = await _context.OwnerCategories.ToListAsync();
         ViewBag.SelectedOperator = operatorId ?? 0;
