@@ -127,29 +127,37 @@
     </div>
 
     <!-- Динамическое окошко под таблицей -->
-    <div class="mt-4 p-3 border rounded bg-light d-flex justify-content-between" id="detailsPane" style="min-height: 200px;">
-        <!-- Левая часть: таблица 2x3 -->
-        <div class="w-75">
-            <div class="row mb-2">
-                <div class="col-4 fw-bold">ФИО:</div>
-                <div class="col-8" id="detailName">—</div>
+    <div class="mt-4 p-3 border rounded bg-light" id="detailsPane" style="min-height: 200px;">
+        <div class="row">
+            <!-- Левая часть -->
+            <div class="col-md-8">
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Категория владельца:</div>
+                    <div class="col-8" id="detailCategory">—</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Организация:</div>
+                    <div class="col-8" id="detailOrg">—</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Сотрудник:</div>
+                    <div class="col-8" id="detailEmployee">—</div>
+                </div>
             </div>
-            <div class="row mb-2">
-                <div class="col-4 fw-bold">Должность:</div>
-                <div class="col-8" id="detailPosition">—</div>
-            </div>
-            <div class="row">
-                <div class="col-4 fw-bold">Управление:</div>
-                <div class="col-8" id="detailDepartment">—</div>
-            </div>
-        </div>
 
-        <!-- Правая часть: фотография -->
-        <div class="w-25 d-flex justify-content-end align-items-start">
-            <img src="~/images/default-profile.jpg" alt="Фото сотрудника" id="detailPhoto"
-                 style="max-height: 200px; max-width: 150px; object-fit: cover; border: 1px solid #999;" />
+            <!-- Правая часть: фотография -->
+            <div class="col-md-4 d-flex flex-column align-items-end">
+                <img src="~/images/default-profile.jpg" alt="Фото сотрудника" id="detailPhoto"
+                     style="max-height: 200px; max-width: 150px; object-fit: cover; border: 1px solid #999;" />
+
+                <div class="mt-2 text-end">
+                    <strong>Таб. №:</strong> <span id="detailTabnum">—</span>
+                </div>
+            </div>
+
         </div>
     </div>
+
 </div>
 
 
@@ -201,5 +209,25 @@
                 $('form').submit();
             });
         });
+                // При клике на строку таблицы загружаем доп. данные
+        $('.phone-row').click(function () {
+            var phoneId = $(this).data('id');
+
+        $.get('/Phones/GetDetails', { id: phoneId }, function (data) {
+            if (data) {
+                $('#detailCategory').text(data.category || '—');
+                $('#detailOrg').text(data.organization || '—');
+                $('#detailEmployee').text(data.employee || '—');
+                $('#detailTabnum').text(data.tabNum || '—');
+
+                if (data.photoUrl)
+                    $('#detailPhoto').attr('src', data.photoUrl);
+                else
+                    $('#detailPhoto').attr('src', '/images/default-profile.jpg');
+            }
+        });
+
+        });
+
     </script>
 }

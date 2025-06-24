@@ -26,14 +26,15 @@ public class PhonesController : Controller
             .AsQueryable();
 
         if (operatorId.HasValue && operatorId.Value != 0)
-            query = query.Where(p => p.Operator == operatorId);
+            query = query.Where(p => p.Operator == operatorId.Value);
 
         if (categoryId.HasValue && categoryId.Value != 0)
             query = query.Where(p => p.CodeOwnerNavigation != null &&
-                                     p.CodeOwnerNavigation.CodeCategory == categoryId);
+                                     p.CodeOwnerNavigation.CodeCategory == categoryId.Value);
 
         if (onlyCorp.HasValue && onlyCorp.Value)
             query = query.Where(p => p.Corporative == true);
+
 
         var phones = await query.ToListAsync();
 
@@ -51,7 +52,6 @@ public class PhonesController : Controller
             Corporative = p.Corporative ?? false
         }).ToList();
 
-        // Передаем количество телефонов в ViewBag для корректного отображения
         ViewBag.PhoneCount = phoneViewModels.Count;
 
         ViewBag.Operators = await _context.Operators.ToListAsync();
@@ -62,4 +62,70 @@ public class PhonesController : Controller
 
         return View(phoneViewModels);
     }
+
+    // 👇 Вот сюда вставляем новый метод
+    [HttpGet]
+    public IActionResult GetDetails(int id)
+    {
+        var phone = _context.Phones
+            .Include(p => p.CodeOwnerNavigation)
+                .ThenInclude(o => o.CategoryNavigation)
+            .Include(p => p.CodeOwnerNavigation.EmployeeNavigation)  // Включаем сотрудника через владельца
+            .FirstOrDefault(p => p.CodePhone == id);
+
+        if (phone == null)
+            return NotFound();
+
+        // Получаем сотрудника через владельца
+        var emp = phone.CodeOwnerNavigation?.EmployeeNavigation;
+
+        string category = phone.CodeOwnerNavigation?.CategoryNavigation?.Category ?? "—";
+
+        string organization = "—";
+        if (phone.CodeOwner == null)
+            organization = "";
+        else if (new[] { 1, 4, 6, 7 }.Contains(phone.CodeOwnerNavigation.CodeCategory ?? -1))
+            organization = "ОсОО \"Алтынкен\"";
+        else if (new[] { 2, 8, 10 }.Contains(phone.CodeOwnerNavigation.CodeCategory ?? -1))
+            organization = _context.OtherOwners
+                .Where(o => o.CodeOthers == phone.CodeOwnerNavigation.CodeOthers)
+                .Select(o => o.Title)
+                .FirstOrDefault() ?? "—";
+
+        string employee = emp != null
+            ? $"{emp.Surname} {emp.Firstname} {emp.Midname} {emp.NameCh}".Trim()
+            : "—";
+
+        string photoFileName = emp?.TabNum?.ToString("D5"); // форматирует число в 5-значное с ведущими нулями
+
+        string photoPath = null;
+
+        if (!string.IsNullOrEmpty(photoFileName))
+        {
+            string mainPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Photo", $"{photoFileName}.jpg");
+            string archivePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Photo", "Archive", $"{photoFileName}.jpg");
+
+            if (System.IO.File.Exists(mainPath))
+            {
+                photoPath = Url.Content($"/Photo/{photoFileName}.jpg");
+            }
+            else if (System.IO.File.Exists(archivePath))
+            {
+                photoPath = Url.Content($"/Photo/Archive/{photoFileName}.jpg");
+            }
+        }
+        string tabNum = emp?.TabNum?.ToString() ?? "—";
+
+        return Json(new
+        {
+            category,
+            organization,
+            employee,
+            tabNum,
+            photoUrl = photoPath ?? Url.Content("~/images/default-profile.jpg")
+        });
+    }
+
+
+
 }

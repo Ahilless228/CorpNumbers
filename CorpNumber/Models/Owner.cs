@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CorpNumber.Models
 {
@@ -15,6 +16,8 @@ namespace CorpNumber.Models
         
         public virtual OwnerCategory? CategoryNavigation { get; set; }
         public virtual ICollection<Phone> Phones { get; set; } = new List<Phone>();
+        [ForeignKey("CodeEmployee")]
+        public virtual Employee? EmployeeNavigation { get; set; }
 
     }
 

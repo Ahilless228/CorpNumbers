@@ -88,7 +88,9 @@ namespace CorpNumber.Models
                 .WithMany(o => o.Phones)  // В модели Owner должно быть ICollection<Phone> Phones { get; set; }
                 .HasForeignKey(p => p.CodeOwner)
                 .HasPrincipalKey(o => o.CodeOwner)  // Код владельца в Owner
-    .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            
 
 
             // Если появятся модели Status и InternetService:

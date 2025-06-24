@@ -21,6 +21,7 @@ namespace CorpNumber.Models
         public bool? Router { get; set; }
         public bool? Phonebook { get; set; }
         public byte[]? SSMA_TimeStamp { get; set; }
+        
         // Навигационные свойства:
         public virtual Operator? OperatorNavigation { get; set; }
         public virtual Tariff? TariffNavigation { get; set; }
@@ -28,6 +29,6 @@ namespace CorpNumber.Models
         public virtual InternetService? InternetNavigation { get; set; }
         [ForeignKey(nameof(Account))]
         public virtual Accounts ?AccountNavigation { get; set; }
-        public virtual Owner ?CodeOwnerNavigation { get; set; }
+        public virtual Owner ?CodeOwnerNavigation { get; set; } // навигационное свойство
     }
 }
