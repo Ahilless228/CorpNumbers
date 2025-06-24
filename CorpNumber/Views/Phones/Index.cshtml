@@ -70,31 +70,29 @@
             </tr>
         </thead>
         <tbody>
-            @{
-                if (Model != null)
-                {
-                    foreach (var phone in Model)
-                    {
-                        <tr>
-                            <td>@phone.CodePhone</td>
-                            <td><a href="#">@phone.Number</a></td>
-                            <td>@phone.ICCID</td>
-                            <td>@phone.Operator</td>
-                            <td>@phone.Account</td>
-                            <td>@phone.Tariff</td>
-                            <td>@phone.Status</td>
-                            <td>@phone.Internet</td>
-                            <td>@(phone.Limit?.ToString() ?? "—")</td>
-                            <td><input type="checkbox" @(phone.Corporative ? "checked" : "") disabled /></td>
-                        </tr>
-                    }
-                }
-                else
+            @if (Model != null)
+            {
+                foreach (var phone in Model)
                 {
                     <tr>
-                        <td colspan="10" class="text-center">Нет данных для отображения</td>
+                        <td>@phone.CodePhone</td>
+                        <td><a href="#">@phone.Number</a></td>
+                        <td>@phone.ICCID</td>
+                        <td>@phone.Operator</td>
+                        <td>@phone.Account</td>
+                        <td>@phone.Tariff</td>
+                        <td>@phone.Status</td>
+                        <td>@phone.Internet</td>
+                        <td>@(phone.Limit?.ToString() ?? "—")</td>
+                        <td><input type="checkbox" @(phone.Corporative ? "checked" : "") disabled /></td>
                     </tr>
                 }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center">Нет данных для отображения</td>
+                </tr>
             }
         </tbody>
     </table>
