@@ -24,26 +24,39 @@
         <a class="btn btn-outline-dark" asp-controller="Phones" asp-action="EditPanel">Редактирование ⚙️</a>
     </div>
 
-    <div class="row mb-2">
-        <div class="col-md-3">
-            <label>Оператор:</label>
-            <select class="form-select">
-                <option>Все</option>
-                <option>O!</option>
-                <!-- можно заполнить динамически -->
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label>Категория:</label>
-            <input type="text" class="form-control" />
-        </div>
-        <div class="col-md-3 d-flex align-items-end">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" checked>
-                <label class="form-check-label">Только корп. группа</label>
+    <!-- ✅ Форма фильтрации -->
+    <form method="get" asp-controller="Phones" asp-action="Index">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label>Оператор:</label>
+                <select class="form-select" name="operatorId" onchange="this.form.submit()">
+                    <option value="0">Все операторы</option>
+                    @if (ViewBag.Operators != null)
+                    {
+                        @foreach (var op in ViewBag.Operators)
+                        {
+                            <option value="@op.CodeOperator"
+                                    selected="@(ViewContext.HttpContext.Request.Query["operatorId"] == op.CodeOperator.ToString() ? "selected" : null)">
+                                @op.Title
+                            </option>
+                        }
+
+
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>Категория:</label>
+                <input type="text" class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">Только корп. группа</label>
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 
     <table class="table table-bordered table-striped table-hover">
         <thead class="table-dark">
@@ -61,7 +74,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model != null)
+            @if (Model != null && Model.Any())
             {
                 foreach (var phone in Model)
                 {

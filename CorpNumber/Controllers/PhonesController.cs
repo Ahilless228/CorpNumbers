@@ -1,6 +1,7 @@
 ﻿using CorpNumber.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 public class PhonesController : Controller
 {
@@ -11,20 +12,29 @@ public class PhonesController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? operatorId)
     {
-        System.Diagnostics.Debug.WriteLine("Index method started");
+        // Подгружаем операторов для фильтра
+        ViewBag.Operators = await _context.Operators
+            .OrderBy(o => o.Title)
+            .ToListAsync();
 
-        var phones = await _context.Phones
+        // Загружаем телефоны с навигацией
+        var query = _context.Phones
             .Include(p => p.OperatorNavigation)
             .Include(p => p.TariffNavigation)
             .Include(p => p.StatusNavigation)
             .Include(p => p.InternetNavigation)
             .Include(p => p.AccountNavigation)
-            .ToListAsync();
+            .AsQueryable();
 
-        // Временный вывод в консоль или отладчик
-        System.Diagnostics.Debug.WriteLine($"Phones count: {phones.Count}");
+        // Фильтрация по оператору
+        if (operatorId.HasValue && operatorId != 0)
+        {
+            query = query.Where(p => p.Operator == operatorId.Value);
+        }
+
+        var phones = await query.ToListAsync();
 
         var phoneViewModels = phones.Select(p => new PhoneViewModel
         {
@@ -32,17 +42,13 @@ public class PhonesController : Controller
             Number = p.Number?.ToString() ?? "—",
             ICCID = p.ICCID ?? "—",
             Operator = p.OperatorNavigation?.Title ?? "—",
-            Account = p.AccountNavigation?.Type ?? "—",  // <- здесь отображай название
+            Account = p.AccountNavigation?.Type ?? "—",
             Tariff = p.TariffNavigation?.Title ?? "—",
             Status = p.StatusNavigation?.StatusText ?? "—",
             Internet = p.InternetNavigation?.Service ?? "—",
             Limit = p.Limit,
             Corporative = p.Corporative ?? false
         }).ToList();
-
-
-
-        System.Diagnostics.Debug.WriteLine($"PhoneViewModels count: {phoneViewModels.Count}");
 
         return View(phoneViewModels);
     }
