@@ -12,6 +12,15 @@ public class PhonesController : Controller
     {
         _context = context;
     }
+    public IActionResult EditPanel()
+    {
+        if (HttpContext.Session.GetString("IsAdmin") != "true")
+            return RedirectToAction("Login", "Auth");
+
+        // Логика отображения как в Index
+        return RedirectToAction("Index"); // или свой View с админ-кнопками
+    }
+    // Метод для отображения списка телефонов
 
     public async Task<IActionResult> Index(int? operatorId, int? categoryId, bool? onlyCorp)
     {
