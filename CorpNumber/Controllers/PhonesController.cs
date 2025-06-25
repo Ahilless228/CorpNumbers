@@ -132,6 +132,26 @@ public class PhonesController : Controller
                 photoPath = Url.Content($"/Photo/Archive/{photoFileName}.jpg");
             }
         }
+        if (string.IsNullOrEmpty(photoFileName))
+        {
+            var categoryCode = phone.CodeOwnerNavigation?.CodeCategory ?? -1;
+            switch (categoryCode)
+            {
+                case 7: // Стационарный
+                    photoPath = Url.Content("~/images/stat.jpg");
+                    break;
+                case 8: // Силовые структуры
+                    photoPath = Url.Content("~/images/logomvd1.jpg");
+                    break;
+                case 4: // Резерв
+                    photoPath = Url.Content("~/images/simcard.jpg");
+                    break;
+                default:
+                    photoPath = Url.Content("~/images/default-profile.jpg");
+                    break;
+            }
+        }
+
         string tabNum = emp?.TabNum?.ToString() ?? "—";
 
         return Json(new
