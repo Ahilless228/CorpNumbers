@@ -62,6 +62,70 @@ public class PhonesController : Controller
 
         return View(phoneViewModels);
     }
+    // Метод для экспорта в Excel
+    [HttpGet]
+    public async Task<IActionResult> ExportToExcel(int? operatorId, int? categoryId, bool? onlyCorp)
+    {
+        var query = _context.Phones
+            .Include(p => p.OperatorNavigation)
+            .Include(p => p.TariffNavigation)
+            .Include(p => p.StatusNavigation)
+            .Include(p => p.InternetNavigation)
+            .Include(p => p.AccountNavigation)
+            .Include(p => p.CodeOwnerNavigation)
+                .ThenInclude(o => o.CategoryNavigation)
+            .AsQueryable();
+
+        if (operatorId.HasValue && operatorId.Value != 0)
+            query = query.Where(p => p.Operator == operatorId.Value);
+
+        if (categoryId.HasValue && categoryId.Value != 0)
+            query = query.Where(p => p.CodeOwnerNavigation != null &&
+                                     p.CodeOwnerNavigation.CodeCategory == categoryId.Value);
+
+        if (onlyCorp.HasValue && onlyCorp.Value)
+            query = query.Where(p => p.Corporative == true);
+
+        var phones = await query.ToListAsync();
+
+        using var package = new OfficeOpenXml.ExcelPackage();
+        var worksheet = package.Workbook.Worksheets.Add("Телефоны");
+
+        // Заголовки
+        worksheet.Cells[1, 1].Value = "№";
+        worksheet.Cells[1, 2].Value = "Номер";
+        worksheet.Cells[1, 3].Value = "ICCID";
+        worksheet.Cells[1, 4].Value = "Оператор";
+        worksheet.Cells[1, 5].Value = "Счёт";
+        worksheet.Cells[1, 6].Value = "Тарифный план";
+        worksheet.Cells[1, 7].Value = "Состояние";
+        worksheet.Cells[1, 8].Value = "Интернет";
+        worksheet.Cells[1, 9].Value = "Лимит";
+        worksheet.Cells[1, 10].Value = "Корпоративный";
+
+        // Данные
+        for (int i = 0; i < phones.Count; i++)
+        {
+            var p = phones[i];
+            worksheet.Cells[i + 2, 1].Value = p.CodePhone;
+            worksheet.Cells[i + 2, 2].Value = p.Number;
+            worksheet.Cells[i + 2, 3].Value = p.ICCID;
+            worksheet.Cells[i + 2, 4].Value = p.OperatorNavigation?.Title;
+            worksheet.Cells[i + 2, 5].Value = p.AccountNavigation?.Type;
+            worksheet.Cells[i + 2, 6].Value = p.TariffNavigation?.Title;
+            worksheet.Cells[i + 2, 7].Value = p.StatusNavigation?.StatusText;
+            worksheet.Cells[i + 2, 8].Value = p.InternetNavigation?.Service;
+            worksheet.Cells[i + 2, 9].Value = p.Limit?.ToString() ?? "—";
+            worksheet.Cells[i + 2, 10].Value = p.Corporative == true ? "Да" : "Нет";
+        }
+
+        worksheet.Cells.AutoFitColumns();
+
+        var excelData = package.GetAsByteArray();
+        var fileName = $"Телефоны_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+        return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+    }
+
 
     // 👇 Вот сюда вставляем новый метод
     [HttpGet]

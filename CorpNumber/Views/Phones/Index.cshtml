@@ -37,6 +37,13 @@
     <div class="mb-3">
         <a class="btn btn-outline-dark" asp-controller="Phones" asp-action="EditPanel">Редактирование ⚙️</a>
     </div>
+    <form method="get" asp-controller="Phones" asp-action="ExportToExcel" style="display: inline;">
+        <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
+        <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
+        <input type="hidden" name="onlyCorp" value="@ViewBag.OnlyCorp" />
+        <button type="submit" class="btn btn-success">📥 Экспорт в Excel</button>
+    </form>
+
 
     <!-- Форма фильтрации -->
     <form method="get" asp-controller="Phones" asp-action="Index">
