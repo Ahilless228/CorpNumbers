@@ -95,6 +95,24 @@ public class PhonesController : Controller
         string employee = emp != null
             ? $"{emp.Surname} {emp.Firstname} {emp.Midname} {emp.NameCh}".Trim()
             : "—";
+        string departmentFull = "—";
+        string postFull = "—";
+
+        if (emp != null && new[] { 1, 6 }.Contains(phone.CodeOwnerNavigation.CodeCategory ?? -1))
+        {
+            var dep = _context.Departments.FirstOrDefault(d => d.CodeDepartment == emp.Department);
+            if (dep != null)
+            {
+                departmentFull = (dep.DepartmentName ?? "") + " " + (dep.DepartmentCh ?? "");
+            }
+
+            var post = _context.Posts.FirstOrDefault(p => p.CodePost == emp.Post);
+            if (post != null)
+            {
+                postFull = (post.Postt ?? "") + " " + (post.PostCh ?? "");
+            }
+        }
+
 
         string photoFileName = emp?.TabNum?.ToString("D5"); // форматирует число в 5-значное с ведущими нулями
 
@@ -122,7 +140,9 @@ public class PhonesController : Controller
             organization,
             employee,
             tabNum,
-            photoUrl = photoPath ?? Url.Content("~/images/default-profile.jpg")
+            photoUrl = photoPath ?? Url.Content("~/images/default-profile.jpg"),
+            department = departmentFull,
+            post = postFull
         });
     }
 

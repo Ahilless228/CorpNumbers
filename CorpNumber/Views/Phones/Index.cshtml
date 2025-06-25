@@ -143,6 +143,15 @@
                     <div class="col-4 fw-bold">Сотрудник:</div>
                     <div class="col-8" id="detailEmployee">—</div>
                 </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Управление:</div>
+                    <div class="col-8" id="detailDepartment">—</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Должность:</div>
+                    <div class="col-8" id="detailPost">—</div>
+                </div>
+
             </div>
 
             <!-- Правая часть: фотография -->
@@ -219,6 +228,10 @@
                 $('#detailOrg').text(data.organization || '—');
                 $('#detailEmployee').text(data.employee || '—');
                 $('#detailTabnum').text(data.tabNum || '—');
+                $('#detailDepartment').text(data.department || '—');
+                $('#detailPost').text(data.post || '—');
+
+
 
                 if (data.photoUrl)
                     $('#detailPhoto').attr('src', data.photoUrl);
