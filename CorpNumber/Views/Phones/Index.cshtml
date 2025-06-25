@@ -7,6 +7,17 @@
     int selectedCategory = ViewBag.SelectedCategory ?? 0;
     bool onlyCorp = ViewBag.OnlyCorp ?? false;
 }
+<style>
+    tbody tr.selected-row td {
+        background-color: #d1ecf1 !important;
+    }
+
+    tbody tr.selected-row td {
+        font-weight: bold;
+    }
+</style>
+
+
 
 <div class="container-fluid mt-3">
     <h2>Телефонные номера</h2>
@@ -217,30 +228,38 @@
                 // Перезапуск формы фильтрации
                 $('form').submit();
             });
+
+            // ✅ Обработка клика по строке таблицы
+            $('#phoneTableBody').on('click', '.phone-row', function () {
+
+                var phoneId = $(this).data('id');
+                console.log("Строка нажата:", phoneId);
+
+
+                // Снимаем выделение со всех строк
+                $('.phone-row').removeClass('selected-row');
+
+                // Выделяем текущую
+                $(this).addClass('selected-row');
+
+                // Подгружаем детали
+                $.get('/Phones/GetDetails', { id: phoneId }, function (data) {
+                    if (data) {
+                        $('#detailCategory').text(data.category || '—');
+                        $('#detailOrg').text(data.organization || '—');
+                        $('#detailEmployee').text(data.employee || '—');
+                        $('#detailTabnum').text(data.tabNum || '—');
+                        $('#detailDepartment').text(data.department || '—');
+                        $('#detailPost').text(data.post || '—');
+
+                        if (data.photoUrl)
+                            $('#detailPhoto').attr('src', data.photoUrl);
+                        else
+                            $('#detailPhoto').attr('src', '/images/default-profile.jpg');
+                    }
+                });
+            });
         });
-                // При клике на строку таблицы загружаем доп. данные
-        $('.phone-row').click(function () {
-            var phoneId = $(this).data('id');
-
-        $.get('/Phones/GetDetails', { id: phoneId }, function (data) {
-            if (data) {
-                $('#detailCategory').text(data.category || '—');
-                $('#detailOrg').text(data.organization || '—');
-                $('#detailEmployee').text(data.employee || '—');
-                $('#detailTabnum').text(data.tabNum || '—');
-                $('#detailDepartment').text(data.department || '—');
-                $('#detailPost').text(data.post || '—');
-
-
-
-                if (data.photoUrl)
-                    $('#detailPhoto').attr('src', data.photoUrl);
-                else
-                    $('#detailPhoto').attr('src', '/images/default-profile.jpg');
-            }
-        });
-
-        });
-
     </script>
 }
+
