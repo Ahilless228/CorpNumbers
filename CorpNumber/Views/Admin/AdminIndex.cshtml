@@ -34,20 +34,53 @@
         </div>
     </div>
 
-    <div class="mb-3">
-        <a class="btn btn-outline-secondary" asp-controller="Admin" asp-action="Exit">Выйти из редактирования 🔙</a>
+    <!-- Кнопочный блок 2xN -->
+    <!-- Блок действий -->
+    <div class="container-fluid mb-3">
+        <div class="bg-light border rounded p-3">
+            <div class="d-flex flex-wrap gap-2 justify-content-start" style="font-size: 0.9rem;">
+                @Html.ActionLink("🔙 Выйти из редактирования", "Exit", "Admin", null, new { @class = "btn btn-outline-secondary btn-sm flex-fill", style = "min-width:160px;" })
+
+                @using (Html.BeginForm("ExportToExcel", "Phones", FormMethod.Get))
+                {
+                    <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
+                    <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
+                    <input type="hidden" name="onlyCorp" value="@ViewBag.OnlyCorp" />
+                    <button type="submit" class="btn btn-success btn-sm flex-fill" style="min-width:160px;">📥 Экспорт в Excel</button>
+                }
+
+                @* Остальные действия - как обычные кнопки пока без действия *@
+                <button type="button" class="btn btn-outline-warning btn-sm flex-fill" style="min-width:160px;">⏸️ Установка на паузу</button>
+                <button type="button" class="btn btn-outline-success btn-sm flex-fill" style="min-width:160px;">▶️ Снятие с паузы</button>
+                <button type="button" class="btn btn-outline-primary btn-sm flex-fill" style="min-width:160px;">🔁 Восстановление</button>
+                <button type="button" class="btn btn-outline-info btn-sm flex-fill" style="min-width:160px;">💳 Изменение лимита</button>
+                <button type="button" class="btn btn-outline-success btn-sm flex-fill" style="min-width:160px;">🌐 Подключение интернета</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" style="min-width:160px;">❌ Отключение интернета</button>
+                <button type="button" class="btn btn-outline-dark btn-sm flex-fill" style="min-width:160px;">🚫 Блокировка интернета</button>
+                <button type="button" class="btn btn-outline-primary btn-sm flex-fill" style="min-width:160px;">📶 Изменение тарифа</button>
+                <button type="button" class="btn btn-outline-success btn-sm flex-fill" style="min-width:160px;">👤 Выдача сотруднику</button>
+                <button type="button" class="btn btn-outline-warning btn-sm flex-fill" style="min-width:160px;">🕒 Выдача временных</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" style="min-width:160px;">🧍‍♂️ Выдача прочим</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" style="min-width:160px;">📞 Выдача стационар.</button>
+                <button type="button" class="btn btn-outline-danger btn-sm flex-fill" style="min-width:160px;">↩️ Возврат номера</button>
+                <button type="button" class="btn btn-outline-info btn-sm flex-fill" style="min-width:160px;">✈️ Подключение роуминга</button>
+                <button type="button" class="btn btn-outline-dark btn-sm flex-fill" style="min-width:160px;">👛 На личный счёт</button>
+                <button type="button" class="btn btn-outline-primary btn-sm flex-fill" style="min-width:160px;">🏢 На корп. счёт</button>
+                <button type="button" class="btn btn-outline-success btn-sm flex-fill" style="min-width:160px;">👥 Ввод в корп. группу</button>
+                <button type="button" class="btn btn-outline-danger btn-sm flex-fill" style="min-width:160px;">🚪 Вывод из корп. группы</button>
+                <button type="button" class="btn btn-outline-info btn-sm flex-fill" style="min-width:160px;">📄 Запрос детализации</button>
+                <button type="button" class="btn btn-outline-danger btn-sm flex-fill" style="min-width:160px;">❎ Деактивация</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" style="min-width:160px;">⚙️ Прочие операции</button>
+            </div>
+        </div>
     </div>
 
-    <form method="get" asp-controller="Phones" asp-action="ExportToExcel" style="display: inline;">
-        <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
-        <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
-        <input type="hidden" name="onlyCorp" value="@ViewBag.OnlyCorp" />
-        <button type="submit" class="btn btn-success">📥 Экспорт в Excel</button>
-    </form>
+
+
 
 
     <!-- Форма фильтрации -->
-    <form method="get" asp-controller="Phones" asp-action="Index">
+    <form method="get" asp-controller="Admin" asp-action="AdminIndex">
         <div class="row mb-3">
             <!-- Оператор -->
             <div class="col-md-3">
@@ -220,22 +253,27 @@
             });
 
             // Кнопка "Сбросить"
-            $('#resetFiltersBtn').click(function () {
-                $('#phoneSearch').val('');
-                $('#noResultsRow').remove();
-                $('table tbody tr').show();
+                    $('#resetFiltersBtn').click(function () {
+            $('#phoneSearch').val('');
+            $('#noResultsRow').remove();
+            $('table tbody tr').show();
 
-                // Сбросить выпадающие списки
-                $('select').each(function () {
-                    this.selectedIndex = 0;
-                });
-
-                // Сброс чекбокса
-                $('input[type="checkbox"][name="onlyCorp"]').prop('checked', false);
-
-                // Перезапуск формы фильтрации
-                $('form').submit();
+            // Сбросить выпадающие списки
+            $('select').each(function () {
+                this.selectedIndex = 0;
             });
+
+            // Сброс чекбокса
+            $('input[type="checkbox"][name="onlyCorp"]').prop('checked', false);
+
+            // Изменяем атрибуты формы на нужные
+            $('form').attr('action', '/Admin/AdminIndex');
+            $('form').attr('method', 'get');
+
+            // Отправляем форму
+            $('form').submit();
+        });
+
 
             // ✅ Обработка клика по строке таблицы
             $('#phoneTableBody').on('click', '.phone-row', function () {
