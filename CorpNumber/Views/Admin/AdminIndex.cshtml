@@ -205,9 +205,17 @@
                 </div>
 
             </div>
-
+         
             <!-- Правая часть: фотография -->
             <div class="col-md-4 d-flex flex-column align-items-end">
+                <!-- Кнопка всплывающего окна (внутри блока фото) -->
+                <div class="w-100 d-flex justify-content-end mb-2">
+                    <button id="infoPopupBtn" class="btn btn-sm btn-light border rounded-circle" title="Доп. информация"
+                            style="width: 32px; height: 32px; padding: 0; font-size: 1.2rem; line-height: 1;">
+                        👷ℹ️
+                    </button>
+                </div>
+
                 <img src="~/images/default-profile.jpg" alt="Фото сотрудника" id="detailPhoto"
                      style="max-height: 200px; max-width: 150px; object-fit: cover; border: 1px solid #999;" />
 
@@ -218,6 +226,24 @@
 
         </div>
     </div>
+    <!-- Модальное окно -->
+    <div class="modal fade" id="infoPopupModal" tabindex="-1" aria-labelledby="infoPopupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoPopupLabel">Доп. информация</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Здесь будет дополнительная информация по номеру.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </div>
 
@@ -307,5 +333,17 @@
             });
         });
     </script>
+    <script>
+        $(document).ready(function () {
+            // ... (твоя остальная логика)
+
+            // Показ модального окна по нажатию на кнопку
+            $('#infoPopupBtn').click(function () {
+                var modal = new bootstrap.Modal(document.getElementById('infoPopupModal'));
+                modal.show();
+            });
+        });
+    </script>
+
 }
 
