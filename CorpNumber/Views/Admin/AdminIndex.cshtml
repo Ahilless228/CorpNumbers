@@ -208,13 +208,15 @@
          
             <!-- Правая часть: фотография -->
             <div class="col-md-4 d-flex flex-column align-items-end">
-                <!-- Кнопка всплывающего окна (внутри блока фото) -->
+                <!-- Кнопка всплывающего окна (аккуратная иконка с двумя смайликами) -->
                 <div class="w-100 d-flex justify-content-end mb-2">
-                    <button id="infoPopupBtn" class="btn btn-sm btn-light border rounded-circle" title="Доп. информация"
-                            style="width: 32px; height: 32px; padding: 0; font-size: 1.2rem; line-height: 1;">
-                        👷ℹ️
+                    <button id="infoPopupBtn" class="btn btn-sm btn-light border rounded-circle"
+                            title="Доп. информация"
+                            style="width: 48px; height: 32px; padding: 0 6px; font-size: 1.1rem; line-height: 1; display: flex; align-items: center; justify-content: center;">
+                        👷&nbsp;ℹ️
                     </button>
                 </div>
+
 
                 <img src="~/images/default-profile.jpg" alt="Фото сотрудника" id="detailPhoto"
                      style="max-height: 200px; max-width: 150px; object-fit: cover; border: 1px solid #999;" />
@@ -226,23 +228,63 @@
 
         </div>
     </div>
-    <!-- Модальное окно -->
-    <div class="modal fade" id="infoPopupModal" tabindex="-1" aria-labelledby="infoPopupLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="infoPopupLabel">Доп. информация</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+    <!-- Модальное окно с информацией о сотруднике -->
+    <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 50vw; height: 100vh;">
+            <div class="modal-content h-100">
+
+                <!-- Header -->
+                <div class="modal-header d-flex align-items-center">
+                    <div class="me-3" style="font-size: 2.5rem; line-height: 1;">👷</div>
+                    <h5 class="modal-title flex-grow-1">Информация о сотруднике</h5>
+                    <img src="/images/altynken-logo.jpg" alt="Лого" style="height: 40px;">
                 </div>
-                <div class="modal-body">
-                    <p>Здесь будет дополнительная информация по номеру.</p>
+
+                <!-- Body -->
+                <div class="modal-body overflow-auto">
+                    <div class="row">
+
+                        <!-- Левая колонка с данными -->
+                        <div class="col-md-8">
+                            <div class="mb-2"><strong>Код:</strong> <span id="empCode">—</span></div>
+                            <div class="mb-2"><strong>Фамилия:</strong> <span id="empSurname">—</span></div>
+                            <div class="mb-2"><strong>Имя:</strong> <span id="empFirstname">—</span></div>
+                            <div class="mb-2"><strong>Отчество:</strong> <span id="empMidname">—</span></div>
+                            <div class="mb-2"><strong>姓名:</strong> <span id="empNameCh">—</span></div>
+
+                            <div class="mb-2 row">
+                                <div class="col-6"><strong>Таб. №:</strong> <span id="empTabNum">—</span></div>
+                                <div class="col-6"><strong>Дата приёма:</strong> <span id="empInputDate">—</span></div>
+                            </div>
+
+                            <div class="mb-2"><strong>Должность:</strong> <span id="empPost">—</span></div>
+                            <div class="mb-2"><strong>Совмещение:</strong> <span id="empPartTime">—</span></div>
+                            <div class="mb-2"><strong>Управление:</strong> <span id="empDepartment">—</span></div>
+                            <div class="mb-2"><strong>Отдел:</strong> <span id="empSection">—</span></div>
+                            <div class="mb-2"><strong>Норма:</strong> <span id="empQuota">—</span></div>
+                        </div>
+
+                        <!-- Правая колонка -->
+                        <div class="col-md-4 d-flex flex-column align-items-center">
+                            <img src="/images/default-profile.jpg" alt="Фото сотрудника" id="empPhoto"
+                                 style="max-height: 200px; max-width: 100%; object-fit: cover; border: 1px solid #999;">
+
+                            <div class="mt-2 text-center" id="empOrg">—</div>
+                            <button class="btn btn-sm btn-outline-primary mt-2">Переводы</button>
+                        </div>
+
+                    </div>
                 </div>
+
+                <!-- Footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
                 </div>
+
             </div>
         </div>
     </div>
+
 
 
 </div>
@@ -339,11 +381,57 @@
 
             // Показ модального окна по нажатию на кнопку
             $('#infoPopupBtn').click(function () {
-                var modal = new bootstrap.Modal(document.getElementById('infoPopupModal'));
+                var modal = new bootstrap.Modal(document.getElementById('employeeInfoModal'));
                 modal.show();
             });
         });
     </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#infoPopupBtn').click(function () {
+                // Получаем ID выбранного номера
+                var selectedRow = $('.phone-row.selected-row');
+                if (selectedRow.length === 0) {
+                    alert("Выберите строку с номером.");
+                    return;
+                }
+
+                var phoneId = selectedRow.data('id');
+
+                // Загружаем данные
+                $.get('/Admin/GetEmployeeDetails', { id: phoneId }, function (data) {
+                    if (!data) {
+                        alert("Данные сотрудника не найдены.");
+                        return;
+                    }
+
+                    $('#empCode').text(data.codeEmployee ?? '—');
+                    $('#empSurname').text(data.surname ?? '—');
+                    $('#empFirstname').text(data.firstname ?? '—');
+                    $('#empMidname').text(data.midname ?? '—');
+                    $('#empNameCh').text(data.nameCh ?? '—');
+                    $('#empTabNum').text(data.tabNum ?? '—');
+                    $('#empInputDate').text(data.inputDate?.substring(0, 10) ?? '—');
+                    $('#empPost').text(data.post ?? '—');
+                    $('#empPartTime').text(data.partTime ?? '—');
+                    $('#empDepartment').text(data.department ?? '—');
+                    $('#empSection').text(data.section ?? '—');
+                    $('#empQuota').text(data.quota ?? '—');
+                    $('#empOrg').text(data.org ?? '—');
+                    $('#empPhoto').attr('src', data.photo ?? '/images/default-profile.jpg');
+
+                    $('.modal-backdrop').remove(); // удаляет серую подложку, если осталась
+                    $('body').removeClass('modal-open'); // убирает блокировку прокрутки
+
+
+                    var modal = new bootstrap.Modal(document.getElementById('employeeInfoModal'));
+                    modal.show();
+                });
+            });
+        });
+    </script>
+
 
 }
 

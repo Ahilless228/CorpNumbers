@@ -220,6 +220,66 @@ namespace CorpNumber.Controllers
             HttpContext.Session.Remove("IsAdmin"); // или .Clear()
             return RedirectToAction("Index", "Phones");
         }
+        // Загрузка данных модального окна для получения информации о сотруднике по ID телефона
+        [HttpGet]
+        public IActionResult GetEmployeeDetails(int id)
+        {
+            var phone = _context.Phones
+                .Include(p => p.CodeOwnerNavigation)
+                    .ThenInclude(o => o.EmployeeNavigation)
+                .FirstOrDefault(p => p.CodePhone == id);
+
+            var emp = phone?.CodeOwnerNavigation?.EmployeeNavigation;
+
+            if (emp == null)
+                return Json(null);
+
+            var department = _context.Departments.FirstOrDefault(d => d.CodeDepartment == emp.Department);
+            var section = _context.Sections.FirstOrDefault(s => s.CodeSection == emp.Section);
+            var post = _context.Posts.FirstOrDefault(p => p.CodePost == emp.Post);
+            var quotaText = _context.Quotas
+              .Where(q => q.CodeQuota == emp.CodeQuota)
+              .Select(q => (q.Quotaa != null ? q.Quotaa.ToString() : "—"))
+              .FirstOrDefault();
+
+
+
+            string photoFileName = emp.TabNum?.ToString("D5");
+            string photoPath = null;
+
+            if (!string.IsNullOrEmpty(photoFileName))
+            {
+                string mainPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Photo", $"{photoFileName}.jpg");
+                string archivePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Photo", "Archive", $"{photoFileName}.jpg");
+
+                if (System.IO.File.Exists(mainPath))
+                    photoPath = Url.Content($"/Photo/{photoFileName}.jpg");
+                else if (System.IO.File.Exists(archivePath))
+                    photoPath = Url.Content($"/Photo/Archive/{photoFileName}.jpg");
+            }
+
+            if (string.IsNullOrEmpty(photoPath))
+                photoPath = Url.Content("~/images/default-profile.jpg");
+
+            return Json(new
+            {
+                emp.CodeEmployee,
+                emp.Surname,
+                emp.Firstname,
+                emp.Midname,
+                emp.NameCh,
+                emp.TabNum,
+                emp.InputDate,
+                emp.PartTime,
+                Quota = quotaText,
+                Post = post?.Postt + " " + post?.PostCh,
+                Department = department?.DepartmentName + " " + department?.DepartmentCh,
+                Section = section?.SectionName,
+                Photo = photoPath,
+                Org = "ОсОО \"Алтынкен\""
+            });
+        }
+
 
     }
 }
