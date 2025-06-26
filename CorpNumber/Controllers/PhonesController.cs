@@ -24,6 +24,8 @@ public class PhonesController : Controller
 
     public async Task<IActionResult> Index(int? operatorId, int? categoryId, bool? onlyCorp)
     {
+        ViewBag.IsAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
+
         var query = _context.Phones
             .Include(p => p.OperatorNavigation)
             .Include(p => p.TariffNavigation)

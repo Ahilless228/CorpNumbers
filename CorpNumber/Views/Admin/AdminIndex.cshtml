@@ -35,8 +35,9 @@
     </div>
 
     <div class="mb-3">
-        <a class="btn btn-outline-dark" asp-controller="Phones" asp-action="EditPanel">Редактирование ⚙️</a>
+        <a class="btn btn-outline-secondary" asp-controller="Admin" asp-action="Exit">Выйти из редактирования 🔙</a>
     </div>
+
     <form method="get" asp-controller="Phones" asp-action="ExportToExcel" style="display: inline;">
         <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
         <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />

@@ -213,6 +213,13 @@ namespace CorpNumber.Controllers
                 department = departmentFull,
                 post = postFull
             });
+     
         }
+        public IActionResult Exit()
+        {
+            HttpContext.Session.Remove("IsAdmin"); // или .Clear()
+            return RedirectToAction("Index", "Phones");
+        }
+
     }
 }
