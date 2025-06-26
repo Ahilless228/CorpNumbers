@@ -1,0 +1,272 @@
+﻿@model IEnumerable<CorpNumber.Models.PhoneViewModel>
+
+@{
+    ViewBag.Title = "Список телефонных номеров";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int selectedOperator = ViewBag.SelectedOperator ?? 0;
+    int selectedCategory = ViewBag.SelectedCategory ?? 0;
+    bool onlyCorp = ViewBag.OnlyCorp ?? false;
+}
+<style>
+    tbody tr.selected-row td {
+        background-color: #d1ecf1 !important;
+    }
+
+    tbody tr.selected-row td {
+        font-weight: bold;
+    }
+</style>
+
+
+
+<div class="container-fluid mt-3">
+    <h2>Телефонные номера</h2>
+
+    <!-- Верхняя панель -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <strong>Кол-во номеров:</strong>
+            <span class="badge bg-primary">@((int?)ViewBag.PhoneCount ?? 0)</span>
+        </div>
+        <div class="input-group w-25 mb-3">
+            <input type="text" id="phoneSearch" class="form-control" placeholder="Поиск номера" />
+            <button class="btn btn-outline-secondary" id="resetFiltersBtn">Сбросить</button>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a class="btn btn-outline-dark" asp-controller="Phones" asp-action="EditPanel">Редактирование ⚙️</a>
+    </div>
+    <form method="get" asp-controller="Phones" asp-action="ExportToExcel" style="display: inline;">
+        <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
+        <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
+        <input type="hidden" name="onlyCorp" value="@ViewBag.OnlyCorp" />
+        <button type="submit" class="btn btn-success">📥 Экспорт в Excel</button>
+    </form>
+
+
+    <!-- Форма фильтрации -->
+    <form method="get" asp-controller="Phones" asp-action="Index">
+        <div class="row mb-3">
+            <!-- Оператор -->
+            <div class="col-md-3">
+                <label>Оператор:</label>
+                <select class="form-select" name="operatorId" onchange="this.form.submit()">
+                    @Html.Raw($"<option value='0' {(selectedOperator == 0 ? "selected" : "")}>Все операторы</option>")
+                    @foreach (var op in ViewBag.Operators)
+                    {
+                        var selectedAttr = op.CodeOperator == selectedOperator ? "selected" : "";
+                        @Html.Raw($"<option value='{op.CodeOperator}' {selectedAttr}>{op.Title}</option>")
+                    }
+                </select>
+            </div>
+
+            <!-- Категория -->
+            <div class="col-md-3">
+                <label>Категория:</label>
+                <select class="form-select" name="categoryId" onchange="this.form.submit()">
+                    @Html.Raw($"<option value='0' {(selectedCategory == 0 ? "selected" : "")}>Все категории</option>")
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        var selectedAttr = cat.CodeCategory == selectedCategory ? "selected" : "";
+                        @Html.Raw($"<option value='{cat.CodeCategory}' {selectedAttr}>{cat.Category}</option>")
+                    }
+                </select>
+            </div>
+
+            <!-- Корпоративный чекбокс -->
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="onlyCorp"
+                           value="true"
+                           onchange="this.form.submit()"
+                           @(onlyCorp ? "checked" : "") />
+                    <label class="form-check-label">Только корп. группа</label>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- Обёртка таблицы с прокруткой -->
+    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 5px;">
+        <table class="table table-bordered table-striped table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>№</th>
+                    <th>Номер</th>
+                    <th>ICCID</th>
+                    <th>Оператор</th>
+                    <th>Счёт</th>
+                    <th>Тарифный план</th>
+                    <th>Состояние</th>
+                    <th>Интернет</th>
+                    <th>Лимит</th>
+                    <th>Корпоративный</th>
+                </tr>
+            </thead>
+            <tbody id="phoneTableBody">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var phone in Model)
+                    {
+                        <tr class="phone-row" data-id="@phone.CodePhone">
+                            <td>@phone.CodePhone</td>
+                            <td><a href="#">@phone.Number</a></td>
+                            <td>@phone.ICCID</td>
+                            <td>@phone.Operator</td>
+                            <td>@phone.Account</td>
+                            <td>@phone.Tariff</td>
+                            <td>@phone.Status</td>
+                            <td>@phone.Internet</td>
+                            <td>@(phone.Limit?.ToString() ?? "—")</td>
+                            <td>
+                                <div class="form-check d-flex justify-content-center">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           @(phone.Corporative ? "checked" : "")
+                                           disabled
+                                           style="transform: scale(1.5); accent-color: #0d6efd;" />
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center">Нет данных для отображения</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Динамическое окошко под таблицей -->
+    <div class="mt-4 p-3 border rounded bg-light" id="detailsPane" style="min-height: 200px;">
+        <div class="row">
+            <!-- Левая часть -->
+            <div class="col-md-8">
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Категория владельца:</div>
+                    <div class="col-8" id="detailCategory">—</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Организация:</div>
+                    <div class="col-8" id="detailOrg">—</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Сотрудник:</div>
+                    <div class="col-8" id="detailEmployee">—</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Управление:</div>
+                    <div class="col-8" id="detailDepartment">—</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 fw-bold">Должность:</div>
+                    <div class="col-8" id="detailPost">—</div>
+                </div>
+
+            </div>
+
+            <!-- Правая часть: фотография -->
+            <div class="col-md-4 d-flex flex-column align-items-end">
+                <img src="~/images/default-profile.jpg" alt="Фото сотрудника" id="detailPhoto"
+                     style="max-height: 200px; max-width: 150px; object-fit: cover; border: 1px solid #999;" />
+
+                <div class="mt-2 text-end">
+                    <strong>Таб. №:</strong> <span id="detailTabnum">—</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Живой поиск по номеру
+            $('#phoneSearch').on('input', function () {
+                var searchValue = $(this).val().toLowerCase();
+                let anyVisible = false;
+
+                $('table tbody tr').each(function () {
+                    const number = $(this).find('td:nth-child(2)').text().toLowerCase();
+
+                    if (number.startsWith(searchValue)) {
+                        $(this).show();
+                        anyVisible = true;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                if (!anyVisible) {
+                    if ($('#noResultsRow').length === 0) {
+                        $('table tbody').append('<tr id="noResultsRow"><td colspan="10" class="text-center text-danger">Совпадений не найдено</td></tr>');
+                    }
+                } else {
+                    $('#noResultsRow').remove();
+                }
+            });
+
+            // Кнопка "Сбросить"
+            $('#resetFiltersBtn').click(function () {
+                $('#phoneSearch').val('');
+                $('#noResultsRow').remove();
+                $('table tbody tr').show();
+
+                // Сбросить выпадающие списки
+                $('select').each(function () {
+                    this.selectedIndex = 0;
+                });
+
+                // Сброс чекбокса
+                $('input[type="checkbox"][name="onlyCorp"]').prop('checked', false);
+
+                // Перезапуск формы фильтрации
+                $('form').submit();
+            });
+
+            // ✅ Обработка клика по строке таблицы
+            $('#phoneTableBody').on('click', '.phone-row', function () {
+
+                var phoneId = $(this).data('id');
+                console.log("Строка нажата:", phoneId);
+
+
+                // Снимаем выделение со всех строк
+                $('.phone-row').removeClass('selected-row');
+
+                // Выделяем текущую
+                $(this).addClass('selected-row');
+
+                // Подгружаем детали
+                $.get('/Phones/GetDetails', { id: phoneId }, function (data) {
+                    if (data) {
+                        $('#detailCategory').text(data.category || '—');
+                        $('#detailOrg').text(data.organization || '—');
+                        $('#detailEmployee').text(data.employee || '—');
+                        $('#detailTabnum').text(data.tabNum || '—');
+                        $('#detailDepartment').text(data.department || '—');
+                        $('#detailPost').text(data.post || '—');
+
+                        if (data.photoUrl)
+                            $('#detailPhoto').attr('src', data.photoUrl);
+                        else
+                            $('#detailPhoto').attr('src', '/images/default-profile.jpg');
+                    }
+                });
+            });
+        });
+    </script>
+}
+

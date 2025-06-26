@@ -23,7 +23,7 @@ public class AuthController : Controller
         if (login == expectedLogin && password == expectedPassword)
         {
             HttpContext.Session.SetString("IsAdmin", "true");
-            return RedirectToAction("EditPanel", "Phones");
+            return RedirectToAction("AdminIndex", "Admin");
         }
 
         ViewBag.Error = "Неверный логин или пароль";
