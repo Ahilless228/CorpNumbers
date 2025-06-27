@@ -230,8 +230,8 @@
     </div>
     <!-- Модальное окно с информацией о сотруднике -->
     <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 50vw; height: 100vh;">
-            <div class="modal-content h-100">
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 85vw;">
+            <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
 
                 <!-- Header -->
                 <div class="modal-header d-flex align-items-center">
@@ -241,9 +241,8 @@
                 </div>
 
                 <!-- Body -->
-                <div class="modal-body overflow-auto">
+                <div class="modal-body">
                     <div class="row">
-
                         <!-- Левая колонка с данными -->
                         <div class="col-md-8">
                             <div class="mb-2"><strong>Код:</strong> <span id="empCode">—</span></div>
@@ -268,15 +267,14 @@
                         <div class="col-md-4 d-flex flex-column align-items-center">
                             <img src="/images/default-profile.jpg" alt="Фото сотрудника" id="empPhoto"
                                  style="max-height: 200px; max-width: 100%; object-fit: cover; border: 1px solid #999;">
-
                             <div class="mt-2 text-center" id="empOrg">—</div>
                             <button class="btn btn-sm btn-outline-primary mt-2">Переводы</button>
                         </div>
-
                     </div>
                 </div>
+
                 <!-- Tab-панель -->
-                <ul class="nav nav-tabs mb-3" id="employeeTab" role="tablist">
+                <ul class="nav nav-tabs px-3" id="employeeTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="contract-tab" data-bs-toggle="tab" data-bs-target="#contract" type="button" role="tab">Труд. договор и вредность</button>
                     </li>
@@ -289,21 +287,15 @@
                 </ul>
 
                 <!-- Содержимое вкладок -->
-                <div class="tab-content" id="employeeTabContent">
-                    <!-- Вкладка 1: Трудовой договор и вредность -->
-                    <div class="tab-pane fade show active" id="contract" role="tabpanel" aria-labelledby="contract-tab">
+                <div class="tab-content px-3 pt-2" id="employeeTabContent">
+                    <!-- Вкладка 1 -->
+                    <div class="tab-pane fade show active" id="contract" role="tabpanel">
                         <div class="row">
-                            <!-- Левая колонка -->
                             <div class="col-md-6">
                                 <div class="mb-2"><strong>Номер труд. договора:</strong> <span id="empContractNumber">—</span></div>
                                 <div class="mb-2"><strong>Дата труд. договора:</strong> <span id="empContractDate">—</span></div>
-                                <div class="mb-2">
-                                    <strong>Уволен:</strong>
-                                    <input type="checkbox" id="empFired" disabled />
-                                </div>
+                                <div class="mb-2"><strong>Уволен:</strong> <input type="checkbox" id="empFired" disabled /></div>
                             </div>
-
-                            <!-- Правая колонка -->
                             <div class="col-md-6">
                                 <div class="mb-2"><strong>Доплата за вредность:</strong> <span id="empHazard">—</span></div>
                                 <div class="mb-2"><strong>Документ на вредность:</strong> <span id="empHazardDoc">—</span></div>
@@ -312,43 +304,39 @@
                         </div>
                     </div>
 
-                    <!-- Остальные вкладки пока пустые -->
-                    <div class="tab-pane fade" id="passport" role="tabpanel" aria-labelledby="passport-tab">
+                    <!-- Вкладка 2 -->
+                    <div class="tab-pane fade" id="passport" role="tabpanel">
                         <div class="row">
-                            <!-- Левая колонка -->
                             <div class="col-md-6">
                                 <div class="mb-2"><strong>Пол:</strong> <span id="empSex">—</span></div>
                                 <div class="mb-2"><strong>Дата рождения:</strong> <span id="empBirthday">—</span></div>
                                 <div class="mb-2"><strong>Гражданство:</strong> <span id="empCitizenship">—</span></div>
                             </div>
-
-                            <!-- Правая колонка -->
                             <div class="col-md-6">
                                 <div class="mb-2"><strong>Паспортные данные:</strong> <span id="empPassport">—</span></div>
                                 <div class="mb-2"><strong>Национальность:</strong> <span id="empNationality">—</span></div>
                             </div>
                         </div>
-
                     </div>
-                    <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+
+                    <!-- Вкладка 3 -->
+                    <div class="tab-pane fade" id="address" role="tabpanel">
                         <div class="row">
                             <div class="col-12">
                                 <div class="mb-2"><strong>Адрес:</strong> <span id="empAddress">—</span></div>
                                 <div class="mb-2"><strong>Район:</strong> <span id="empDistrict">—</span></div>
                             </div>
                         </div>
-
                     </div>
-                    <!-- ✅ А вот теперь ТРЕТИЙ BODY -->
+
+                    <!-- ✅ Таблица номеров -->
                     <hr />
                     <div class="mt-4">
-                        <!-- Заголовок -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0">Зарегистрированные на сотрудника номера</h5>
                             <span class="badge bg-primary" id="empPhoneCount">0</span>
                         </div>
 
-                        <!-- Таблица номеров -->
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm">
                                 <thead class="table-light">
@@ -368,15 +356,14 @@
                     </div>
                 </div>
 
-                
                 <!-- Footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
                 </div>
-
             </div>
         </div>
     </div>
+
 
 
 
