@@ -339,9 +339,36 @@
                         </div>
 
                     </div>
+                    <!-- ✅ А вот теперь ТРЕТИЙ BODY -->
+                    <hr />
+                    <div class="mt-4">
+                        <!-- Заголовок -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Зарегистрированные на сотрудника номера</h5>
+                            <span class="badge bg-primary" id="empPhoneCount">0</span>
+                        </div>
+
+                        <!-- Таблица номеров -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Номер</th>
+                                        <th>Оператор</th>
+                                        <th>Счёт</th>
+                                        <th>Дата выдачи</th>
+                                        <th>Корп.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empPhoneTableBody">
+                                    <!-- Заполняется динамически -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
-
+                
                 <!-- Footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
@@ -478,10 +505,51 @@
                     $('#empAddress').text(data.address ?? '—');
                     $('#empDistrict').text(data.districtTitle ?? '—');
 
+                    // 📱 Регистр. номера сотрудника
+                    if (data.registeredPhones && Array.isArray(data.registeredPhones)) {
+                        $('#regPhoneCount').text(data.registeredPhones.length);
+                        const tbody = $('#regPhonesTable tbody');
+                        tbody.empty();
+
+                        if (data.registeredPhones.length === 0) {
+                            tbody.append('<tr><td colspan="5" class="text-center">Номера не найдены</td></tr>');
+                        } else {
+                            data.registeredPhones.forEach(p => {
+                                tbody.append(`
+                                    <tr>
+                                        <td>${p.number ?? '—'}</td>
+                                        <td>${p.operator ?? '—'}</td>
+                                        <td>${p.account ?? '—'}</td>
+                                        <td>${p.issueDate ? p.issueDate.substring(0, 10) : '—'}</td>
+                                        <td><input type="checkbox" disabled ${p.corporative ? 'checked' : ''}></td>
+                                    </tr>
+                                `);
+                            });
+                        }
+                    }
+                            // После employee заполнения, запрашиваем зарегистрированные номера
+                    $.get('/Admin/GetRegisteredPhones', { id: data.codeEmployee }, function (phoneData) {
+                        $('#empPhoneCount').text(phoneData.count);
+
+                        const tbody = $('#empPhoneTableBody');
+                        tbody.empty();
+
+                        if (phoneData.count === 0) {
+                            tbody.append('<tr><td colspan="5" class="text-center text-muted">Нет зарегистрированных номеров</td></tr>');
+                        } else {
+                            phoneData.phones.forEach(p => {
+                                tbody.append(`<tr>
+                                    <td>${p.number}</td>
+                                    <td>${p.operatorTitle}</td>
+                                    <td>${p.accountType}</td>
+                                    <td>${p.issueDate}</td>
+                                    <td><input type="checkbox" disabled ${p.corporative ? 'checked' : ''}></td>
+                                </tr>`);
+                            });
+                        }
+                    });
 
 
-
-                    // Показываем модалку
                     const modal = new bootstrap.Modal(document.getElementById('employeeInfoModal'));
                     modal.show();
                 });
@@ -489,4 +557,5 @@
         });
     </script>
 }
+
 

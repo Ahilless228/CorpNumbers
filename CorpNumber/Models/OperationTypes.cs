@@ -2,12 +2,12 @@
 
 namespace CorpNumber.Models
 {
-    public class OperationType
+    public class OperationTypes
     {
         [Key]
         public int CodeOperType { get; set; }
         public string? Type { get; set; }
 
-        public virtual ICollection<Operation>? Operations { get; set; }
+        public virtual ICollection<Operations>? Operations { get; set; }
     }
 }

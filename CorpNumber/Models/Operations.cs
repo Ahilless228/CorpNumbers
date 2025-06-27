@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CorpNumber.Models
 {
-    public class Operation
+    public class Operations
     {
         [Key]
         public int CodeOperation { get; set; }

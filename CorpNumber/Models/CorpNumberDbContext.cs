@@ -26,7 +26,7 @@ namespace CorpNumber.Models
         public DbSet<CompanyDocs> CompanyDocs { get; set; }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<OtherOwner> OtherOwners { get; set; }
-        public DbSet<Operation> Operations { get; set; }
+        public DbSet<Operations> Operations { get; set; }
         public DbSet<Tariff> Tariffs { get; set; }
         public DbSet<SimCard> SimCards { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
@@ -37,7 +37,7 @@ namespace CorpNumber.Models
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<InternetService> InternetServices { get; set; }
-        public DbSet<OperationType> OperationTypes { get; set; }
+        public DbSet<OperationTypes> OperationTypes { get; set; }
         public DbSet<OwnerCategory> OwnerCategories { get; set; }
       
 

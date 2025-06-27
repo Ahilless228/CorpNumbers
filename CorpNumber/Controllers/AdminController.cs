@@ -261,6 +261,8 @@ namespace CorpNumber.Controllers
             if (string.IsNullOrEmpty(photoPath))
                 photoPath = Url.Content("~/images/default-profile.jpg");
 
+
+
             return Json(new
             {
                 emp.CodeEmployee,
@@ -313,6 +315,55 @@ namespace CorpNumber.Controllers
 
             });
         }
+
+        [HttpGet]
+        public IActionResult GetRegisteredPhones(int id)
+        {
+            // Ищем всех владельцев, связанных с этим сотрудником
+            var owners = _context.Owners
+                .Where(o => o.CodeEmployee == id)
+                .Select(o => o.CodeOwner)
+                .ToList();
+
+            if (!owners.Any())
+                return Json(new { count = 0, phones = new List<object>() });
+
+            // Ищем все номера, у которых CodeOwner совпадает с владельцем
+            var phones = _context.Phones
+                .Where(p => p.CodeOwner != null && owners.Contains(p.CodeOwner.Value))
+                .Include(p => p.OperatorNavigation)
+                .Include(p => p.AccountNavigation)
+                .ToList();
+
+            var result = phones.Select(phone =>
+            {
+                // Находим последнюю операцию "выдача номера" (CodeOperType == 6)
+                var issueDate = _context.Operations
+                    .Where(op => op.Number == phone.CodePhone &&
+                                 op.CodeOperType == 6 &&
+                                 op.Owner_new != null &&
+                                 owners.Contains(op.Owner_new.Value))
+                    .OrderByDescending(op => op.OperDate)
+                    .Select(op => op.OperDate)
+                    .FirstOrDefault();
+
+                return new
+                {
+                    number = phone.Number?.ToString() ?? "—",
+                    operatorTitle = phone.OperatorNavigation?.Title ?? "—",
+                    accountType = phone.AccountNavigation?.Type ?? "—",
+                    issueDate = issueDate?.ToString("yyyy-MM-dd") ?? "—",
+                    corporative = phone.Corporative == true
+                };
+            }).ToList();
+
+            return Json(new
+            {
+                count = result.Count,
+                phones = result
+            });
+        }
+
 
 
     }
