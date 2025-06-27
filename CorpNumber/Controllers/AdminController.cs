@@ -303,6 +303,12 @@ namespace CorpNumber.Controllers
 
                 Birthday = emp.Birthday,
                 Passport = emp.Passport,
+                Address = emp.Address,
+                DistrictTitle = _context.Districts
+                    .Where(d => d.CodeDistrict == emp.District)
+                    .Select(d => d.District + " " + d.DistrictCh)
+                    .FirstOrDefault(),
+
 
 
             });

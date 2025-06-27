@@ -17,6 +17,7 @@ namespace CorpNumber.Models
         // DbSet-свойства для таблиц
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Districts> Districts { get; set; }
         public DbSet<Phone> Phones { get; set; }
         public DbSet<Operator> Operators { get; set; }
         public DbSet<Quota> Quotas { get; set; }

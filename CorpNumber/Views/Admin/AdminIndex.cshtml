@@ -331,7 +331,13 @@
 
                     </div>
                     <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
-                        <p>Адрес будет добавлен позже.</p>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-2"><strong>Адрес:</strong> <span id="empAddress">—</span></div>
+                                <div class="mb-2"><strong>Район:</strong> <span id="empDistrict">—</span></div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -469,6 +475,9 @@
                     $('#empCitizenship').text(data.citizenshipTitle ?? '—');
                     $('#empPassport').text(data.passport ?? '—');
                     $('#empNationality').text(data.nationalityTitle ?? '—');
+                    $('#empAddress').text(data.address ?? '—');
+                    $('#empDistrict').text(data.districtTitle ?? '—');
+
 
 
 
