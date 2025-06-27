@@ -275,6 +275,52 @@
 
                     </div>
                 </div>
+                <!-- Tab-панель -->
+                <ul class="nav nav-tabs mb-3" id="employeeTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="contract-tab" data-bs-toggle="tab" data-bs-target="#contract" type="button" role="tab">Труд. договор и вредность</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="passport-tab" data-bs-toggle="tab" data-bs-target="#passport" type="button" role="tab">Паспортные данные</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab">Адрес</button>
+                    </li>
+                </ul>
+
+                <!-- Содержимое вкладок -->
+                <div class="tab-content" id="employeeTabContent">
+                    <!-- Вкладка 1: Трудовой договор и вредность -->
+                    <div class="tab-pane fade show active" id="contract" role="tabpanel" aria-labelledby="contract-tab">
+                        <div class="row">
+                            <!-- Левая колонка -->
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Номер труд. договора:</strong> <span id="empContractNumber">—</span></div>
+                                <div class="mb-2"><strong>Дата труд. договора:</strong> <span id="empContractDate">—</span></div>
+                                <div class="mb-2">
+                                    <strong>Уволен:</strong>
+                                    <input type="checkbox" id="empFired" disabled />
+                                </div>
+                            </div>
+
+                            <!-- Правая колонка -->
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Доплата за вредность:</strong> <span id="empHazard">—</span></div>
+                                <div class="mb-2"><strong>Документ на вредность:</strong> <span id="empHazardDoc">—</span></div>
+                                <div class="mb-2"><strong>Дата увольнения:</strong> <span id="empFiringDate">—</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Остальные вкладки пока пустые -->
+                    <div class="tab-pane fade" id="passport" role="tabpanel" aria-labelledby="passport-tab">
+                        <p>Паспортные данные будут добавлены позже.</p>
+                    </div>
+                    <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                        <p>Адрес будет добавлен позже.</p>
+                    </div>
+                </div>
+
 
                 <!-- Footer -->
                 <div class="modal-footer">
@@ -398,6 +444,13 @@
                     $('#empQuota').text(data.quota ?? '—');
                     $('#empOrg').text(data.org ?? '—');
                     $('#empPhoto').attr('src', data.photo ?? '/images/default-profile.jpg');
+                    $('#empContractNumber').text(data.contractNumber ?? '—');
+                    $('#empContractDate').text(data.contractDate ? data.contractDate.substring(0, 10) : '—');
+                    $('#empFired').prop('checked', data.fired === true);
+                    $('#empHazard').text(data.hazard != null ? data.hazard + '%' : '—');
+                    $('#empHazardDoc').text(data.hazardDocTitle ?? '—');
+                    $('#empFiringDate').text(data.firingDate ? data.firingDate.substring(0, 10) : '—');
+
 
                     // Показываем модалку
                     const modal = new bootstrap.Modal(document.getElementById('employeeInfoModal'));

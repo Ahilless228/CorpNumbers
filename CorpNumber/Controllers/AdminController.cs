@@ -276,7 +276,17 @@ namespace CorpNumber.Controllers
                 Department = department?.DepartmentName + " " + department?.DepartmentCh,
                 Section = section?.SectionName,
                 Photo = photoPath,
-                Org = "ОсОО \"Алтынкен\""
+                Org = "ОсОО \"Алтынкен\"",
+                Hazard = emp.Hazard,
+                ContractNumber = emp.ContractNumber,
+                ContractDate = emp.ContractDate,
+                Fired = emp.Fired,
+                FiringDate = emp.FiringDate,
+                HazardDocTitle = _context.CompanyDocs
+                .Where(cd => cd.Code == emp.HazardDoc)
+                .Select(cd => cd.Title)
+                .FirstOrDefault()
+
             });
         }
 

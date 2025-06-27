@@ -22,6 +22,7 @@ namespace CorpNumber.Models
         public DbSet<Quota> Quotas { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
         public DbSet<Citizenship> Citizenships { get; set; }
+        public DbSet<CompanyDocs> CompanyDocs { get; set; }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<OtherOwner> OtherOwners { get; set; }
         public DbSet<Operation> Operations { get; set; }
