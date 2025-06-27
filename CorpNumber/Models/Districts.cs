@@ -7,8 +7,8 @@ namespace CorpNumber.Models
     {
         [Key]
         public int CodeDistrict { get; set; }
-        public string District { get; set; }
-        public string DistrictCh { get; set; }
+        public string? District { get; set; }
+        public string? DistrictCh { get; set; }
         
        
     }

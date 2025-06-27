@@ -1,4 +1,59 @@
 ﻿@model IEnumerable<CorpNumber.Models.PhoneViewModel>
+<style>
+    /* Скрываем нативный чекбокс */
+    input[type="checkbox"].custom-checkbox {
+        position: relative;
+        width: 24px;
+        height: 24px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border: 2px solid #0d6efd;
+        border-radius: 4px;
+        cursor: default;
+        outline: none;
+        background-color: white;
+    }
+
+        /* Когда чекбокс отмечен */
+        input[type="checkbox"].custom-checkbox:checked::before {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 12px;
+            border: solid #0d6efd;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Состояние disabled: не серый фон, галочка яркая */
+        input[type="checkbox"].custom-checkbox:disabled {
+            border-color: #0d6efd;
+            background-color: #e7f1ff; /* светлый голубой фон */
+            cursor: not-allowed;
+        }
+
+        input[type="checkbox"].custom-checkbox:checked:disabled::before {
+            border-color: #0d6efd;
+        }
+
+    /* Улучшение всех disabled-чекбоксов: иконка цветная и заметная */
+    input[type="checkbox"][disabled] {
+        transform: scale(0.9);
+        accent-color: #0d6efd;
+        opacity: 1 !important;
+        cursor: default;
+        filter: none !important; /* Убираем серость */
+    }
+
+    /* Если хочешь именно для "Уволен" сделать красным — по id */
+    #empFired[disabled] {
+        accent-color: #dc3545;
+    }
+</style>
+
 
 @{
     ViewBag.Title = "Список телефонных номеров";
@@ -162,7 +217,8 @@
                                            type="checkbox"
                                            @(phone.Corporative ? "checked" : "")
                                            disabled
-                                           style="transform: scale(1.5); accent-color: #0d6efd;" />
+                                           style="transform: scale(1.6); accent-color: #0d6efd; opacity: 1;" />
+
                                 </div>
                             </td>
                         </tr>
@@ -294,7 +350,14 @@
                             <div class="col-md-6">
                                 <div class="mb-2"><strong>Номер труд. договора:</strong> <span id="empContractNumber">—</span></div>
                                 <div class="mb-2"><strong>Дата труд. договора:</strong> <span id="empContractDate">—</span></div>
-                                <div class="mb-2"><strong>Уволен:</strong> <input type="checkbox" id="empFired" disabled /></div>
+                                <div class="mb-2">
+                                    <strong>Уволен:</strong>
+                                    <input type="checkbox" id="empFired" disabled class="custom-checkbox"
+                                           style="accent-color: #dc3545; opacity: 1;filter: none;" />
+
+                                </div>
+
+
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2"><strong>Доплата за вредность:</strong> <span id="empHazard">—</span></div>
@@ -508,7 +571,12 @@
                                         <td>${p.operator ?? '—'}</td>
                                         <td>${p.account ?? '—'}</td>
                                         <td>${p.issueDate ? p.issueDate.substring(0, 10) : '—'}</td>
-                                        <td><input type="checkbox" disabled ${p.corporative ? 'checked' : ''}></td>
+                                        <td>
+                                            <input type="checkbox" disabled class="custom-checkbox" ${p.corporative ? 'checked' : ''}
+                                            style="accent-color: #0d6efd; opacity: 1; filter: none;" />
+
+                                        </td>
+
                                     </tr>
                                 `);
                             });
@@ -530,7 +598,10 @@
                                     <td>${p.operatorTitle}</td>
                                     <td>${p.accountType}</td>
                                     <td>${p.issueDate}</td>
-                                    <td><input type="checkbox" disabled ${p.corporative ? 'checked' : ''}></td>
+                                    <td>
+                                        <input type="checkbox" disabled class="custom-checkbox" ${p.corporative ? 'checked' : ''}
+                                        style=" accent-color: #0d6efd; opacity: 1;filter: none;" />
+                                    </td>
                                 </tr>`);
                             });
                         }
