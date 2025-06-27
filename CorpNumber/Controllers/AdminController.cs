@@ -285,7 +285,25 @@ namespace CorpNumber.Controllers
                 HazardDocTitle = _context.CompanyDocs
                 .Where(cd => cd.Code == emp.HazardDoc)
                 .Select(cd => cd.Title)
-                .FirstOrDefault()
+                .FirstOrDefault(),
+                SexTitle = _context.Sexes
+                    .Where(s => s.CodeSex == emp.Sex)
+                    .Select(s => s.Sex + " " + s.SexCh)
+                    .FirstOrDefault(),
+
+                CitizenshipTitle = _context.Citizenships
+                    .Where(c => c.CodeCitizenship == emp.Citizenship)
+                    .Select(c => c.Citizenship + " " + c.CitizenshipCh)
+                    .FirstOrDefault(),
+
+                NationalityTitle = _context.Nationalities
+                    .Where(n => n.CodeNationality == emp.Nationality)
+                    .Select(n => n.Nationality + " " + n.NationalityCh)
+                    .FirstOrDefault(),
+
+                Birthday = emp.Birthday,
+                Passport = emp.Passport,
+
 
             });
         }

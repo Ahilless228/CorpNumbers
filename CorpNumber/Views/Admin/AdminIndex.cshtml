@@ -314,7 +314,21 @@
 
                     <!-- Остальные вкладки пока пустые -->
                     <div class="tab-pane fade" id="passport" role="tabpanel" aria-labelledby="passport-tab">
-                        <p>Паспортные данные будут добавлены позже.</p>
+                        <div class="row">
+                            <!-- Левая колонка -->
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Пол:</strong> <span id="empSex">—</span></div>
+                                <div class="mb-2"><strong>Дата рождения:</strong> <span id="empBirthday">—</span></div>
+                                <div class="mb-2"><strong>Гражданство:</strong> <span id="empCitizenship">—</span></div>
+                            </div>
+
+                            <!-- Правая колонка -->
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Паспортные данные:</strong> <span id="empPassport">—</span></div>
+                                <div class="mb-2"><strong>Национальность:</strong> <span id="empNationality">—</span></div>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
                         <p>Адрес будет добавлен позже.</p>
@@ -450,6 +464,12 @@
                     $('#empHazard').text(data.hazard != null ? data.hazard + '%' : '—');
                     $('#empHazardDoc').text(data.hazardDocTitle ?? '—');
                     $('#empFiringDate').text(data.firingDate ? data.firingDate.substring(0, 10) : '—');
+                    $('#empSex').text(data.sexTitle ?? '—');
+                    $('#empBirthday').text(data.birthday ? data.birthday.substring(0, 10) : '—');
+                    $('#empCitizenship').text(data.citizenshipTitle ?? '—');
+                    $('#empPassport').text(data.passport ?? '—');
+                    $('#empNationality').text(data.nationalityTitle ?? '—');
+
 
 
                     // Показываем модалку

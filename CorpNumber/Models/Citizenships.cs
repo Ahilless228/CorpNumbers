@@ -4,12 +4,11 @@ namespace CorpNumber.Models
     
 
 {
-    public class Citizenship
+    public class Citizenships
     {
         [Key]
         public int CodeCitizenship { get; set; }
-        [Column("Citizenship")]
-        public string ?Citizenshipp { get; set; }
+        public string ?Citizenship { get; set; }
         public string ?CitizenshipCh { get; set; }
     }
 
