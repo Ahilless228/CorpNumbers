@@ -65,6 +65,11 @@ namespace CorpNumber.Controllers
             ViewBag.SelectedOperator = operatorId ?? 0;
             ViewBag.SelectedCategory = categoryId ?? 0;
             ViewBag.OnlyCorp = onlyCorp ?? false;
+            //кнопки с счетчиками
+            ViewBag.IncompleteOperations = await _context.Operations.CountAsync(op => op.Complete == false);
+            ViewBag.SimCardDeliveries = await _context.SimCards.CountAsync(sc =>
+                sc.Incomplete == false && sc.IssueDate == null && sc.Operator == 1);
+
 
             return View("AdminIndex", phoneViewModels);
         }

@@ -61,6 +61,11 @@
     int selectedOperator = ViewBag.SelectedOperator ?? 0;
     int selectedCategory = ViewBag.SelectedCategory ?? 0;
     bool onlyCorp = ViewBag.OnlyCorp ?? false;
+    int operCount = ViewBag.IncompleteOperations ?? 0;
+    int simCount = ViewBag.SimCardDeliveries ?? 0;
+
+    string operBtnClass = operCount > 0 ? "btn-danger" : "btn-outline-secondary";
+    string simBtnClass = simCount < 20 ? "btn-danger" : "btn-outline-secondary";
 }
 <style>
     tbody tr.selected-row td {
@@ -126,6 +131,26 @@
                 <button type="button" class="btn btn-outline-info btn-sm flex-fill" style="min-width:160px;">📄 Запрос детализации</button>
                 <button type="button" class="btn btn-outline-danger btn-sm flex-fill" style="min-width:160px;">❎ Деактивация</button>
                 <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" style="min-width:160px;">⚙️ Прочие операции</button>
+                <button type="button" class="btn @operBtnClass btn-sm flex-fill" style="min-width:160px;">
+                    ❗ Невыполненные операции (@operCount)
+                </button>
+
+                <button type="button" class="btn @simBtnClass btn-sm flex-fill" style="min-width:160px;">
+                    📦 Поступление сим-карт (@simCount)
+                </button>
+
+                <button type="button" class="btn btn-outline-primary btn-sm flex-fill" style="min-width:160px;">
+                    👥 Все операции
+                </button>
+
+                <button type="button" class="btn btn-outline-dark btn-sm flex-fill" style="min-width:160px;">
+                    🏢 Сотрудники ОсОО "Алтынкен"
+                </button>
+
+                <button type="button" class="btn btn-outline-info btn-sm flex-fill" style="min-width:160px;">
+                    📡 Роутеры
+                </button>
+
             </div>
         </div>
     </div>
