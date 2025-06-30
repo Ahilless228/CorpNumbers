@@ -1,0 +1,122 @@
+﻿@model IEnumerable<CorpNumber.Models.Employee>
+@{
+    ViewData["Title"] = "Сотрудники ОсОО Алтынкен";
+}
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>🧑‍🔧👷Сотрудники ОсОО "Алтынкен</h2>
+        </div>
+        <img src="~/images/altynken-logo.jpg" alt="Логотип" height="60" />
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mb-3">
+        <div class="btn-group" role="group">
+            <button class="btn btn-success">Прием на работу</button>
+            <button class="btn btn-danger">Увольнение</button>
+            <button class="btn btn-primary">Должности</button>
+            <button class="btn btn-primary">Отделы</button>
+            <button class="btn btn-warning">Перевод</button>
+            <button class="btn btn-info">Управления</button>
+            <button class="btn btn-secondary">Уволенные</button>
+            <button class="btn btn-dark">Переводы</button>
+        </div>
+    </div>
+
+    <!-- Search & Controls -->
+    <div class="row mb-2">
+        <div class="col-md-4">
+            <input type="text" id="employeeSearch" class="form-control" placeholder="Поиск сотрудника...">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-outline-secondary" id="resetSearch">Сброс фильтра</button>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-outline-primary" id="scrollStart">⏮️</button>
+            <button class="btn btn-outline-primary" id="scrollEnd">⏭️</button>
+        </div>
+    </div>
+    <!-- Employee Count -->
+    <div class="mt-3">
+        <strong>Количество сотрудников: </strong><span id="employeeCount">@Model.Count()</span>
+    </div>
+    <!-- Employees Table -->
+    <table class="table table-bordered table-hover table-sm" id="employeeTable">
+        <thead class="table-light">
+            <tr>
+                <th>Код</th>
+                <th>Фамилия</th>
+                <th>Имя</th>
+                <th>Отчество</th>
+                <th>姓名</th>
+                <th>Таб. №</th>
+                <th>Должность</th>
+                <th>Управление</th>
+                <th>Отдел</th>
+                <th>Норма</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var emp in Model)
+            {
+                <tr>
+                    <td>@emp.CodeEmployee</td>
+                    <td>@emp.Surname</td>
+                    <td>@emp.Firstname</td>
+                    <td>@emp.Midname</td>
+                    <td>@emp.NameCh</td>
+                    <td>@emp.TabNum?.ToString("D5")</td>
+                    <td>@(emp.PostNavigation?.Postt + " " + emp.PostNavigation?.PostCh)</td>
+                    <td>@(emp.DepartmentNavigation?.DepartmentName + " " + emp.DepartmentNavigation?.DepartmentCh)</td>
+                    <td>@(emp.SectionNavigation?.SectionName + " " + emp.SectionNavigation?.SectionCh)</td>
+                    <td>@emp.CodeQuotaNavigation?.Quotaa</td>
+
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+    
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('employeeSearch').addEventListener('input', function () {
+            const search = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#employeeTable tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const name = row.children[1].textContent.toLowerCase();
+                const fname = row.children[2].textContent.toLowerCase();
+                const mname = row.children[3].textContent.toLowerCase();
+                const match = name.includes(search) || fname.includes(search) || mname.includes(search);
+                row.style.display = match ? '' : 'none';
+                if (match) visibleCount++;
+            });
+
+            document.getElementById('employeeCount').textContent = visibleCount;
+        });
+
+        document.getElementById('resetSearch').addEventListener('click', function () {
+            document.getElementById('employeeSearch').value = '';
+            const rows = document.querySelectorAll('#employeeTable tbody tr');
+            rows.forEach(row => row.style.display = '');
+            document.getElementById('employeeCount').textContent = rows.length;
+        });
+
+        document.getElementById('scrollStart').addEventListener('click', function () {
+            const firstRow = document.querySelector('#employeeTable tbody tr');
+            if (firstRow) firstRow.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('scrollEnd').addEventListener('click', function () {
+            const rows = document.querySelectorAll('#employeeTable tbody tr');
+            if (rows.length) rows[rows.length - 1].scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+}

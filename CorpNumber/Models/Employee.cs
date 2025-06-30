@@ -31,5 +31,12 @@ namespace CorpNumber.Models
         public int? Citizenship { get; set; }
         public int? Nationality { get; set; }
         public byte[]? SSMA_TimeStamp { get; set; }
+
+
+        public Post? PostNavigation { get; set; }
+        public Department? DepartmentNavigation { get; set; }
+        public Section? SectionNavigation { get; set; }
+        public Quota? CodeQuotaNavigation { get; set; }
+
     }
 }

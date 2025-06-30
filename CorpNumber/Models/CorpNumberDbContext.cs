@@ -94,7 +94,27 @@ namespace CorpNumber.Models
                 .HasPrincipalKey(o => o.CodeOwner)  // Код владельца в Owner
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.PostNavigation)
+                .WithMany()
+                .HasForeignKey(e => e.Post);
+
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.DepartmentNavigation)
+                .WithMany()
+                .HasForeignKey(e => e.Department);
+
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.SectionNavigation)
+                .WithMany()
+                .HasForeignKey(e => e.Section);
+
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.CodeQuotaNavigation)
+                .WithMany()
+                .HasForeignKey(e => e.CodeQuota);
+
+
 
 
             // Если появятся модели Status и InternetService:
