@@ -16,7 +16,10 @@
         vertical-align: middle;
         padding: 0.4rem 0.6rem;
         font-size: 0.95rem;
-    }
+     }
+
+    .table-primary {
+        background-color: #d0ebff !important;
 </style>
 
 @{
@@ -153,6 +156,33 @@
 @section Scripts {
     <!--Фильтрация , счетчик-->
     <script>
+        function selectEmployeeRow(row) {
+            const id = row.getAttribute('data-id');
+
+            fetch(`/Employee/GetEmployeeDetails?id=${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("detailEmployee").textContent = data.fullname;
+                    document.getElementById("detailNameCh").textContent = data.nameCh;
+                    document.getElementById("detailTabnum").textContent = data.tabnum;
+                    document.getElementById("detailInputDate").textContent = data.inputDate;
+                    document.getElementById("detailPost").textContent = data.post;
+                    document.getElementById("detailDepartment").textContent = data.department;
+                    document.getElementById("detailSection").textContent = data.section;
+                    document.getElementById("detailPhoto").src = data.photoPath;
+                });
+
+            // Подсветка выбранной строки
+            document.querySelectorAll('.employee-row').forEach(r => r.classList.remove('table-primary'));
+            row.classList.add('table-primary');
+        }
+
+        document.querySelectorAll('.employee-row').forEach(row => {
+            row.addEventListener('click', function () {
+                selectEmployeeRow(this);
+            });
+        });
+
         document.getElementById('employeeSearch').addEventListener('input', function () {
             const search = this.value.toLowerCase();
             const rows = document.querySelectorAll('#employeeTable tbody tr');
@@ -178,13 +208,25 @@
         });
 
         document.getElementById('scrollStart').addEventListener('click', function () {
-            const firstRow = document.querySelector('#employeeTable tbody tr');
-            if (firstRow) firstRow.scrollIntoView({ behavior: 'smooth' });
+            const visibleRows = Array.from(document.querySelectorAll('#employeeTable tbody tr'))
+                .filter(row => row.style.display !== 'none');
+
+            if (visibleRows.length > 0) {
+                const firstVisible = visibleRows[0];
+                firstVisible.scrollIntoView({ behavior: 'smooth' });
+                selectEmployeeRow(firstVisible);
+            }
         });
 
         document.getElementById('scrollEnd').addEventListener('click', function () {
-            const rows = document.querySelectorAll('#employeeTable tbody tr');
-            if (rows.length) rows[rows.length - 1].scrollIntoView({ behavior: 'smooth' });
+            const visibleRows = Array.from(document.querySelectorAll('#employeeTable tbody tr'))
+                .filter(row => row.style.display !== 'none');
+
+            if (visibleRows.length > 0) {
+                const lastVisible = visibleRows[visibleRows.length - 1];
+                lastVisible.scrollIntoView({ behavior: 'smooth' });
+                selectEmployeeRow(lastVisible);
+            }
         });
     </script>
 
