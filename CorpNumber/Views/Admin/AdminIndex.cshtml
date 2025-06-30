@@ -150,6 +150,26 @@
                 <button type="button" class="btn btn-outline-info btn-sm flex-fill" style="min-width:160px;">
                     📡 Роутеры
                 </button>
+                <button class="btn btn-outline-primary btn-sm flex-fill" style="min-width: 160px;">
+                    ⏱️ Врем. номера (@ViewBag.TempIssued/@ViewBag.TempOverdue)
+                </button>
+
+                <button class="btn btn-outline-success btn-sm flex-fill" style="min-width: 160px;" onclick="location.href='@Url.Action("Phonebook1", "Admin")'">
+                    📒 Тел. справочник 1
+                </button>
+
+                <button class="btn btn-outline-success btn-sm flex-fill" style="min-width: 160px;" onclick="location.href='@Url.Action("Phonebook2", "Admin")'">
+                    📕 Тел. справочник 2
+                </button>
+
+                <button class="btn btn-outline-warning btn-sm flex-fill" style="min-width: 160px;">
+                    🔔 Напоминания (@ViewBag.TaskOverdue/@ViewBag.TaskTotal)
+                </button>
+
+                <button class="btn btn-outline-info btn-sm flex-fill" style="min-width: 160px;">
+                    🎉 Именинники (@ViewBag.BirthdayCount)
+                </button>
+
 
             </div>
         </div>

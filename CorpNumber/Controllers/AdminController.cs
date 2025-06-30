@@ -59,6 +59,31 @@ namespace CorpNumber.Controllers
                 Corporative = p.Corporative ?? false
             }).ToList();
 
+            // Временно выданные номера (все / просроченные)
+            var tempPhones = await (from temp in _context.TempOwners
+                                    join owner in _context.Owners on temp.CodeTempOwner equals owner.CodeTempOwner
+                                    join phone in _context.Phones on owner.CodeOwner equals phone.CodeOwner
+                                    where owner.CodeCategory == 3
+                                    select new { temp.Period, owner.CodeOwner }).ToListAsync();
+
+            int tempIssued = tempPhones.Count;
+            int tempOverdue = 0;
+
+            foreach (var item in tempPhones)
+            {
+                if (item.Period != null && item.Period != 0)
+                {
+                    var issueDate = await _context.Operations
+                        .Where(op => op.Owner_new == item.CodeOwner && op.CodeOperType == 6)
+                        .OrderByDescending(op => op.OperDate)
+                        .Select(op => op.OperDate)
+                        .FirstOrDefaultAsync();
+
+                    if (issueDate.HasValue && issueDate.Value.AddDays(item.Period ?? 0) < DateTime.Now)
+                        tempOverdue++;
+                }
+            }
+
             ViewBag.PhoneCount = phoneViewModels.Count;
             ViewBag.Operators = await _context.Operators.ToListAsync();
             ViewBag.Categories = await _context.OwnerCategories.ToListAsync();
@@ -69,6 +94,20 @@ namespace CorpNumber.Controllers
             ViewBag.IncompleteOperations = await _context.Operations.CountAsync(op => op.Complete == false);
             ViewBag.SimCardDeliveries = await _context.SimCards.CountAsync(sc =>
                 sc.Incomplete == false && sc.IssueDate == null && sc.Operator == 1);
+
+            ViewBag.TempIssued = tempIssued;
+            ViewBag.TempOverdue = tempOverdue;
+
+            // Задачи (все и просроченные)
+            ViewBag.TaskTotal = await _context.Tasks.CountAsync(t => t.Complete == false);
+            ViewBag.TaskOverdue = await _context.Tasks.CountAsync(t => t.Complete == false && t.TaskDate < DateTime.Now);
+
+            // Именинники
+            ViewBag.BirthdayCount = await _context.Employees.CountAsync(e =>
+                !e.Fired.HasValue || e.Fired == false &&
+                e.Birthday.HasValue &&
+                e.Birthday.Value.Day == DateTime.Today.Day &&
+                e.Birthday.Value.Month == DateTime.Today.Month);
 
 
             return View("AdminIndex", phoneViewModels);
@@ -368,6 +407,121 @@ namespace CorpNumber.Controllers
                 phones = result
             });
         }
+
+
+
+        // Телефонные справочник 1
+        [HttpGet]
+        public async Task<IActionResult> Phonebook1()
+        {
+            var data = await (from phone in _context.Phones
+                              join owner in _context.Owners on phone.CodeOwner equals owner.CodeOwner
+                              join emp in _context.Employees on owner.CodeEmployee equals emp.CodeEmployee
+                              where phone.Corporative == true && phone.Phonebook == true && phone.Router == false && phone.Operator == 1
+                              orderby emp.Surname, emp.Firstname
+                              select new
+                              {
+                                  phone.Number,
+                                  FullName = emp.Surname + " " + emp.Firstname + " " + emp.Midname,
+                                  emp.NameCh,
+                                  TabNum = emp.TabNum,
+                                  Department = _context.Departments.Where(d => d.CodeDepartment == emp.Department)
+                                                                   .Select(d => d.DepartmentName + " " + d.DepartmentCh)
+                                                                   .FirstOrDefault(),
+                                  Post = _context.Posts.Where(p => p.CodePost == emp.Post)
+                                                       .Select(p => p.Postt + " " + p.PostCh)
+                                                       .FirstOrDefault()
+                              }).ToListAsync();
+
+            using var package = new ExcelPackage();
+            var sheet = package.Workbook.Worksheets.Add("Тел. справочник 1");
+
+            sheet.Cells[1, 1].Value = "Номер";
+            sheet.Cells[1, 2].Value = "Сотрудник";
+            sheet.Cells[1, 3].Value = "姓名";
+            sheet.Cells[1, 4].Value = "Таб №";
+            sheet.Cells[1, 5].Value = "Управление";
+            sheet.Cells[1, 6].Value = "Должность";
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                var d = data[i];
+                sheet.Cells[i + 2, 1].Value = d.Number;
+                sheet.Cells[i + 2, 2].Value = d.FullName;
+                sheet.Cells[i + 2, 3].Value = d.NameCh;
+                sheet.Cells[i + 2, 4].Value = d.TabNum?.ToString("D5");
+                sheet.Cells[i + 2, 5].Value = d.Department;
+                sheet.Cells[i + 2, 6].Value = d.Post;
+            }
+
+            sheet.Cells.AutoFitColumns();
+            var file = package.GetAsByteArray();
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ТелСправочник1_{DateTime.Now:yyyyMMdd}.xlsx");
+        }
+
+
+        // Телефонные справочник 2
+        [HttpGet]
+        public async Task<IActionResult> Phonebook2()
+        {
+            // практически аналогично первому, но добавляем ещё тариф, интернет и квоту
+            var data = await (from phone in _context.Phones
+                              join owner in _context.Owners on phone.CodeOwner equals owner.CodeOwner
+                              join emp in _context.Employees on owner.CodeEmployee equals emp.CodeEmployee
+                              where phone.Corporative == true && phone.Phonebook == true && phone.Router == false && phone.Operator == 1
+                              orderby emp.Surname, emp.Firstname
+                              select new
+                              {
+                                  phone.Number,
+                                  FullName = emp.Surname + " " + emp.Firstname + " " + emp.Midname,
+                                  emp.NameCh,
+                                  TabNum = emp.TabNum,
+                                  Department = _context.Departments.Where(d => d.CodeDepartment == emp.Department)
+                                                                   .Select(d => d.DepartmentName + " " + d.DepartmentCh)
+                                                                   .FirstOrDefault(),
+                                  Post = _context.Posts.Where(p => p.CodePost == emp.Post)
+                                                       .Select(p => p.Postt + " " + p.PostCh)
+                                                       .FirstOrDefault(),
+                                  Tariff = phone.Tariff,
+                                  Internet = phone.Internet,
+                                  Limit = phone.Limit,
+                                  Quota = emp.CodeQuota
+                              }).ToListAsync();
+
+            using var package = new ExcelPackage();
+            var sheet = package.Workbook.Worksheets.Add("Тел. справочник 2");
+
+            sheet.Cells[1, 1].Value = "Номер";
+            sheet.Cells[1, 2].Value = "Сотрудник";
+            sheet.Cells[1, 3].Value = "姓名";
+            sheet.Cells[1, 4].Value = "Таб №";
+            sheet.Cells[1, 5].Value = "Управление";
+            sheet.Cells[1, 6].Value = "Должность";
+            sheet.Cells[1, 7].Value = "Тариф";
+            sheet.Cells[1, 8].Value = "Интернет";
+            sheet.Cells[1, 9].Value = "Лимит";
+            sheet.Cells[1, 10].Value = "Норма";
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                var d = data[i];
+                sheet.Cells[i + 2, 1].Value = d.Number;
+                sheet.Cells[i + 2, 2].Value = d.FullName;
+                sheet.Cells[i + 2, 3].Value = d.NameCh;
+                sheet.Cells[i + 2, 4].Value = d.TabNum?.ToString("D5");
+                sheet.Cells[i + 2, 5].Value = d.Department;
+                sheet.Cells[i + 2, 6].Value = d.Post;
+                sheet.Cells[i + 2, 7].Value = d.Tariff;
+                sheet.Cells[i + 2, 8].Value = d.Internet;
+                sheet.Cells[i + 2, 9].Value = d.Limit?.ToString() ?? "—";
+                sheet.Cells[i + 2, 10].Value = d.Quota?.ToString() ?? "—";
+            }
+
+            sheet.Cells.AutoFitColumns();
+            var file = package.GetAsByteArray();
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ТелСправочник2_{DateTime.Now:yyyyMMdd}.xlsx");
+        }
+
 
 
 
