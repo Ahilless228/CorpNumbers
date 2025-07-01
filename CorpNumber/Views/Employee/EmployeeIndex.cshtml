@@ -378,32 +378,6 @@
         });
     </script>
 
-    
-    <!--Мод окно-->
-    <script>
-        // Твой уже существующий код поиска и прочего
-
-        // Добавляем обработчик клика по строкам таблицы с сотрудниками
-        document.querySelectorAll('.employee-row').forEach(row => {
-            row.addEventListener('click', function () {
-                const id = this.getAttribute('data-id');
-
-                fetch(`/Employee/GetEmployeeDetails?id=${id}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        document.getElementById("detailEmployee").textContent = data.fullname;
-                        document.getElementById("detailNameCh").textContent = data.nameCh;
-                        document.getElementById("detailTabnum").textContent = data.tabnum;
-                        document.getElementById("detailInputDate").textContent = data.inputDate;
-                        document.getElementById("detailPost").textContent = data.post;
-                        document.getElementById("detailDepartment").textContent = data.department;
-                        document.getElementById("detailSection").textContent = data.section;
-                        document.getElementById("detailPhoto").src = data.photoPath;
-                    });
-            });
-        });
-    </script>
-
 
 
     <!--загрузка данных из БД в мод окно-->
@@ -510,12 +484,59 @@
     </script>
 
 
-    <!--Скрипт сохранения изменений данных сотрудника в БД-->
+
+    <!--Подтверждение отмены изменений и сохранения — исправленный вариант-->
     <script>
+        let isFormChanged = false;
+        let cancelConfirmed = false;
+
+        function resetFormChangedFlag() {
+            isFormChanged = false;
+            cancelConfirmed = false;
+        }
+
+        (() => {
+            const modalEl = document.getElementById('employeeInfoModal');
+
+            // Слушатели на все input/select — один раз при загрузке страницы
+            document.querySelectorAll('#employeeInfoModal input, #employeeInfoModal select').forEach(el => {
+                el.addEventListener('change', () => {
+                    isFormChanged = true;
+                });
+            });
+
+            // Кнопка "Отменить"
+            document.querySelector('#employeeInfoModal .btn-secondary').addEventListener('click', function (e) {
+                if (isFormChanged) {
+                    const confirmCancel = confirm("Вы уверены, что хотите отменить изменения?");
+                    if (!confirmCancel) {
+                        e.preventDefault();
+                        return;
+                    }
+                    cancelConfirmed = true;
+                }
+                resetFormChangedFlag();
+            });
+
+            // Обработчик закрытия модального окна
+            modalEl.addEventListener('hide.bs.modal', function (e) {
+                if (isFormChanged && !cancelConfirmed) {
+                    const confirmClose = confirm("Вы уверены, что хотите отменить изменения?");
+                    if (!confirmClose) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+                resetFormChangedFlag();
+            });
+        })();
+
+
+        // Кнопка "Сохранить"
         document.querySelector('#employeeInfoModal .btn-success').addEventListener('click', function () {
-                if (!confirm("Вы уверены, что хотите сохранить изменения?")) {
-                    return; // Отмена, если пользователь нажал "Отмена"
-                 }
+            if (!confirm("Вы уверены, что хотите сохранить изменения?")) {
+                return; // Отмена
+            }
             const data = {
                 CodeEmployee: +document.getElementById('empCode').textContent,
                 Surname: document.getElementById('empSurname').value,
@@ -543,8 +564,8 @@
                 Nationality: parseInt(document.getElementById('empNationality').value) || null,
                 District: parseInt(document.getElementById('empDistrict').value) || null,
                 CodeCategory: parseInt(document.getElementById('empCategory').value) || null
-
             };
+
             console.log("Отправляемые данные:", data);
 
             fetch('/Employee/SaveEmployee', {
@@ -554,70 +575,24 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(res => res.ok ? res.json() : Promise.reject())
+            .then(res => {
+                if (res.ok) return res.json();
+                return res.text().then(text => { throw new Error(text) });
+            })
             .then(() => {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('employeeInfoModal'));
                 resetFormChangedFlag();
                 modal.hide();
-                location.reload(); // перезагрузить данные таблицы
+                location.reload(); // обновить таблицу
             })
-            .catch(async err => {
-                const text = await err.text?.();
-                console.error("Ошибка запроса:", err, text);
-                alert("Не удалось сохранить данные: " + text);
-            });
-
-        });
-    </script>
-        
-
-    <!--Подтверждение сохранения-->
-    <script>
-        // Флаг для отслеживания изменений
-        let cancelConfirmed = false;
-        let isFormChanged = false;
-
-        // Отмечаем, если что-то изменилось
-        document.querySelectorAll('#employeeInfoModal input, #employeeInfoModal select').forEach(el => {
-            el.addEventListener('change', () => {
-                isFormChanged = true;
+            .catch(err => {
+                console.error("Ошибка запроса:", err);
+                alert("Не удалось сохранить данные: " + err.message);
             });
         });
-
-        // Обработка закрытия модального окна через "Отменить"
-        document.querySelector('#employeeInfoModal .btn-secondary').addEventListener('click', function (e) {
-            if (isFormChanged) {
-                if (!confirm("Вы уверены, что хотите отменить изменения?")) {
-                    e.preventDefault();
-                    return;
-                }
-                cancelConfirmed = true; // подтвердили отмену
-            }
-            isFormChanged = false;
-        });
-
-
-        // Обработка закрытия по клику вне модального окна (серая область)
-        const modalEl = document.getElementById('employeeInfoModal');
-        modalEl.addEventListener('hide.bs.modal', function (e) {
-            if (isFormChanged && !cancelConfirmed) {
-                const confirmClose = confirm("Вы уверены, что хотите отменить изменения?");
-                if (!confirmClose) {
-                    e.preventDefault();
-                } else {
-                    isFormChanged = false;
-                    cancelConfirmed = true;
-                }
-            }
-            // Всегда сбрасываем флаг после попытки закрытия
-            cancelConfirmed = false;
-        });
-
-
-        // После успешного сохранения сбрасываем флаг
-        function resetFormChangedFlag() {
-            isFormChanged = false;
-        }
     </script>
+
+
+
 
 }
