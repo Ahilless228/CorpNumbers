@@ -20,6 +20,7 @@
 
     .table-primary {
         background-color: #d0ebff !important;
+    }
 </style>
 
 @{
@@ -186,7 +187,15 @@
                             </div>
 
                             <div class="mb-2"><strong>Должность:</strong> <select id="empPost" class="form-select form-select-sm"></select></div>
-                            <div class="mb-2"><strong>Совмещение:</strong> <select id="empPartTime" class="form-select form-select-sm"></select></div>
+                            <div class="mb-2">
+                                <strong>
+                                    Совмещение:
+                                    <select id="empPartTime" class="form-select form-select-sm">
+                                        <option value="">—</option> <!-- для случаев, когда PartTime == null -->
+                                    </select>
+                                </strong>
+                                    
+                            </div>
                             <div class="mb-2"><strong>Управление:</strong> <select id="empDepartment" class="form-select form-select-sm"></select></div>
                             <div class="mb-2"><strong>Отдел:</strong> <select id="empSection" class="form-select form-select-sm"></select></div>
                             <div class="mb-2"><strong>Норма:</strong> <select id="empQuota" class="form-select form-select-sm"></select></div>
@@ -228,7 +237,14 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-2"><strong>Доплата за вредность:</strong> <input type="text" id="empHazard" class="form-control form-control-sm" /></div>
+                                <div class="mb-2">
+                                    <strong>Доплата за вредность:</strong>
+                                    <div class="input-group">
+                                        <input type="number" id="empHazard" class="form-control form-control-sm" />
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+
                                 <div class="mb-2"><strong>Документ на вредность:</strong> <select id="empHazardDoc" class="form-select form-select-sm"></select></div>
                                 <div class="mb-2"><strong>Дата увольнения:</strong> <input type="date" id="empFiringDate" class="form-control form-control-sm" /></div>
                             </div>
@@ -276,6 +292,8 @@
 
     
 </div>
+
+
 
 @section Scripts {
     <!--Фильтрация , счетчик-->
@@ -379,7 +397,10 @@
             });
         });
     </script>
-    
+
+
+
+    <!--загрузка данных из БД в мод окно-->
     <script>
         document.querySelector('[data-bs-target="#employeeInfoModal"]').addEventListener('click', () => {
             const selectedRow = document.querySelector('.employee-row.table-primary');
@@ -390,44 +411,54 @@
             fetch(`/Employee/GetEmployeeFullDetails?id=${id}`)
                 .then(response => response.json())
                 .then(data => {
-                    // Текстовые поля
+                    // Установить значения input'ов
                     document.getElementById('empCode').textContent = data.codeEmployee;
                     document.getElementById('empSurname').value = data.surname;
                     document.getElementById('empFirstname').value = data.firstname;
                     document.getElementById('empMidname').value = data.midname;
                     document.getElementById('empNameCh').value = data.nameCh;
+                    document.getElementById('empPartTime').value = data.partTime ?? '';
                     document.getElementById('empTabNum').value = data.tabNum;
                     document.getElementById('empInputDate').value = data.inputDate?.split('T')[0] || "";
 
-                    // select
-                    document.getElementById('empPost').value = data.post;
-                    document.getElementById('empPartTime').value = data.partTime;
-                    document.getElementById('empDepartment').value = data.department;
-                    document.getElementById('empSection').value = data.section;
-                    document.getElementById('empQuota').value = data.quota;
-
-                    // contract
                     document.getElementById('empContractNumber').value = data.contractNumber;
                     document.getElementById('empContractDate').value = data.contractDate?.split('T')[0] || "";
                     document.getElementById('empFired').checked = data.fired;
                     document.getElementById('empFiringDate').value = data.firingDate?.split('T')[0] || "";
                     document.getElementById('empHazard').value = data.hazard;
-                    document.getElementById('empHazardDoc').value = data.hazardDoc;
-
-                    // passport
-                    document.getElementById('empSex').value = data.sex;
-                    document.getElementById('empBirthday').value = data.birthday?.split('T')[0] || "";
-                    document.getElementById('empCitizenship').value = data.citizenship;
                     document.getElementById('empPassport').value = data.passport;
-                    document.getElementById('empNationality').value = data.nationality;
-
-                    // address
+                    document.getElementById('empBirthday').value = data.birthday?.split('T')[0] || "";
                     document.getElementById('empAddress').value = data.address;
-                    document.getElementById('empDistrict').value = data.district;
-
-                    // фото
                     document.getElementById('empPhoto').src = data.photo;
+
+                    // Функция для заполнения select'а
+                    function fillSelect(selectId, list, selectedCode) {
+                        const select = document.getElementById(selectId);
+                        select.innerHTML = ""; // Очистка
+
+                        list.forEach(item => {
+                            const option = document.createElement("option");
+                            option.value = item.code ?? ""; // null → пустая строка
+                            option.textContent = item.title ?? "—";
+                            if ((item.code ?? "") == (selectedCode ?? "")) option.selected = true;
+                            select.appendChild(option);
+                        });
+                    }
+
+
+
+                    fillSelect('empPost', data.posts, data.post);
+                    fillSelect('empPartTime', data.partTimeList, data.partTime);
+                    fillSelect('empDepartment', data.departments, data.department);
+                    fillSelect('empSection', data.sections, data.section);
+                    fillSelect('empQuota', data.quotas, data.quota);
+                    fillSelect('empHazardDoc', data.hazardDocs, data.hazardDoc);
+                    fillSelect('empSex', data.sexes, data.sex);
+                    fillSelect('empCitizenship', data.citizenships, data.citizenship);
+                    fillSelect('empNationality', data.nationalities, data.nationality);
+                    fillSelect('empDistrict', data.districts, data.district);
                 });
         });
     </script>
+
 }
