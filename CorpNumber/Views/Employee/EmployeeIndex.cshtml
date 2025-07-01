@@ -199,13 +199,19 @@
                             <div class="mb-2"><strong>Управление:</strong> <select id="empDepartment" class="form-select form-select-sm"></select></div>
                             <div class="mb-2"><strong>Отдел:</strong> <select id="empSection" class="form-select form-select-sm"></select></div>
                             <div class="mb-2"><strong>Норма:</strong> <select id="empQuota" class="form-select form-select-sm"></select></div>
+                            <div class="mb-2"><strong>Категория:</strong> <select id="empCategory" class="form-select form-select-sm"></select></div>
+
                         </div>
 
                         <!-- Правая колонка -->
                         <div class="col-md-4 d-flex flex-column align-items-center">
                             <img src="/images/default-profile.jpg" alt="Фото сотрудника" id="empPhoto"
                                  style="max-height: 200px; max-width: 100%; object-fit: cover; border: 1px solid #999;">
-                            <button class="btn btn-sm btn-outline-primary mt-2">Изменить фото</button>
+                            <form id="uploadPhotoForm" enctype="multipart/form-data">
+                                <input type="file" id="empPhotoInput" accept=".jpg" style="display: none;" />
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="changePhotoBtn">Изменить фото</button>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -457,7 +463,48 @@
                     fillSelect('empCitizenship', data.citizenships, data.citizenship);
                     fillSelect('empNationality', data.nationalities, data.nationality);
                     fillSelect('empDistrict', data.districts, data.district);
+                    fillSelect('empCategory', data.categories, data.category);
+
                 });
+        });
+    </script>
+
+
+    <!--Скрипт замены фото-->
+    <script>
+        document.getElementById("changePhotoBtn").addEventListener("click", function () {
+            document.getElementById("empPhotoInput").click();
+        });
+
+        document.getElementById("empPhotoInput").addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file || !file.name.endsWith('.jpg')) {
+                alert("Пожалуйста, выберите файл формата .jpg");
+                return;
+            }
+
+            const tabNum = document.getElementById("empTabNum").value;
+            if (!tabNum) {
+                alert("Табельный номер не найден");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("photo", file);
+            formData.append("tabNum", tabNum);
+
+            fetch("/Employee/UploadPhoto", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => {
+                if (res.ok) return res.text();
+                throw new Error("Ошибка загрузки");
+            })
+            .then(photoUrl => {
+                document.getElementById("empPhoto").src = photoUrl + "?t=" + new Date().getTime(); // обновить без кэша
+            })
+            .catch(err => alert(err));
         });
     </script>
 

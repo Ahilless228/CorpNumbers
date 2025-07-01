@@ -118,6 +118,23 @@ namespace CorpNumber.Controllers
                     .FirstOrDefault()
                 : "—";
 
+            // Получение категории сотрудника через таблицу Owners
+            var owner = _context.Owners
+                .Include(o => o.CategoryNavigation)
+                .FirstOrDefault(o => o.CodeEmployee == emp.CodeEmployee);
+
+            int? categoryCode = owner?.CodeCategory;
+            string? categoryTitle = owner?.CategoryNavigation?.Category ?? "—";
+
+            var categories = _context.OwnerCategories
+                .Select(c => new NamedId
+                {
+                    Code = c.CodeCategory,
+                    Title = c.Category
+                }).ToList();
+            categories.Insert(0, new NamedId { Code = null, Title = "—" });
+
+
             return Json(new
             {
                 codeEmployee = emp.CodeEmployee,
@@ -148,6 +165,11 @@ namespace CorpNumber.Controllers
                 section = emp.Section,
                 quota = emp.CodeQuota,
                 photo = photoPath,
+                category = categoryCode,
+                categoryTitle = categoryTitle,
+                categories = categories,
+
+
 
                 posts = _context.Posts.Select(p => new NamedId
                 {
@@ -202,7 +224,9 @@ namespace CorpNumber.Controllers
                 {
                     Code = d.CodeDistrict,
                     Title = d.District + " " + d.DistrictCh
-                }).ToList()
+                }).ToList(),
+                
+
             });
         }
 
@@ -210,6 +234,29 @@ namespace CorpNumber.Controllers
         {
             public int? Code { get; set; }
             public string?Title { get; set; }
+        }
+        //Замена фото сотрудника
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(IFormFile photo, string tabNum)
+        {
+            if (photo == null || string.IsNullOrWhiteSpace(tabNum))
+                return BadRequest("Файл или табельный номер не передан");
+
+            if (!photo.FileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
+                return BadRequest("Разрешены только файлы .jpg");
+
+            string paddedTabNum = int.TryParse(tabNum, out int num) ? num.ToString("D5") : tabNum;
+            string fileName = $"{paddedTabNum}.jpg";
+
+            string savePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Photo", fileName);
+
+            using (var stream = new FileStream(savePath, FileMode.Create))
+            {
+                await photo.CopyToAsync(stream);
+            }
+
+            string photoUrl = Url.Content($"/Photo/{fileName}");
+            return Content(photoUrl);
         }
 
 
