@@ -110,7 +110,16 @@
 
 
     <!--Информационное окошко-->
-    <div class="mt-4 p-3 border rounded bg-light" id="detailsPane" style="min-height: 200px; margin-bottom: 80px;">
+    <div class="mt-4 p-3 border rounded bg-light position-relative" id="detailsPane" style="min-height: 200px; margin-bottom: 80px;">
+        <!-- Кнопка со смайликом в правом верхнем углу -->
+        <button type="button" class="btn btn-sm btn-light border rounded-circle position-absolute"
+                title="Подробнее о сотруднике"
+                style="top: 10px; right: 10px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"
+                data-bs-toggle="modal" data-bs-target="#employeeInfoModal">
+            👨‍💼
+        </button>
+
+
         <div class="row">
             <!-- Фото -->
             <div class="col-md-3 d-flex align-items-center">
@@ -147,6 +156,121 @@
             </div>
         </div>
     </div>
+
+    <!-- Модальное окно редактирования данных о сотруднике -->
+    <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 85vw;">
+            <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+
+                <!-- Header -->
+                <div class="modal-header d-flex align-items-center">
+                    <div class="me-3" style="font-size: 2.5rem; line-height: 1;">👷</div>
+                    <h5 class="modal-title flex-grow-1">Изменить данные о сотруднике</h5>
+                    <img src="/images/altynken-logo.jpg" alt="Лого" style="height: 40px;">
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Левая колонка с данными -->
+                        <div class="col-md-8">
+                            <div class="mb-2"><strong>Код:</strong> <span id="empCode">—</span></div>
+                            <div class="mb-2"><strong>Фамилия:</strong> <input type="text" id="empSurname" class="form-control form-control-sm" /></div>
+                            <div class="mb-2"><strong>Имя:</strong> <input type="text" id="empFirstname" class="form-control form-control-sm" /></div>
+                            <div class="mb-2"><strong>Отчество:</strong> <input type="text" id="empMidname" class="form-control form-control-sm" /></div>
+                            <div class="mb-2"><strong>姓名:</strong> <input type="text" id="empNameCh" class="form-control form-control-sm" /></div>
+
+                            <div class="mb-2 row">
+                                <div class="col-6"><strong>Таб. №:</strong> <input type="text" id="empTabNum" class="form-control form-control-sm" /></div>
+                                <div class="col-6"><strong>Дата приёма:</strong> <input type="date" id="empInputDate" class="form-control form-control-sm" /></div>
+                            </div>
+
+                            <div class="mb-2"><strong>Должность:</strong> <select id="empPost" class="form-select form-select-sm"></select></div>
+                            <div class="mb-2"><strong>Совмещение:</strong> <select id="empPartTime" class="form-select form-select-sm"></select></div>
+                            <div class="mb-2"><strong>Управление:</strong> <select id="empDepartment" class="form-select form-select-sm"></select></div>
+                            <div class="mb-2"><strong>Отдел:</strong> <select id="empSection" class="form-select form-select-sm"></select></div>
+                            <div class="mb-2"><strong>Норма:</strong> <select id="empQuota" class="form-select form-select-sm"></select></div>
+                        </div>
+
+                        <!-- Правая колонка -->
+                        <div class="col-md-4 d-flex flex-column align-items-center">
+                            <img src="/images/default-profile.jpg" alt="Фото сотрудника" id="empPhoto"
+                                 style="max-height: 200px; max-width: 100%; object-fit: cover; border: 1px solid #999;">
+                            <button class="btn btn-sm btn-outline-primary mt-2">Изменить фото</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab-панель -->
+                <ul class="nav nav-tabs px-3" id="employeeTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="contract-tab" data-bs-toggle="tab" data-bs-target="#contract" type="button" role="tab">Труд. договор и вредность</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="passport-tab" data-bs-toggle="tab" data-bs-target="#passport" type="button" role="tab">Паспортные данные</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab">Адрес</button>
+                    </li>
+                </ul>
+
+                <!-- Содержимое вкладок -->
+                <div class="tab-content px-3 pt-2" id="employeeTabContent">
+                    <!-- Вкладка 1 -->
+                    <div class="tab-pane fade show active" id="contract" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Номер труд. договора:</strong> <input type="text" id="empContractNumber" class="form-control form-control-sm" /></div>
+                                <div class="mb-2"><strong>Дата труд. договора:</strong> <input type="date" id="empContractDate" class="form-control form-control-sm" /></div>
+                                <div class="mb-2 form-check">
+                                    <input type="checkbox" id="empFired" class="form-check-input">
+                                    <label class="form-check-label" for="empFired"><strong>Уволен</strong></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Доплата за вредность:</strong> <input type="text" id="empHazard" class="form-control form-control-sm" /></div>
+                                <div class="mb-2"><strong>Документ на вредность:</strong> <select id="empHazardDoc" class="form-select form-select-sm"></select></div>
+                                <div class="mb-2"><strong>Дата увольнения:</strong> <input type="date" id="empFiringDate" class="form-control form-control-sm" /></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Вкладка 2 -->
+                    <div class="tab-pane fade" id="passport" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Пол:</strong> <select id="empSex" class="form-select form-select-sm"></select></div>
+                                <div class="mb-2"><strong>Дата рождения:</strong> <input type="date" id="empBirthday" class="form-control form-control-sm" /></div>
+                                <div class="mb-2"><strong>Гражданство:</strong> <select id="empCitizenship" class="form-select form-select-sm"></select></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Паспортные данные:</strong> <input type="text" id="empPassport" class="form-control form-control-sm" /></div>
+                                <div class="mb-2"><strong>Национальность:</strong> <select id="empNationality" class="form-select form-select-sm"></select></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Вкладка 3 -->
+                    <div class="tab-pane fade" id="address" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-2"><strong>Адрес:</strong> <input type="text" id="empAddress" class="form-control form-control-sm" /></div>
+                                <div class="mb-2"><strong>Район:</strong> <select id="empDistrict" class="form-select form-select-sm"></select></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm">Сохранить</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Отменить</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
 
 
@@ -230,7 +354,8 @@
         });
     </script>
 
-
+    
+    <!--Мод окно-->
     <script>
         // Твой уже существующий код поиска и прочего
 
@@ -252,6 +377,57 @@
                         document.getElementById("detailPhoto").src = data.photoPath;
                     });
             });
+        });
+    </script>
+    
+    <script>
+        document.querySelector('[data-bs-target="#employeeInfoModal"]').addEventListener('click', () => {
+            const selectedRow = document.querySelector('.employee-row.table-primary');
+            if (!selectedRow) return;
+
+            const id = selectedRow.getAttribute('data-id');
+
+            fetch(`/Employee/GetEmployeeFullDetails?id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Текстовые поля
+                    document.getElementById('empCode').textContent = data.codeEmployee;
+                    document.getElementById('empSurname').value = data.surname;
+                    document.getElementById('empFirstname').value = data.firstname;
+                    document.getElementById('empMidname').value = data.midname;
+                    document.getElementById('empNameCh').value = data.nameCh;
+                    document.getElementById('empTabNum').value = data.tabNum;
+                    document.getElementById('empInputDate').value = data.inputDate?.split('T')[0] || "";
+
+                    // select
+                    document.getElementById('empPost').value = data.post;
+                    document.getElementById('empPartTime').value = data.partTime;
+                    document.getElementById('empDepartment').value = data.department;
+                    document.getElementById('empSection').value = data.section;
+                    document.getElementById('empQuota').value = data.quota;
+
+                    // contract
+                    document.getElementById('empContractNumber').value = data.contractNumber;
+                    document.getElementById('empContractDate').value = data.contractDate?.split('T')[0] || "";
+                    document.getElementById('empFired').checked = data.fired;
+                    document.getElementById('empFiringDate').value = data.firingDate?.split('T')[0] || "";
+                    document.getElementById('empHazard').value = data.hazard;
+                    document.getElementById('empHazardDoc').value = data.hazardDoc;
+
+                    // passport
+                    document.getElementById('empSex').value = data.sex;
+                    document.getElementById('empBirthday').value = data.birthday?.split('T')[0] || "";
+                    document.getElementById('empCitizenship').value = data.citizenship;
+                    document.getElementById('empPassport').value = data.passport;
+                    document.getElementById('empNationality').value = data.nationality;
+
+                    // address
+                    document.getElementById('empAddress').value = data.address;
+                    document.getElementById('empDistrict').value = data.district;
+
+                    // фото
+                    document.getElementById('empPhoto').src = data.photo;
+                });
         });
     </script>
 }
