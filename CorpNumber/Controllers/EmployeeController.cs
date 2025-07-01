@@ -126,13 +126,28 @@ namespace CorpNumber.Controllers
             int? categoryCode = owner?.CodeCategory;
             string? categoryTitle = owner?.CategoryNavigation?.Category ?? "—";
 
-            var categories = _context.OwnerCategories
+           /* var categories = _context.OwnerCategories
                 .Select(c => new NamedId
                 {
                     Code = c.CodeCategory,
                     Title = c.Category
                 }).ToList();
+            categories.Insert(0, new NamedId { Code = null, Title = "—" });*/
+
+            var ownerCategory = _context.Owners
+                .Where(o => o.CodeEmployee == emp.CodeEmployee)
+                .Select(o => o.CodeCategory)
+                .FirstOrDefault();
+
+            var categories = _context.OwnerCategories
+                .Select(c => new NamedId
+                {
+                    Code = c.CodeCategory,
+                    Title = c.Category + " " + c.CategoryCh
+                }).ToList();
+
             categories.Insert(0, new NamedId { Code = null, Title = "—" });
+
 
 
             return Json(new
@@ -168,6 +183,9 @@ namespace CorpNumber.Controllers
                 category = categoryCode,
                 categoryTitle = categoryTitle,
                 categories = categories,
+                codeCategory = ownerCategory,
+                
+
 
 
 
@@ -257,6 +275,64 @@ namespace CorpNumber.Controllers
 
             string photoUrl = Url.Content($"/Photo/{fileName}");
             return Content(photoUrl);
+        }
+
+
+        // Сохранение изменений сотрудника
+        [HttpPost]
+        public async Task<IActionResult> SaveEmployee([FromBody] EmployeeViewModel updated)
+        {
+            if (updated == null || updated.CodeEmployee == 0)
+                return BadRequest("Неверные данные");
+
+            var emp = await _context.Employees.FirstOrDefaultAsync(e => e.CodeEmployee == updated.CodeEmployee);
+            if (emp == null) return NotFound();
+
+            // Обновление полей
+            emp.Surname = updated.Surname;
+            emp.Firstname = updated.Firstname;
+            emp.Midname = updated.Midname;
+            emp.NameCh = updated.NameCh;
+            emp.TabNum = updated.TabNum;
+            emp.InputDate = updated.InputDate;
+            emp.Post = updated.Post;
+            emp.PartTime = updated.PartTime;
+            emp.Department = updated.Department;
+            emp.Section = updated.Section;
+            emp.ContractNumber = updated.ContractNumber;
+            emp.ContractDate = updated.ContractDate;
+            emp.Fired = updated.Fired;
+            emp.FiringDate = updated.FiringDate;
+            emp.Hazard = updated.Hazard;
+            emp.HazardDoc = updated.HazardDoc;
+            emp.Sex = updated.Sex;
+            emp.Birthday = updated.Birthday;
+            emp.Passport = updated.Passport;
+            emp.Citizenship = updated.Citizenship;
+            emp.Nationality = updated.Nationality;
+            emp.Address = updated.Address;
+            emp.District = updated.District;
+            emp.CodeQuota = updated.CodeQuota;
+
+            // Обновление CodeCategory
+            var owner = await _context.Owners.FirstOrDefaultAsync(o => o.CodeEmployee == updated.CodeEmployee);
+
+            if (owner != null)
+            {
+                owner.CodeCategory = updated.CodeCategory;
+            }
+            else if (updated.CodeCategory != null)
+            {
+                _context.Owners.Add(new Owner
+                {
+                    CodeEmployee = updated.CodeEmployee,
+                    CodeCategory = updated.CodeCategory.Value
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true });
         }
 
 

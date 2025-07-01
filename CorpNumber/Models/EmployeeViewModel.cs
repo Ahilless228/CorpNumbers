@@ -1,11 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CorpNumber.Models
+﻿namespace CorpNumber.Models
 {
-    public class Employee
+    public class EmployeeViewModel
     {
-        [Key]
         public int CodeEmployee { get; set; }
         public string? Surname { get; set; }
         public string? Firstname { get; set; }
@@ -31,15 +27,8 @@ namespace CorpNumber.Models
         public int? District { get; set; }
         public int? Citizenship { get; set; }
         public int? Nationality { get; set; }
-        public byte[]? SSMA_TimeStamp { get; set; }
-        [NotMapped]
-        public int? CodeCategory { get; set; }
 
-
-        public Post? PostNavigation { get; set; }
-        public Department? DepartmentNavigation { get; set; }
-        public Section? SectionNavigation { get; set; }
-        public Quota? CodeQuotaNavigation { get; set; }
-
+        public int? CodeCategory { get; set; } // теперь сериализуется!
     }
+
 }

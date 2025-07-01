@@ -463,7 +463,8 @@
                     fillSelect('empCitizenship', data.citizenships, data.citizenship);
                     fillSelect('empNationality', data.nationalities, data.nationality);
                     fillSelect('empDistrict', data.districts, data.district);
-                    fillSelect('empCategory', data.categories, data.category);
+                    fillSelect('empCategory', data.categories, data.codeCategory);
+
 
                 });
         });
@@ -506,6 +507,117 @@
             })
             .catch(err => alert(err));
         });
+    </script>
+
+
+    <!--Скрипт сохранения изменений данных сотрудника в БД-->
+    <script>
+        document.querySelector('#employeeInfoModal .btn-success').addEventListener('click', function () {
+                if (!confirm("Вы уверены, что хотите сохранить изменения?")) {
+                    return; // Отмена, если пользователь нажал "Отмена"
+                 }
+            const data = {
+                CodeEmployee: +document.getElementById('empCode').textContent,
+                Surname: document.getElementById('empSurname').value,
+                Firstname: document.getElementById('empFirstname').value,
+                Midname: document.getElementById('empMidname').value,
+                NameCh: document.getElementById('empNameCh').value,
+                TabNum: +document.getElementById('empTabNum').value,
+                InputDate: document.getElementById('empInputDate').value || null,
+                Post: parseInt(document.getElementById('empPost').value) || null,
+                PartTime: parseInt(document.getElementById('empPartTime').value) || null,
+                Department: parseInt(document.getElementById('empDepartment').value) || null,
+                Section: parseInt(document.getElementById('empSection').value) || null,
+                CodeQuota: parseInt(document.getElementById('empQuota').value) || null,
+                ContractNumber: document.getElementById('empContractNumber').value,
+                ContractDate: document.getElementById('empContractDate').value || null,
+                Fired: document.getElementById('empFired').checked,
+                FiringDate: document.getElementById('empFiringDate').value || null,
+                Hazard: parseInt(document.getElementById('empHazard').value) || null,
+                HazardDoc: parseInt(document.getElementById('empHazardDoc').value) || null,
+                Sex: parseInt(document.getElementById('empSex').value) || null,
+                Birthday: document.getElementById('empBirthday').value || null,
+                Passport: document.getElementById('empPassport').value,
+                Address: document.getElementById('empAddress').value,
+                Citizenship: parseInt(document.getElementById('empCitizenship').value) || null,
+                Nationality: parseInt(document.getElementById('empNationality').value) || null,
+                District: parseInt(document.getElementById('empDistrict').value) || null,
+                CodeCategory: parseInt(document.getElementById('empCategory').value) || null
+
+            };
+            console.log("Отправляемые данные:", data);
+
+            fetch('/Employee/SaveEmployee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.ok ? res.json() : Promise.reject())
+            .then(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('employeeInfoModal'));
+                resetFormChangedFlag();
+                modal.hide();
+                location.reload(); // перезагрузить данные таблицы
+            })
+            .catch(async err => {
+                const text = await err.text?.();
+                console.error("Ошибка запроса:", err, text);
+                alert("Не удалось сохранить данные: " + text);
+            });
+
+        });
+    </script>
+        
+
+    <!--Подтверждение сохранения-->
+    <script>
+        // Флаг для отслеживания изменений
+        let cancelConfirmed = false;
+        let isFormChanged = false;
+
+        // Отмечаем, если что-то изменилось
+        document.querySelectorAll('#employeeInfoModal input, #employeeInfoModal select').forEach(el => {
+            el.addEventListener('change', () => {
+                isFormChanged = true;
+            });
+        });
+
+        // Обработка закрытия модального окна через "Отменить"
+        document.querySelector('#employeeInfoModal .btn-secondary').addEventListener('click', function (e) {
+            if (isFormChanged) {
+                if (!confirm("Вы уверены, что хотите отменить изменения?")) {
+                    e.preventDefault();
+                    return;
+                }
+                cancelConfirmed = true; // подтвердили отмену
+            }
+            isFormChanged = false;
+        });
+
+
+        // Обработка закрытия по клику вне модального окна (серая область)
+        const modalEl = document.getElementById('employeeInfoModal');
+        modalEl.addEventListener('hide.bs.modal', function (e) {
+            if (isFormChanged && !cancelConfirmed) {
+                const confirmClose = confirm("Вы уверены, что хотите отменить изменения?");
+                if (!confirmClose) {
+                    e.preventDefault();
+                } else {
+                    isFormChanged = false;
+                    cancelConfirmed = true;
+                }
+            }
+            // Всегда сбрасываем флаг после попытки закрытия
+            cancelConfirmed = false;
+        });
+
+
+        // После успешного сохранения сбрасываем флаг
+        function resetFormChangedFlag() {
+            isFormChanged = false;
+        }
     </script>
 
 }
