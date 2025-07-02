@@ -116,7 +116,7 @@
         <button type="button" class="btn btn-sm btn-light border rounded-circle position-absolute"
                 title="Подробнее о сотруднике"
                 style="top: 10px; right: 10px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"
-                data-bs-toggle="modal" data-bs-target="#employeeInfoModal">
+                data-bs-toggle="modal" data-bs-target="#employeeEditModal">
             👨‍💼
         </button>
 
@@ -159,7 +159,7 @@
     </div>
 
     <!-- Модальное окно редактирования данных о сотруднике -->
-    <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="employeeEditModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 85vw;">
             <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
 
@@ -294,6 +294,145 @@
     </div>
 
 
+    <!-- Модальное окно с информацией о сотруднике -->
+    <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 85vw;">
+            <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+
+                <!-- Header -->
+                <div class="modal-header d-flex align-items-center">
+                    <div class="me-3" style="font-size: 2.5rem; line-height: 1;">👷</div>
+                    <h5 class="modal-title flex-grow-1">Информация о сотруднике</h5>
+                    <img src="/images/altynken-logo.jpg" alt="Лого" style="height: 40px;">
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Левая колонка -->
+                        <div class="col-md-8">
+                            <div class="mb-2"><strong>Код:</strong> <span id="info_empCode">—</span></div>
+                            <div class="mb-2"><strong>Фамилия:</strong> <span id="info_empSurname">—</span></div>
+                            <div class="mb-2"><strong>Имя:</strong> <span id="info_empFirstname">—</span></div>
+                            <div class="mb-2"><strong>Отчество:</strong> <span id="info_empMidname">—</span></div>
+                            <div class="mb-2"><strong>姓名:</strong> <span id="info_empNameCh">—</span></div>
+
+                            <div class="mb-2 row">
+                                <div class="col-6"><strong>Таб. №:</strong> <span id="info_empTabNum">—</span></div>
+                                <div class="col-6"><strong>Дата приёма:</strong> <span id="info_empInputDate">—</span></div>
+                            </div>
+
+                            <div class="mb-2"><strong>Должность:</strong> <span id="info_empPost">—</span></div>
+                            <div class="mb-2"><strong>Совмещение:</strong> <span id="info_empPartTime">—</span></div>
+                            <div class="mb-2"><strong>Управление:</strong> <span id="info_empDepartment">—</span></div>
+                            <div class="mb-2"><strong>Отдел:</strong> <span id="info_empSection">—</span></div>
+                            <div class="mb-2"><strong>Норма:</strong> <span id="info_empQuota">—</span></div>
+                        </div>
+
+                        <!-- Правая колонка -->
+                        <div class="col-md-4 d-flex flex-column align-items-center">
+                            <img src="/images/default-profile.jpg" alt="Фото сотрудника" id="info_empPhoto"
+                                 style="max-height: 200px; max-width: 100%; object-fit: cover; border: 1px solid #999;">
+                            <div class="mt-2 text-center" id="info_empOrg">—</div>
+                            <button class="btn btn-sm btn-outline-primary mt-2">Переводы</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab-панель -->
+                <ul class="nav nav-tabs px-3" id="employeeTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="contract-tab" data-bs-toggle="tab" data-bs-target="#contract" type="button" role="tab">Труд. договор и вредность</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="passport-tab" data-bs-toggle="tab" data-bs-target="#passport" type="button" role="tab">Паспортные данные</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab">Адрес</button>
+                    </li>
+                </ul>
+
+                <!-- Содержимое вкладок -->
+                <div class="tab-content px-3 pt-2" id="employeeTabContent">
+                    <!-- Вкладка 1 -->
+                    <div class="tab-pane fade show active" id="contract" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Номер труд. договора:</strong> <span id="info_empContractNumber">—</span></div>
+                                <div class="mb-2"><strong>Дата труд. договора:</strong> <span id="info_empContractDate">—</span></div>
+                                <div class="mb-2">
+                                    <strong>Уволен:</strong>
+                                    <input type="checkbox" id="info_empFired" disabled class="custom-checkbox"
+                                           style="accent-color: #dc3545; opacity: 1; filter: none;" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Доплата за вредность:</strong> <span id="info_empHazard">—</span></div>
+                                <div class="mb-2"><strong>Документ на вредность:</strong> <span id="info_empHazardDoc">—</span></div>
+                                <div class="mb-2"><strong>Дата увольнения:</strong> <span id="info_empFiringDate">—</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Вкладка 2 -->
+                    <div class="tab-pane fade" id="passport" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Пол:</strong> <span id="info_empSex">—</span></div>
+                                <div class="mb-2"><strong>Дата рождения:</strong> <span id="info_empBirthday">—</span></div>
+                                <div class="mb-2"><strong>Гражданство:</strong> <span id="info_empCitizenship">—</span></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2"><strong>Паспортные данные:</strong> <span id="info_empPassport">—</span></div>
+                                <div class="mb-2"><strong>Национальность:</strong> <span id="info_empNationality">—</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Вкладка 3 -->
+                    <div class="tab-pane fade" id="address" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-2"><strong>Адрес:</strong> <span id="info_empAddress">—</span></div>
+                                <div class="mb-2"><strong>Район:</strong> <span id="info_empDistrict">—</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Таблица номеров -->
+                    <hr />
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Зарегистрированные на сотрудника номера</h5>
+                            <span class="badge bg-primary" id="info_empPhoneCount">0</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Номер</th>
+                                        <th>Оператор</th>
+                                        <th>Счёт</th>
+                                        <th>Дата выдачи</th>
+                                        <th>Корп.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="info_empPhoneTableBody">
+                                    <!-- Динамически -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
     
@@ -382,7 +521,7 @@
 
     <!--загрузка данных из БД в мод окно-->
     <script>
-        document.querySelector('[data-bs-target="#employeeInfoModal"]').addEventListener('click', () => {
+        document.querySelector('[data-bs-target="#employeeEditModal"]').addEventListener('click', () => {
             const selectedRow = document.querySelector('.employee-row.table-primary');
             if (!selectedRow) return;
 
@@ -501,17 +640,17 @@
         }
 
         (() => {
-            const modalEl = document.getElementById('employeeInfoModal');
+            const modalEl = document.getElementById('employeeEditModal');
 
             // Слушатели на все input/select — один раз при загрузке страницы
-            document.querySelectorAll('#employeeInfoModal input, #employeeInfoModal select').forEach(el => {
+            document.querySelectorAll('#employeeEditModal input, #employeeEditModal select').forEach(el => {
                 el.addEventListener('change', () => {
                     isFormChanged = true;
                 });
             });
 
             // Кнопка "Отменить"
-            document.querySelector('#employeeInfoModal .btn-secondary').addEventListener('click', function (e) {
+            document.querySelector('#employeeEditModal .btn-secondary').addEventListener('click', function (e) {
                 if (isFormChanged) {
                     const confirmCancel = confirm("Вы уверены, что хотите отменить изменения?");
                     if (!confirmCancel) {
@@ -538,7 +677,7 @@
 
 
         // Кнопка "Сохранить"
-        document.querySelector('#employeeInfoModal .btn-success').addEventListener('click', function () {
+        document.querySelector('#employeeEditModal .btn-success').addEventListener('click', function () {
             if (!confirm("Вы уверены, что хотите сохранить изменения?")) {
                 return; // Отмена
             }
@@ -585,7 +724,7 @@
                 return res.text().then(text => { throw new Error(text) });
             })
             .then(() => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('employeeInfoModal'));
+                const modal = bootstrap.Modal.getInstance(document.getElementById('employeeEditModal'));
                 resetFormChangedFlag();
                 modal.hide();
                 location.reload(); // обновить таблицу
@@ -601,6 +740,86 @@
         });
     </script>
 
+
+    <!--Обработчик дабл клика и загрузка данных в мод окно с инфо-->
+    <script>
+                // Обработчик дабл клика и загрузка данных в мод окно с инфо
+        $(document).ready(function () {
+            $('#employeeTable').on('dblclick', '.employee-row', function () {
+                const codeEmployee = $(this).data('id');
+
+                $.get(`/Employee/GetEmployeeInfoModal?id=${codeEmployee}`, function (data) {
+                    if (!data || Object.keys(data).length === 0) {
+                        alert("Сотрудник не найден.");
+                        return;
+                    }
+
+                    // Заполнение полей
+                    $('#info_empCode').text(data.codeEmployee ?? '—');
+                    $('#info_empSurname').text(data.surname ?? '—');
+                    $('#info_empFirstname').text(data.firstname ?? '—');
+                    $('#info_empMidname').text(data.midname ?? '—');
+                    $('#info_empNameCh').text(data.nameCh ?? '—');
+                    $('#info_empTabNum').text(data.tabNum ?? '—');
+                    $('#info_empInputDate').text(data.inputDate?.substring(0, 10) ?? '—');
+                    $('#info_empPost').text(data.post ?? '—');
+                    $('#info_empPartTime').text(data.partTime ?? '—');
+                    $('#info_empDepartment').text(data.department ?? '—');
+                    $('#info_empSection').text(data.section ?? '—');
+                    $('#info_empQuota').text(data.quota ?? '—');
+                    $('#info_empOrg').text(data.org ?? '—');
+                    $('#info_empPhoto').attr('src', data.photo ?? '/images/default-profile.jpg');
+
+                    $('#info_empContractNumber').text(data.contractNumber ?? '—');
+                    $('#info_empContractDate').text(data.contractDate?.substring(0, 10) ?? '—');
+                    $('#info_empFired').prop('checked', data.fired === true);
+                    $('#info_empHazard').text(data.hazard != null ? data.hazard + '%' : '—');
+                    $('#info_empHazardDoc').text(data.hazardDocTitle ?? '—');
+                    $('#info_empFiringDate').text(data.firingDate?.substring(0, 10) ?? '—');
+
+                    $('#info_empSex').text(data.sexTitle ?? '—');
+                    $('#info_empBirthday').text(data.birthday?.substring(0, 10) ?? '—');
+                    $('#info_empCitizenship').text(data.citizenshipTitle ?? '—');
+                    $('#info_empPassport').text(data.passport ?? '—');
+                    $('#info_empNationality').text(data.nationalityTitle ?? '—');
+                    $('#info_empAddress').text(data.address ?? '—');
+                    $('#info_empDistrict').text(data.districtTitle ?? '—');
+
+                    // Получение телефонов
+                    console.log("codeEmployee для телефонов:", data.codeEmployee);
+
+                    $.get('/Employee/GetRegisteredPhones', { id: data.codeEmployee }, function (phoneData) {
+                        $('#info_empPhoneCount').text(phoneData.count);
+
+                        const tbody = $('#info_empPhoneTableBody');
+                        tbody.empty();
+
+                        if (phoneData.count === 0) {
+                            tbody.append('<tr><td colspan="5" class="text-center text-muted">Нет зарегистрированных номеров</td></tr>');
+                        } else {
+                            phoneData.phones.forEach(p => {
+                                tbody.append(`<tr>
+                                    <td>${p.number}</td>
+                                    <td>${p.operatorTitle}</td>
+                                    <td>${p.accountType}</td>
+                                    <td>${p.issueDate}</td>
+                                    <td>
+                                        <input type="checkbox" disabled class="custom-checkbox" ${p.corporative ? 'checked' : ''}
+                                               style="accent-color: #0d6efd; opacity: 1;filter: none;" />
+                                    </td>
+                                </tr>`);
+                            });
+                        }
+                    });
+
+                    // Показать модальное окно
+                    const modal = new bootstrap.Modal(document.getElementById('employeeInfoModal'));
+                    modal.show();
+                });
+            });
+        });
+
+    </script>
 
 
 

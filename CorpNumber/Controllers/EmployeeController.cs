@@ -376,6 +376,138 @@ namespace CorpNumber.Controllers
             return 99999;
         }
 
+        //получение зарегистрированных телефонов сотрудника для мод инфо окна
+        [HttpGet]
+        public IActionResult GetRegisteredPhones(int id)
+        {
+            // Ищем всех владельцев, связанных с этим сотрудником
+            var owners = _context.Owners
+                .Where(o => o.CodeEmployee == id)
+                .Select(o => o.CodeOwner)
+                .ToList();
+
+            if (!owners.Any())
+                return Json(new { count = 0, phones = new List<object>() });
+
+            // Ищем все номера, у которых CodeOwner совпадает с владельцем
+            var phones = _context.Phones
+                .Where(p => p.CodeOwner != null && owners.Contains(p.CodeOwner.Value))
+                .Include(p => p.OperatorNavigation)
+                .Include(p => p.AccountNavigation)
+                .ToList();
+
+            var result = phones.Select(phone =>
+            {
+                // Находим последнюю операцию "выдача номера" (CodeOperType == 6)
+                var issueDate = _context.Operations
+                    .Where(op => op.Number == phone.CodePhone &&
+                                 op.CodeOperType == 6 &&
+                                 op.Owner_new != null &&
+                                 owners.Contains(op.Owner_new.Value))
+                    .OrderByDescending(op => op.OperDate)
+                    .Select(op => op.OperDate)
+                    .FirstOrDefault();
+
+                return new
+                {
+                    number = phone.Number?.ToString() ?? "—",
+                    operatorTitle = phone.OperatorNavigation?.Title ?? "—",
+                    accountType = phone.AccountNavigation?.Type ?? "—",
+                    issueDate = issueDate?.ToString("yyyy-MM-dd") ?? "—",
+                    corporative = phone.Corporative == true
+                };
+            }).ToList();
+
+            return Json(new
+            {
+                count = result.Count,
+                phones = result
+            });
+        }
+
+        //метод загрузки инфоо сотруднике для модального окна с информацией
+        [HttpGet]
+        public IActionResult GetEmployeeInfoModal(int id)
+        {
+            // Достаём сотрудника по ID
+            var emp = _context.Employees
+                .Include(e => e.PostNavigation)
+                .Include(e => e.DepartmentNavigation)
+                .Include(e => e.SectionNavigation)
+                .FirstOrDefault(e => e.CodeEmployee == id);
+
+            if (emp == null)
+                return Json(null);
+
+            // Подгружаем справочники
+            var quotaText = _context.Quotas
+                .Where(q => q.CodeQuota == emp.CodeQuota)
+                .Select(q => (q.Quotaa != null ? q.Quotaa.ToString() : "—"))
+                .FirstOrDefault();
+
+            string photoFileName = emp.TabNum?.ToString("D5");
+            string photoPath = null;
+
+            if (!string.IsNullOrEmpty(photoFileName))
+            {
+                string mainPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Photo", $"{photoFileName}.jpg");
+                string archivePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Photo", "Archive", $"{photoFileName}.jpg");
+
+                if (System.IO.File.Exists(mainPath))
+                    photoPath = Url.Content($"/Photo/{photoFileName}.jpg");
+                else if (System.IO.File.Exists(archivePath))
+                    photoPath = Url.Content($"/Photo/Archive/{photoFileName}.jpg");
+            }
+
+            if (string.IsNullOrEmpty(photoPath))
+                photoPath = Url.Content("~/images/default-profile.jpg");
+
+            return Json(new
+            {
+                emp.CodeEmployee,
+                emp.Surname,
+                emp.Firstname,
+                emp.Midname,
+                emp.NameCh,
+                emp.TabNum,
+                emp.InputDate,
+                emp.PartTime,
+                Quota = quotaText,
+                Post = emp.PostNavigation?.Postt + " " + emp.PostNavigation?.PostCh,
+                Department = emp.DepartmentNavigation?.DepartmentName + " " + emp.DepartmentNavigation?.DepartmentCh,
+                Section = emp.SectionNavigation?.SectionName + " " + emp.SectionNavigation?.SectionCh,
+                Photo = photoPath,
+                Org = "ОсОО \"Алтынкен\"",
+                Hazard = emp.Hazard,
+                ContractNumber = emp.ContractNumber,
+                ContractDate = emp.ContractDate,
+                Fired = emp.Fired,
+                FiringDate = emp.FiringDate,
+                HazardDocTitle = _context.CompanyDocs
+                    .Where(cd => cd.Code == emp.HazardDoc)
+                    .Select(cd => cd.Title)
+                    .FirstOrDefault(),
+                SexTitle = _context.Sexes
+                    .Where(s => s.CodeSex == emp.Sex)
+                    .Select(s => s.Sex + " " + s.SexCh)
+                    .FirstOrDefault(),
+                CitizenshipTitle = _context.Citizenships
+                    .Where(c => c.CodeCitizenship == emp.Citizenship)
+                    .Select(c => c.Citizenship + " " + c.CitizenshipCh)
+                    .FirstOrDefault(),
+                NationalityTitle = _context.Nationalities
+                    .Where(n => n.CodeNationality == emp.Nationality)
+                    .Select(n => n.Nationality + " " + n.NationalityCh)
+                    .FirstOrDefault(),
+                Birthday = emp.Birthday,
+                Passport = emp.Passport,
+                Address = emp.Address,
+                DistrictTitle = _context.Districts
+                    .Where(d => d.CodeDistrict == emp.District)
+                    .Select(d => d.District + " " + d.DistrictCh)
+                    .FirstOrDefault()
+            });
+        }
 
 
 
