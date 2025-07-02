@@ -288,6 +288,31 @@ namespace CorpNumber.Controllers
             var emp = await _context.Employees.FirstOrDefaultAsync(e => e.CodeEmployee == updated.CodeEmployee);
             if (emp == null) return NotFound();
 
+            // Сохраняем старый табельный номер
+            var oldTabNum = emp.TabNum;
+
+            // Проверка на конфликт нового TabNum (если он изменился)
+            if (updated.TabNum != oldTabNum)
+            {
+                bool tabNumExists = await _context.Employees.AnyAsync(e => e.TabNum == updated.TabNum);
+                if (tabNumExists)
+                {
+                    var suggested = await GetSuggestedTabNum();
+                    return BadRequest($"Таб. номер {updated.TabNum} уже занят. Предложение: {suggested:D5}");
+                }
+
+               
+                // Переименование фото (если есть файл с прошлым табельным номером)
+                var photoDir = Path.Combine("wwwroot", "Photo");
+                var oldFile = Path.Combine(photoDir, $"{oldTabNum:D5}.jpg");
+                var newFile = Path.Combine(photoDir, $"{updated.TabNum:D5}.jpg");
+                if (System.IO.File.Exists(oldFile))
+                {
+                    System.IO.File.Move(oldFile, newFile);
+                }
+
+            }
+
             // Обновление полей
             emp.Surname = updated.Surname;
             emp.Firstname = updated.Firstname;
@@ -334,6 +359,23 @@ namespace CorpNumber.Controllers
 
             return Ok(new { success = true });
         }
+
+        //метод помощник для предложения табельного номера
+        private async Task<int> GetSuggestedTabNum()
+        {
+            var used = await _context.Employees
+                .Where(e => e.TabNum.HasValue)
+                .Select(e => e.TabNum.Value)
+                .ToListAsync();
+
+            for (int i = 1; i < 99999; i++)
+            {
+                if (!used.Contains(i))
+                    return i;
+            }
+            return 99999;
+        }
+
 
 
 

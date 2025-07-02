@@ -445,9 +445,13 @@
     </script>
 
 
-    <!--Скрипт замены фото-->
+    <!--Скрипт замены фото с защитой от несохранённых данных-->
     <script>
         document.getElementById("changePhotoBtn").addEventListener("click", function () {
+            if (isFormChanged) {
+                alert("Сначала сохраните изменения перед сменой фото.");
+                return;
+            }
             document.getElementById("empPhotoInput").click();
         });
 
@@ -482,6 +486,7 @@
             .catch(err => alert(err));
         });
     </script>
+
 
 
 
@@ -587,8 +592,12 @@
             })
             .catch(err => {
                 console.error("Ошибка запроса:", err);
-                alert("Не удалось сохранить данные: " + err.message);
-            });
+                    if (err.message.includes("Таб. номер")) {
+                        alert(err.message); // Покажет сообщение от сервера с предложением
+                    } else {
+                        alert("Не удалось сохранить данные: " + err.message);
+                    }
+                });
         });
     </script>
 
