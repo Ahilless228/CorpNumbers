@@ -3,5 +3,5 @@
 Логин и пароль админа менять в файле app.settings.json
 "AdminCredentials": {
   "Login": "ADMINAPP",
-  "Password": "123456"
+  "Password": "app2025"
 }

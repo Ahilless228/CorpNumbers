@@ -293,8 +293,8 @@
         </div>
     </div>
 
-
-    <!-- Модальное окно с информацией о сотруднике -->
+    
+    @* <!-- Модальное окно с информацией о сотруднике -->
     <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 85vw;">
             <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
@@ -431,7 +431,8 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>  *@
+    @await Html.PartialAsync("_EmployeeInfoModal")
 
 
 
@@ -441,6 +442,11 @@
 
 
 @section Scripts {
+
+    <!--обработчик дабл клика и загрузки данных из БД в мод инфо окно-->
+    <script src="~/js/employeeInfoModal.js"></script>
+   
+    
     <!--Фильтрация , счетчик-->
     <script>
         function selectEmployeeRow(row) {
@@ -738,87 +744,6 @@
                     }
                 });
         });
-    </script>
-
-
-    <!--Обработчик дабл клика и загрузка данных в мод окно с инфо-->
-    <script>
-                // Обработчик дабл клика и загрузка данных в мод окно с инфо
-        $(document).ready(function () {
-            $('#employeeTable').on('dblclick', '.employee-row', function () {
-                const codeEmployee = $(this).data('id');
-
-                $.get(`/Employee/GetEmployeeInfoModal?id=${codeEmployee}`, function (data) {
-                    if (!data || Object.keys(data).length === 0) {
-                        alert("Сотрудник не найден.");
-                        return;
-                    }
-
-                    // Заполнение полей
-                    $('#info_empCode').text(data.codeEmployee ?? '—');
-                    $('#info_empSurname').text(data.surname ?? '—');
-                    $('#info_empFirstname').text(data.firstname ?? '—');
-                    $('#info_empMidname').text(data.midname ?? '—');
-                    $('#info_empNameCh').text(data.nameCh ?? '—');
-                    $('#info_empTabNum').text(data.tabNum ?? '—');
-                    $('#info_empInputDate').text(data.inputDate?.substring(0, 10) ?? '—');
-                    $('#info_empPost').text(data.post ?? '—');
-                    $('#info_empPartTime').text(data.partTime ?? '—');
-                    $('#info_empDepartment').text(data.department ?? '—');
-                    $('#info_empSection').text(data.section ?? '—');
-                    $('#info_empQuota').text(data.quota ?? '—');
-                    $('#info_empOrg').text(data.org ?? '—');
-                    $('#info_empPhoto').attr('src', data.photo ?? '/images/default-profile.jpg');
-
-                    $('#info_empContractNumber').text(data.contractNumber ?? '—');
-                    $('#info_empContractDate').text(data.contractDate?.substring(0, 10) ?? '—');
-                    $('#info_empFired').prop('checked', data.fired === true);
-                    $('#info_empHazard').text(data.hazard != null ? data.hazard + '%' : '—');
-                    $('#info_empHazardDoc').text(data.hazardDocTitle ?? '—');
-                    $('#info_empFiringDate').text(data.firingDate?.substring(0, 10) ?? '—');
-
-                    $('#info_empSex').text(data.sexTitle ?? '—');
-                    $('#info_empBirthday').text(data.birthday?.substring(0, 10) ?? '—');
-                    $('#info_empCitizenship').text(data.citizenshipTitle ?? '—');
-                    $('#info_empPassport').text(data.passport ?? '—');
-                    $('#info_empNationality').text(data.nationalityTitle ?? '—');
-                    $('#info_empAddress').text(data.address ?? '—');
-                    $('#info_empDistrict').text(data.districtTitle ?? '—');
-
-                    // Получение телефонов
-                    console.log("codeEmployee для телефонов:", data.codeEmployee);
-
-                    $.get('/Employee/GetRegisteredPhones', { id: data.codeEmployee }, function (phoneData) {
-                        $('#info_empPhoneCount').text(phoneData.count);
-
-                        const tbody = $('#info_empPhoneTableBody');
-                        tbody.empty();
-
-                        if (phoneData.count === 0) {
-                            tbody.append('<tr><td colspan="5" class="text-center text-muted">Нет зарегистрированных номеров</td></tr>');
-                        } else {
-                            phoneData.phones.forEach(p => {
-                                tbody.append(`<tr>
-                                    <td>${p.number}</td>
-                                    <td>${p.operatorTitle}</td>
-                                    <td>${p.accountType}</td>
-                                    <td>${p.issueDate}</td>
-                                    <td>
-                                        <input type="checkbox" disabled class="custom-checkbox" ${p.corporative ? 'checked' : ''}
-                                               style="accent-color: #0d6efd; opacity: 1;filter: none;" />
-                                    </td>
-                                </tr>`);
-                            });
-                        }
-                    });
-
-                    // Показать модальное окно
-                    const modal = new bootstrap.Modal(document.getElementById('employeeInfoModal'));
-                    modal.show();
-                });
-            });
-        });
-
     </script>
 
 
