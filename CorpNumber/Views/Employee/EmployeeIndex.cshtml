@@ -292,146 +292,7 @@
             </div>
         </div>
     </div>
-
-    
-    @* <!-- Модальное окно с информацией о сотруднике -->
-    <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 85vw;">
-            <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
-
-                <!-- Header -->
-                <div class="modal-header d-flex align-items-center">
-                    <div class="me-3" style="font-size: 2.5rem; line-height: 1;">👷</div>
-                    <h5 class="modal-title flex-grow-1">Информация о сотруднике</h5>
-                    <img src="/images/altynken-logo.jpg" alt="Лого" style="height: 40px;">
-                </div>
-
-                <!-- Body -->
-                <div class="modal-body">
-                    <div class="row">
-                        <!-- Левая колонка -->
-                        <div class="col-md-8">
-                            <div class="mb-2"><strong>Код:</strong> <span id="info_empCode">—</span></div>
-                            <div class="mb-2"><strong>Фамилия:</strong> <span id="info_empSurname">—</span></div>
-                            <div class="mb-2"><strong>Имя:</strong> <span id="info_empFirstname">—</span></div>
-                            <div class="mb-2"><strong>Отчество:</strong> <span id="info_empMidname">—</span></div>
-                            <div class="mb-2"><strong>姓名:</strong> <span id="info_empNameCh">—</span></div>
-
-                            <div class="mb-2 row">
-                                <div class="col-6"><strong>Таб. №:</strong> <span id="info_empTabNum">—</span></div>
-                                <div class="col-6"><strong>Дата приёма:</strong> <span id="info_empInputDate">—</span></div>
-                            </div>
-
-                            <div class="mb-2"><strong>Должность:</strong> <span id="info_empPost">—</span></div>
-                            <div class="mb-2"><strong>Совмещение:</strong> <span id="info_empPartTime">—</span></div>
-                            <div class="mb-2"><strong>Управление:</strong> <span id="info_empDepartment">—</span></div>
-                            <div class="mb-2"><strong>Отдел:</strong> <span id="info_empSection">—</span></div>
-                            <div class="mb-2"><strong>Норма:</strong> <span id="info_empQuota">—</span></div>
-                        </div>
-
-                        <!-- Правая колонка -->
-                        <div class="col-md-4 d-flex flex-column align-items-center">
-                            <img src="/images/default-profile.jpg" alt="Фото сотрудника" id="info_empPhoto"
-                                 style="max-height: 200px; max-width: 100%; object-fit: cover; border: 1px solid #999;">
-                            <div class="mt-2 text-center" id="info_empOrg">—</div>
-                            <button class="btn btn-sm btn-outline-primary mt-2">Переводы</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab-панель -->
-                <ul class="nav nav-tabs px-3" id="employeeTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="contract-tab" data-bs-toggle="tab" data-bs-target="#contract" type="button" role="tab">Труд. договор и вредность</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="passport-tab" data-bs-toggle="tab" data-bs-target="#passport" type="button" role="tab">Паспортные данные</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab">Адрес</button>
-                    </li>
-                </ul>
-
-                <!-- Содержимое вкладок -->
-                <div class="tab-content px-3 pt-2" id="employeeTabContent">
-                    <!-- Вкладка 1 -->
-                    <div class="tab-pane fade show active" id="contract" role="tabpanel">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-2"><strong>Номер труд. договора:</strong> <span id="info_empContractNumber">—</span></div>
-                                <div class="mb-2"><strong>Дата труд. договора:</strong> <span id="info_empContractDate">—</span></div>
-                                <div class="mb-2">
-                                    <strong>Уволен:</strong>
-                                    <input type="checkbox" id="info_empFired" disabled class="custom-checkbox"
-                                           style="accent-color: #dc3545; opacity: 1; filter: none;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2"><strong>Доплата за вредность:</strong> <span id="info_empHazard">—</span></div>
-                                <div class="mb-2"><strong>Документ на вредность:</strong> <span id="info_empHazardDoc">—</span></div>
-                                <div class="mb-2"><strong>Дата увольнения:</strong> <span id="info_empFiringDate">—</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Вкладка 2 -->
-                    <div class="tab-pane fade" id="passport" role="tabpanel">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-2"><strong>Пол:</strong> <span id="info_empSex">—</span></div>
-                                <div class="mb-2"><strong>Дата рождения:</strong> <span id="info_empBirthday">—</span></div>
-                                <div class="mb-2"><strong>Гражданство:</strong> <span id="info_empCitizenship">—</span></div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2"><strong>Паспортные данные:</strong> <span id="info_empPassport">—</span></div>
-                                <div class="mb-2"><strong>Национальность:</strong> <span id="info_empNationality">—</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Вкладка 3 -->
-                    <div class="tab-pane fade" id="address" role="tabpanel">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="mb-2"><strong>Адрес:</strong> <span id="info_empAddress">—</span></div>
-                                <div class="mb-2"><strong>Район:</strong> <span id="info_empDistrict">—</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Таблица номеров -->
-                    <hr />
-                    <div class="mt-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">Зарегистрированные на сотрудника номера</h5>
-                            <span class="badge bg-primary" id="info_empPhoneCount">0</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Номер</th>
-                                        <th>Оператор</th>
-                                        <th>Счёт</th>
-                                        <th>Дата выдачи</th>
-                                        <th>Корп.</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="info_empPhoneTableBody">
-                                    <!-- Динамически -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>  *@
+    <!--вызов мод инфо окна-->
     @await Html.PartialAsync("_EmployeeInfoModal")
 
 
@@ -442,7 +303,7 @@
 
 
 @section Scripts {
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!--обработчик дабл клика и загрузки данных из БД в мод инфо окно-->
     <script src="~/js/employeeInfoModal.js"></script>
    

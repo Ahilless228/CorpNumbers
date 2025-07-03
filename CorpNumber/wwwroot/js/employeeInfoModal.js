@@ -1,8 +1,5 @@
-﻿//файл employeeInfoModal.js
-// Обработчик дабл клика и загрузка данных в мод окно с инфо
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     const table = document.getElementById('employeeTable');
-
     if (!table) return;
 
     table.addEventListener('dblclick', function (e) {
@@ -19,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
-                // Заполнение данных
+                // Заполнение данных (без изменений)
                 $('#info_empCode').text(data.codeEmployee ?? '—');
                 $('#info_empSurname').text(data.surname ?? '—');
                 $('#info_empFirstname').text(data.firstname ?? '—');
@@ -34,14 +31,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('#info_empQuota').text(data.quota ?? '—');
                 $('#info_empOrg').text(data.org ?? '—');
                 $('#info_empPhoto').attr('src', data.photo ?? '/images/default-profile.jpg');
-
                 $('#info_empContractNumber').text(data.contractNumber ?? '—');
                 $('#info_empContractDate').text(data.contractDate?.substring(0, 10) ?? '—');
                 $('#info_empFired').prop('checked', data.fired === true);
                 $('#info_empHazard').text(data.hazard != null ? data.hazard + '%' : '—');
                 $('#info_empHazardDoc').text(data.hazardDocTitle ?? '—');
                 $('#info_empFiringDate').text(data.firingDate?.substring(0, 10) ?? '—');
-
                 $('#info_empSex').text(data.sexTitle ?? '—');
                 $('#info_empBirthday').text(data.birthday?.substring(0, 10) ?? '—');
                 $('#info_empCitizenship').text(data.citizenshipTitle ?? '—');
@@ -75,36 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
 
-                // Активировать первую вкладку всегда
-                const firstTab = document.querySelector('#employeeTab button[data-bs-target="#contract"]');
-                const tab = new bootstrap.Tab(firstTab);
-                tab.show();
-
-                // Показать модальное окно
+                // Показать модалку
                 const modalEl = document.getElementById('employeeInfoModal');
                 const modal = new bootstrap.Modal(modalEl);
                 modal.show();
-
-                // Инициализация вкладок вручную после показа
-                setTimeout(() => {
-                    const triggerTabList = document.querySelectorAll('#employeeTab button[data-bs-toggle="tab"]');
-                    triggerTabList.forEach(triggerEl => {
-                        const tabTrigger = new bootstrap.Tab(triggerEl);
-
-                        // Перехватываем клик, чтобы переключалось правильно
-                        triggerEl.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            tabTrigger.show();
-                        });
-                    });
-                }, 300); // Небольшая задержка, чтобы DOM успел отрендериться
-
-                // Очистка backdrop при закрытии
-                modalEl.addEventListener('hidden.bs.modal', function () {
-                    document.body.classList.remove('modal-open');
-                    const backdrop = document.querySelector('.modal-backdrop');
-                    if (backdrop) backdrop.remove();
-                });
             });
     });
 });
