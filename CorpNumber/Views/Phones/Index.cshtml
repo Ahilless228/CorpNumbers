@@ -44,7 +44,6 @@
     <form method="get" asp-controller="Phones" asp-action="ExportToExcel" style="display: inline;">
         <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
         <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
-        <input type="hidden" name="onlyCorp" value="@ViewBag.OnlyCorp" />
         <button type="submit" class="btn btn-success">📥 Экспорт в Excel</button>
     </form>
 
@@ -77,19 +76,6 @@
                     }
                 </select>
             </div>
-
-            <!-- Корпоративный чекбокс -->
-            <div class="col-md-3 d-flex align-items-end">
-                <div class="form-check">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           name="onlyCorp"
-                           value="true"
-                           onchange="this.form.submit()"
-                           @(onlyCorp ? "checked" : "") />
-                    <label class="form-check-label">Только корп. группа</label>
-                </div>
-            </div>
         </div>
     </form>
 
@@ -108,7 +94,6 @@
                     <th>Состояние</th>
                     <th>Интернет</th>
                     <th>Лимит</th>
-                    <th>Корпоративный</th>
                 </tr>
             </thead>
             <tbody id="phoneTableBody">
@@ -126,22 +111,13 @@
                             <td>@phone.Status</td>
                             <td>@phone.Internet</td>
                             <td>@(phone.Limit?.ToString() ?? "—")</td>
-                            <td>
-                                <div class="form-check d-flex justify-content-center">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           @(phone.Corporative ? "checked" : "")
-                                           disabled
-                                           style="transform: scale(1.5); accent-color: #0d6efd;" />
-                                </div>
-                            </td>
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="10" class="text-center">Нет данных для отображения</td>
+                        <td colspan="9" class="text-center">Нет данных для отображения</td>
                     </tr>
                 }
             </tbody>
@@ -215,7 +191,7 @@
 
                 if (!anyVisible) {
                     if ($('#noResultsRow').length === 0) {
-                        $('table tbody').append('<tr id="noResultsRow"><td colspan="10" class="text-center text-danger">Совпадений не найдено</td></tr>');
+                        $('table tbody').append('<tr id="noResultsRow"><td colspan="9" class="text-center text-danger">Совпадений не найдено</td></tr>');
                     }
                 } else {
                     $('#noResultsRow').remove();

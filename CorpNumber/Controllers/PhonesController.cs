@@ -22,9 +22,11 @@ public class PhonesController : Controller
     }
     // Метод для отображения списка телефонов
 
-    public async Task<IActionResult> Index(int? operatorId, int? categoryId, bool? onlyCorp)
+    public async Task<IActionResult> Index(int? operatorId, int? categoryId)
     {
         ViewBag.IsAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
+
+        var allowedCategories = new[] { 1, 6, 7 };
 
         var query = _context.Phones
             .Include(p => p.OperatorNavigation)
@@ -34,18 +36,15 @@ public class PhonesController : Controller
             .Include(p => p.AccountNavigation)
             .Include(p => p.CodeOwnerNavigation)
                 .ThenInclude(o => o.CategoryNavigation)
-            .AsQueryable();
+            .Where(p => p.Corporative == true &&
+                        p.CodeOwnerNavigation != null &&
+                        allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
 
         if (operatorId.HasValue && operatorId.Value != 0)
             query = query.Where(p => p.Operator == operatorId.Value);
 
         if (categoryId.HasValue && categoryId.Value != 0)
-            query = query.Where(p => p.CodeOwnerNavigation != null &&
-                                     p.CodeOwnerNavigation.CodeCategory == categoryId.Value);
-
-        if (onlyCorp.HasValue && onlyCorp.Value)
-            query = query.Where(p => p.Corporative == true);
-
+            query = query.Where(p => p.CodeOwnerNavigation.CodeCategory == categoryId.Value);
 
         var phones = await query.ToListAsync();
 
@@ -59,20 +58,22 @@ public class PhonesController : Controller
             Tariff = p.TariffNavigation?.Title ?? "—",
             Status = p.StatusNavigation?.StatusText ?? "—",
             Internet = p.InternetNavigation?.Service ?? "—",
-            Limit = p.Limit,
-            Corporative = p.Corporative ?? false
+            Limit = p.Limit
         }).ToList();
 
         ViewBag.PhoneCount = phoneViewModels.Count;
 
         ViewBag.Operators = await _context.Operators.ToListAsync();
-        ViewBag.Categories = await _context.OwnerCategories.ToListAsync();
+        ViewBag.Categories = await _context.OwnerCategories
+            .Where(c => allowedCategories.Contains(c.CodeCategory))
+            .ToListAsync();
+
         ViewBag.SelectedOperator = operatorId ?? 0;
         ViewBag.SelectedCategory = categoryId ?? 0;
-        ViewBag.OnlyCorp = onlyCorp ?? false;
 
         return View(phoneViewModels);
     }
+
     // Метод для экспорта в Excel
     [HttpGet]
     public async Task<IActionResult> ExportToExcel(int? operatorId, int? categoryId, bool? onlyCorp)
