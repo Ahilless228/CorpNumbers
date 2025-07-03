@@ -76,8 +76,10 @@ public class PhonesController : Controller
 
     // Метод для экспорта в Excel
     [HttpGet]
-    public async Task<IActionResult> ExportToExcel(int? operatorId, int? categoryId, bool? onlyCorp)
+    public async Task<IActionResult> ExportToExcel(int? operatorId, int? categoryId)
     {
+        var allowedCategories = new[] { 1, 6, 7 };
+
         var query = _context.Phones
             .Include(p => p.OperatorNavigation)
             .Include(p => p.TariffNavigation)
@@ -86,17 +88,15 @@ public class PhonesController : Controller
             .Include(p => p.AccountNavigation)
             .Include(p => p.CodeOwnerNavigation)
                 .ThenInclude(o => o.CategoryNavigation)
-            .AsQueryable();
+            .Where(p => p.Corporative == true &&
+                        p.CodeOwnerNavigation != null &&
+                        allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
 
         if (operatorId.HasValue && operatorId.Value != 0)
             query = query.Where(p => p.Operator == operatorId.Value);
 
         if (categoryId.HasValue && categoryId.Value != 0)
-            query = query.Where(p => p.CodeOwnerNavigation != null &&
-                                     p.CodeOwnerNavigation.CodeCategory == categoryId.Value);
-
-        if (onlyCorp.HasValue && onlyCorp.Value)
-            query = query.Where(p => p.Corporative == true);
+            query = query.Where(p => p.CodeOwnerNavigation.CodeCategory == categoryId.Value);
 
         var phones = await query.ToListAsync();
 
@@ -113,7 +113,6 @@ public class PhonesController : Controller
         worksheet.Cells[1, 7].Value = "Состояние";
         worksheet.Cells[1, 8].Value = "Интернет";
         worksheet.Cells[1, 9].Value = "Лимит";
-        worksheet.Cells[1, 10].Value = "Корпоративный";
 
         // Данные
         for (int i = 0; i < phones.Count; i++)
@@ -128,7 +127,6 @@ public class PhonesController : Controller
             worksheet.Cells[i + 2, 7].Value = p.StatusNavigation?.StatusText;
             worksheet.Cells[i + 2, 8].Value = p.InternetNavigation?.Service;
             worksheet.Cells[i + 2, 9].Value = p.Limit?.ToString() ?? "—";
-            worksheet.Cells[i + 2, 10].Value = p.Corporative == true ? "Да" : "Нет";
         }
 
         worksheet.Cells.AutoFitColumns();
@@ -137,6 +135,7 @@ public class PhonesController : Controller
         var fileName = $"Телефоны_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
         return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
+
 
 
     // 👇 Вот сюда вставляем новый метод
