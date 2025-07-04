@@ -12,6 +12,8 @@
         public string ?Internet { get; set; }         // Название интернет-пакета
         public short? Limit { get; set; }
         public bool Corporative { get; set; }
+        public string? FullName { get; set; }        // ФИО
+        public string? NameCh { get; set; }          // 姓名
     }
 
 }

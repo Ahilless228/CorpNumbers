@@ -26,17 +26,15 @@ public class PhonesController : Controller
     {
         ViewBag.IsAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
 
-        var allowedCategories = new[] { 1, 6, 7 };
+        var allowedCategories = new[] { 1, 6 };
 
         var query = _context.Phones
             .Include(p => p.OperatorNavigation)
-            .Include(p => p.TariffNavigation)
-            .Include(p => p.StatusNavigation)
-            .Include(p => p.InternetNavigation)
-            .Include(p => p.AccountNavigation)
             .Include(p => p.CodeOwnerNavigation)
-                .ThenInclude(o => o.CategoryNavigation)
+                .ThenInclude(o => o.EmployeeNavigation)
+            .Include(p => p.CodeOwnerNavigation.CategoryNavigation)
             .Where(p => p.Corporative == true &&
+                        p.Account == 1 &&
                         p.CodeOwnerNavigation != null &&
                         allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
 
@@ -52,13 +50,11 @@ public class PhonesController : Controller
         {
             CodePhone = p.CodePhone,
             Number = p.Number?.ToString() ?? "—",
-            ICCID = p.ICCID ?? "—",
             Operator = p.OperatorNavigation?.Title ?? "—",
-            Account = p.AccountNavigation?.Type ?? "—",
-            Tariff = p.TariffNavigation?.Title ?? "—",
-            Status = p.StatusNavigation?.StatusText ?? "—",
-            Internet = p.InternetNavigation?.Service ?? "—",
-            Limit = p.Limit
+            FullName = p.CodeOwnerNavigation?.EmployeeNavigation != null
+                ? $"{p.CodeOwnerNavigation.EmployeeNavigation.Surname} {p.CodeOwnerNavigation.EmployeeNavigation.Firstname} {p.CodeOwnerNavigation.EmployeeNavigation.Midname}".Trim()
+                : "—",
+            NameCh = p.CodeOwnerNavigation?.EmployeeNavigation?.NameCh ?? "—"
         }).ToList();
 
         ViewBag.PhoneCount = phoneViewModels.Count;
@@ -74,21 +70,20 @@ public class PhonesController : Controller
         return View(phoneViewModels);
     }
 
+
     // Метод для экспорта в Excel
     [HttpGet]
     public async Task<IActionResult> ExportToExcel(int? operatorId, int? categoryId)
     {
-        var allowedCategories = new[] { 1, 6, 7 };
+        var allowedCategories = new[] { 1, 6 };
 
         var query = _context.Phones
             .Include(p => p.OperatorNavigation)
-            .Include(p => p.TariffNavigation)
-            .Include(p => p.StatusNavigation)
-            .Include(p => p.InternetNavigation)
-            .Include(p => p.AccountNavigation)
             .Include(p => p.CodeOwnerNavigation)
-                .ThenInclude(o => o.CategoryNavigation)
+                .ThenInclude(o => o.EmployeeNavigation)
+            .Include(p => p.CodeOwnerNavigation.CategoryNavigation)
             .Where(p => p.Corporative == true &&
+                        p.Account == 1 &&
                         p.CodeOwnerNavigation != null &&
                         allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
 
@@ -106,27 +101,21 @@ public class PhonesController : Controller
         // Заголовки
         worksheet.Cells[1, 1].Value = "№";
         worksheet.Cells[1, 2].Value = "Номер";
-        worksheet.Cells[1, 3].Value = "ICCID";
-        worksheet.Cells[1, 4].Value = "Оператор";
-        worksheet.Cells[1, 5].Value = "Счёт";
-        worksheet.Cells[1, 6].Value = "Тарифный план";
-        worksheet.Cells[1, 7].Value = "Состояние";
-        worksheet.Cells[1, 8].Value = "Интернет";
-        worksheet.Cells[1, 9].Value = "Лимит";
+        worksheet.Cells[1, 3].Value = "ФИО";
+        worksheet.Cells[1, 4].Value = "姓名";
+        worksheet.Cells[1, 5].Value = "Оператор";
 
         // Данные
         for (int i = 0; i < phones.Count; i++)
         {
-            var p = phones[i];
-            worksheet.Cells[i + 2, 1].Value = p.CodePhone;
-            worksheet.Cells[i + 2, 2].Value = p.Number;
-            worksheet.Cells[i + 2, 3].Value = p.ICCID;
-            worksheet.Cells[i + 2, 4].Value = p.OperatorNavigation?.Title;
-            worksheet.Cells[i + 2, 5].Value = p.AccountNavigation?.Type;
-            worksheet.Cells[i + 2, 6].Value = p.TariffNavigation?.Title;
-            worksheet.Cells[i + 2, 7].Value = p.StatusNavigation?.StatusText;
-            worksheet.Cells[i + 2, 8].Value = p.InternetNavigation?.Service;
-            worksheet.Cells[i + 2, 9].Value = p.Limit?.ToString() ?? "—";
+            var emp = phones[i].CodeOwnerNavigation?.EmployeeNavigation;
+            worksheet.Cells[i + 2, 1].Value = phones[i].CodePhone;
+            worksheet.Cells[i + 2, 2].Value = phones[i].Number?.ToString() ?? "—";
+            worksheet.Cells[i + 2, 3].Value = emp != null
+                ? $"{emp.Surname} {emp.Firstname} {emp.Midname}".Trim()
+                : "—";
+            worksheet.Cells[i + 2, 4].Value = emp?.NameCh ?? "—";
+            worksheet.Cells[i + 2, 5].Value = phones[i].OperatorNavigation?.Title ?? "—";
         }
 
         worksheet.Cells.AutoFitColumns();
@@ -135,6 +124,7 @@ public class PhonesController : Controller
         var fileName = $"Телефоны_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
         return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
+
 
 
 
