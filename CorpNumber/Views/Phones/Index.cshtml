@@ -28,10 +28,6 @@
             <strong>Кол-во номеров:</strong>
             <span class="badge bg-primary">@((int?)ViewBag.PhoneCount ?? 0)</span>
         </div>
-        <div class="input-group w-25 mb-3">
-            <input type="text" id="phoneSearch" class="form-control" placeholder="Поиск номера" />
-            <button class="btn btn-outline-secondary" id="resetFiltersBtn">Сбросить</button>
-        </div>
     </div>
 
     @if (ViewBag.IsAdmin != true)
@@ -48,36 +44,69 @@
     </form>
 
 
-    <!-- Форма фильтрации -->
+   
+    <!-- Панель фильтров и поиска -->
     <form method="get" asp-controller="Phones" asp-action="Index">
-        <div class="row mb-3">
+        <div class="row mb-3 align-items-end">
             <!-- Оператор -->
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label>Оператор:</label>
                 <select class="form-select" name="operatorId" onchange="this.form.submit()">
-                    @Html.Raw($"<option value='0' {(selectedOperator == 0 ? "selected" : "")}>Все операторы</option>")
+                    <option value="0" selected>Все операторы</option>
                     @foreach (var op in ViewBag.Operators)
                     {
-                        var selectedAttr = op.CodeOperator == selectedOperator ? "selected" : "";
-                        @Html.Raw($"<option value='{op.CodeOperator}' {selectedAttr}>{op.Title}</option>")
+                        if (selectedOperator == op.CodeOperator)
+                        {
+                            <option value="@op.CodeOperator" selected="selected">@op.Title</option>
+                        }
+                        else
+                        {
+                            <option value="@op.CodeOperator">@op.Title</option>
+                        }
                     }
                 </select>
             </div>
 
             <!-- Категория -->
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label>Категория:</label>
                 <select class="form-select" name="categoryId" onchange="this.form.submit()">
-                    @Html.Raw($"<option value='0' {(selectedCategory == 0 ? "selected" : "")}>Все категории</option>")
+                    <option value="0" selected>Все категории</option>
                     @foreach (var cat in ViewBag.Categories)
                     {
-                        var selectedAttr = cat.CodeCategory == selectedCategory ? "selected" : "";
-                        @Html.Raw($"<option value='{cat.CodeCategory}' {selectedAttr}>{cat.Category}</option>")
+                        if (selectedCategory == cat.CodeCategory)
+                        {
+                            <option value="@cat.CodeCategory" selected="selected">@cat.Category</option>
+                        }
+                        else
+                        {
+                            <option value="@cat.CodeCategory">@cat.Category</option>
+                        }
                     }
                 </select>
             </div>
+
+            <!-- Поиск по номеру -->
+            <div class="col-md-3">
+                <label>Поиск по номеру:</label>
+                <input type="text" id="phoneSearch" class="form-control" placeholder="Введите номер" />
+            </div>
+
+            <!-- Поиск по ФИО -->
+            <div class="col-md-3">
+                <label>Поиск по ФИО:</label>
+                <input type="text" id="fioSearch" class="form-control" placeholder="Введите ФИО" />
+            </div>
+
+            <!-- Сброс -->
+            <div class="col-md-2 d-grid">
+                <label>&nbsp;</label>
+                <button type="button" class="btn btn-outline-secondary" id="resetFiltersBtn">Сбросить</button>
+            </div>
         </div>
     </form>
+
+
 
 
     <!-- Обёртка таблицы с прокруткой -->
@@ -167,16 +196,21 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        $(document).ready(function () {
-            // Живой поиск по номеру
-            $('#phoneSearch').on('input', function () {
-                var searchValue = $(this).val().toLowerCase();
+                $(document).ready(function () {
+            function filterTable() {
+                var fioVal = $('#fioSearch').val().toLowerCase();
+                var numberVal = $('#phoneSearch').val().toLowerCase();
+
                 let anyVisible = false;
 
                 $('table tbody tr').each(function () {
                     const number = $(this).find('td:nth-child(2)').text().toLowerCase();
+                    const fio = $(this).find('td:nth-child(3)').text().toLowerCase();
 
-                    if (number.startsWith(searchValue)) {
+                    const matchNumber = number.includes(numberVal);
+                    const matchFio = fio.includes(fioVal);
+
+                    if (matchNumber && matchFio) {
                         $(this).show();
                         anyVisible = true;
                     } else {
@@ -184,18 +218,19 @@
                     }
                 });
 
+                $('#noResultsRow').remove();
                 if (!anyVisible) {
-                    if ($('#noResultsRow').length === 0) {
-                        $('table tbody').append('<tr id="noResultsRow"><td colspan="9" class="text-center text-danger">Совпадений не найдено</td></tr>');
-                    }
-                } else {
-                    $('#noResultsRow').remove();
+                    $('table tbody').append('<tr id="noResultsRow"><td colspan="9" class="text-center text-danger">Совпадений не найдено</td></tr>');
                 }
-            });
+            }
 
-            // Кнопка "Сбросить"
+            // События для поиска
+            $('#fioSearch, #phoneSearch').on('input', filterTable);
+
+            // Кнопка сброса
             $('#resetFiltersBtn').click(function () {
                 $('#phoneSearch').val('');
+                $('#fioSearch').val('');
                 $('#noResultsRow').remove();
                 $('table tbody tr').show();
 
@@ -204,27 +239,16 @@
                     this.selectedIndex = 0;
                 });
 
-                // Сброс чекбокса
-                $('input[type="checkbox"][name="onlyCorp"]').prop('checked', false);
-
-                // Перезапуск формы фильтрации
+                // Перезапустить форму
                 $('form').submit();
             });
 
-            // ✅ Обработка клика по строке таблицы
+            // Клик по строке
             $('#phoneTableBody').on('click', '.phone-row', function () {
-
                 var phoneId = $(this).data('id');
-                console.log("Строка нажата:", phoneId);
-
-
-                // Снимаем выделение со всех строк
                 $('.phone-row').removeClass('selected-row');
-
-                // Выделяем текущую
                 $(this).addClass('selected-row');
 
-                // Подгружаем детали
                 $.get('/Phones/GetDetails', { id: phoneId }, function (data) {
                     if (data) {
                         $('#detailCategory').text(data.category || '—');
@@ -233,15 +257,12 @@
                         $('#detailTabnum').text(data.tabNum || '—');
                         $('#detailDepartment').text(data.department || '—');
                         $('#detailPost').text(data.post || '—');
-
-                        if (data.photoUrl)
-                            $('#detailPhoto').attr('src', data.photoUrl);
-                        else
-                            $('#detailPhoto').attr('src', '/images/default-profile.jpg');
+                        $('#detailPhoto').attr('src', data.photoUrl || '/images/default-profile.jpg');
                     }
                 });
             });
         });
+
     </script>
 }
 
