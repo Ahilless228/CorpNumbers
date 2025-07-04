@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CorpNumber.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body style="background-color: #FFC173;">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -25,17 +25,19 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - ОсОО Алтынкен
-        </div>
+
+    <footer class="border-top text-center text-muted"
+            style="height: 36px; line-height: 36px; font-size: 0.85rem; background-color: #f9f9f9;">
+        &copy; 2025 — ОсОО Алтынкен
     </footer>
+
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
