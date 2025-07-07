@@ -148,117 +148,121 @@
     <div class="container-fluid mt-3">
         @* <h2>Телефонные номера</h2> *@
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <!-- Лого или заголовок слева -->
-        <div class="fw-bold fs-4 text-dark">
-            <img src="~/images/altynken-logo.jpg" alt="Лого" style="height: 40px;" class="me-2" />
-            Телефонные номера
-        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Лого или заголовок слева -->
+            <div class="fw-bold fs-4 text-dark">
+                <img src="~/images/altynken-logo.jpg" alt="Лого" style="height: 40px;" class="me-2" />
+                Телефонные номера
+            </div>
 
-        <!-- Кнопка напоминаний справа -->
-        <div class="d-flex gap-2">
-            <button class="btn btn-warning">
-                🔔 (@ViewBag.TaskOverdue/@ViewBag.TaskTotal)
-            </button>
+            <!-- Кнопка напоминаний справа -->
+            <div class="d-flex gap-2">
+                <button class="btn btn-warning">
+                    🔔 (@ViewBag.TaskOverdue/@ViewBag.TaskTotal)
+                </button>
+            </div>
         </div>
     </div>
 
-
-        <!-- Блок действий -->
-        <!-- Раздел 1: Телефонные операции -->
-    <div style="background-color: #ba271d; padding: 16px;max-width:auto">
-            <div class="d-flex flex-wrap justify-content-start gap-2">
-                <div class="action-group">
-                    <div class="action-header">📞 Тел. операции</div>
-                    <div class="action-menu">
-                        <div class=" grid">
-                            <button class="btn btn-outline-warning btn-sm">⏸️ Установка на паузу</button>
-                            <button class="btn btn-outline-success btn-sm">▶️ Снятие с паузы</button>
-                            <button class="btn btn-outline-primary btn-sm">🔁 Восстановление</button>
-                            <button class="btn btn-outline-info btn-sm">💳 Изменение лимита</button>
-                            <button class="btn btn-outline-danger btn-sm">❎ Деактивация</button>
-                            <button class="btn btn-outline-info btn-sm">📄 Запрос детализации</button>
-                            <button class="btn @simBtnClass btn-sm">📦 Поступление сим-карт (@simCount)</button>
-                        </div>
+    <!-- Блок действий -->
+    <!-- Раздел 1: Телефонные операции -->
+    <div style="background-color: #ba271d; padding: 16px 32px ;width: 100%;">
+        <div class="d-flex flex-wrap justify-content-start gap-2">
+            <div class="action-group">
+                <div class="action-header">📞 Тел. операции</div>
+                <div class="action-menu">
+                    <div class=" grid">
+                        <button class="btn btn-outline-warning btn-sm">⏸️ Установка на паузу</button>
+                        <button class="btn btn-outline-success btn-sm">▶️ Снятие с паузы</button>
+                        <button class="btn btn-outline-primary btn-sm">🔁 Восстановление</button>
+                        <button class="btn btn-outline-info btn-sm">💳 Изменение лимита</button>
+                        <button class="btn btn-outline-danger btn-sm">❎ Деактивация</button>
+                        <button class="btn btn-outline-info btn-sm">📄 Запрос детализации</button>
+                        <button class="btn @simBtnClass btn-sm">📦 Поступление сим-карт (@simCount)</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Раздел 2: Интернет операции -->
-                <div class="action-group">
-                    <div class="action-header">🌐 Интернет</div>
-                    <div class="action-menu">
-                        <div class=" grid">
-                            <button class="btn btn-outline-success btn-sm">🌐 Подключение интернета</button>
-                            <button class="btn btn-outline-secondary btn-sm">❌ Отключение интернета</button>
-                            <button class="btn btn-outline-dark btn-sm">🚫 Блокировка интернета</button>
-                            <button class="btn btn-outline-primary btn-sm">📶 Изменение тарифа</button>
-                            <button class="btn btn-outline-info btn-sm">📡 Роутеры</button>
-                            <button class="btn btn-outline-info btn-sm">✈️ Подключение роуминга</button>
-                        </div>
+            <!-- Раздел 2: Интернет операции -->
+            <div class="action-group">
+                <div class="action-header">🌐 Интернет</div>
+                <div class="action-menu">
+                    <div class=" grid">
+                        <button class="btn btn-outline-success btn-sm">🌐 Подключение интернета</button>
+                        <button class="btn btn-outline-secondary btn-sm">❌ Отключение интернета</button>
+                        <button class="btn btn-outline-dark btn-sm">🚫 Блокировка интернета</button>
+                        <button class="btn btn-outline-primary btn-sm">📶 Изменение тарифа</button>
+                        <button class="btn btn-outline-info btn-sm">📡 Роутеры</button>
+                        <button class="btn btn-outline-info btn-sm">✈️ Подключение роуминга</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Раздел 3: Выдача/Перевод -->
-                <div class="action-group">
-                    <div class="action-header">👥 Выдача/Перевод</div>
-                    <div class="action-menu">
-                        <div class=" grid">
-                            <button class="btn btn-outline-success btn-sm">👤 Выдача сотруднику</button>
-                            <button class="btn btn-outline-warning btn-sm">🕒 Выдача временных</button>
-                            <button class="btn btn-outline-secondary btn-sm">🧍‍♂️ Выдача прочим</button>
-                            <button class="btn btn-outline-secondary btn-sm">📞 Выдача стационар.</button>
-                            <button class="btn btn-outline-danger btn-sm">↩️ Возврат номера</button>
-                            <button class="btn btn-outline-dark btn-sm">👛 На личный счёт</button>
-                            <button class="btn btn-outline-primary btn-sm">🏢 На корп. счёт</button>
-                            <button class="btn btn-outline-success btn-sm">👥 Ввод в корп. группу</button>
-                            <button class="btn btn-outline-danger btn-sm">🚪 Вывод из корп. группы</button>
-                            <button class="btn btn-outline-primary btn-sm">⏱️ Врем. номера (@ViewBag.TempIssued/@ViewBag.TempOverdue)</button>
-                        </div>
+            <!-- Раздел 3: Выдача/Перевод -->
+            <div class="action-group">
+                <div class="action-header">👥 Выдача/Перевод</div>
+                <div class="action-menu">
+                    <div class=" grid">
+                        <button class="btn btn-outline-success btn-sm">👤 Выдача сотруднику</button>
+                        <button class="btn btn-outline-warning btn-sm">🕒 Выдача временных</button>
+                        <button class="btn btn-outline-secondary btn-sm">🧍‍♂️ Выдача прочим</button>
+                        <button class="btn btn-outline-secondary btn-sm">📞 Выдача стационар.</button>
+                        <button class="btn btn-outline-danger btn-sm">↩️ Возврат номера</button>
+                        <button class="btn btn-outline-dark btn-sm">👛 На личный счёт</button>
+                        <button class="btn btn-outline-primary btn-sm">🏢 На корп. счёт</button>
+                        <button class="btn btn-outline-success btn-sm">👥 Ввод в корп. группу</button>
+                        <button class="btn btn-outline-danger btn-sm">🚪 Вывод из корп. группы</button>
+                        <button class="btn btn-outline-primary btn-sm">⏱️ Врем. номера (@ViewBag.TempIssued/@ViewBag.TempOverdue)</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Раздел 4: Списки операций -->
-                <div class="action-group">
+            <!-- Раздел 4: Списки операций -->
+            <div class="action-group">
                 <div class="action-header">📋 Работа с таблицами БД</div>
-                    <div class="action-menu">
-                        <div class="grid">
-                            <button class="btn btn-outline-primary btn-sm">👥 Все операции</button>
+                <div class="action-menu">
+                    <div class="grid">
+                        <button class="btn btn-outline-primary btn-sm">👥 Все операции</button>
 
-                        </div>  
                     </div>
                 </div>
+            </div>
 
-                <!-- Раздел 5: Отчеты -->
-                <div class="action-group">
-                    <div class="action-header">📊 Отчёты</div>
-                    <div class="action-menu">
-                        <div class="grid">
+            <!-- Раздел 5: Отчеты -->
+            <div class="action-group">
+                <div class="action-header">📊 Отчёты</div>
+                <div class="action-menu">
+                    <div class="grid">
+                        <div>
                             <form method="get" asp-action="ExportToExcel" asp-controller="Phones">
                                 <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
                                 <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
                                 <input type="hidden" name="onlyCorp" value="@ViewBag.OnlyCorp" />
                                 <button type="submit" class="btn btn-success btn-sm">📥 Экспорт в Excel</button>
                             </form>
-                            <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook1", "Admin")'">📒 Тел. справочник 1</button>
-                            <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook2", "Admin")'">📕 Тел. справочник 2</button>
-                            <!--кнопку парсинга вот тут , оформление, стиль, ссылка-->
-                            <button class="btn btn-outline-info btn-sm">Парсинг</button>
                         </div>
+                        <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook1", "Admin")'">📒 Тел. справочник 1</button>
+                        <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook2", "Admin")'">📕 Тел. справочник 2</button>
+                        <!--кнопку парсинга вот тут , оформление, стиль, ссылка-->
+                        <button class="btn btn-outline-info btn-sm">Парсинг</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Раздел 6: Сотрудники -->
-                <div class="action-group">
-                    <div class="action-header">🏢 Сотрудники</div>
-                    <div class="action-menu">
-                        <div class="grid">
-                            <a class="btn btn-outline-dark btn-sm" asp-controller="Employee" asp-action="EmployeeIndex">🏢 ОсОО "Алтынкен"</a>
-                            <button class="btn btn-outline-info btn-sm">🎉 Именинники (@ViewBag.BirthdayCount)</button>
-                        </div>
+            <!-- Раздел 6: Сотрудники -->
+            <div class="action-group">
+                <div class="action-header">🏢 Сотрудники</div>
+                <div class="action-menu">
+                    <div class="grid">
+                        <a class="btn btn-outline-dark btn-sm" asp-controller="Employee" asp-action="EmployeeIndex">🏢 ОсОО "Алтынкен"</a>
+                        <button class="btn btn-outline-info btn-sm">🎉 Именинники (@ViewBag.BirthdayCount)</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="container-fluid mt-1 mx-1">
         <!--Вынесенная кнопка незаконченные операции-->
         <div class="mt-3">
             <button class="btn @operBtnClass">
@@ -267,173 +271,171 @@
         </div>
 
 
-    </div>
 
 
+        <!-- Форма фильтрации -->
+        <form method="get" asp-controller="Admin" asp-action="AdminIndex">
+            <div class="row mb-3">
+                <!-- Оператор -->
+                <div class="col-md-3">
+                    <label>Оператор:</label>
+                    <select class="form-select" name="operatorId" onchange="this.form.submit()">
+                        @Html.Raw($"<option value='0' {(selectedOperator == 0 ? "selected" : "")}>Все операторы</option>")
+                        @foreach (var op in ViewBag.Operators)
+                        {
+                            var selectedAttr = op.CodeOperator == selectedOperator ? "selected" : "";
+                            @Html.Raw($"<option value='{op.CodeOperator}' {selectedAttr}>{op.Title}</option>")
+                        }
+                    </select>
+                </div>
 
+                <!-- Категория -->
+                <div class="col-md-3">
+                    <label>Категория:</label>
+                    <select class="form-select" name="categoryId" onchange="this.form.submit()">
+                        @Html.Raw($"<option value='0' {(selectedCategory == 0 ? "selected" : "")}>Все категории</option>")
+                        @foreach (var cat in ViewBag.Categories)
+                        {
+                            var selectedAttr = cat.CodeCategory == selectedCategory ? "selected" : "";
+                            @Html.Raw($"<option value='{cat.CodeCategory}' {selectedAttr}>{cat.Category}</option>")
+                        }
+                    </select>
+                </div>
 
-
-    <!-- Форма фильтрации -->
-    <form method="get" asp-controller="Admin" asp-action="AdminIndex">
-        <div class="row mb-3">
-            <!-- Оператор -->
-            <div class="col-md-3">
-                <label>Оператор:</label>
-                <select class="form-select" name="operatorId" onchange="this.form.submit()">
-                    @Html.Raw($"<option value='0' {(selectedOperator == 0 ? "selected" : "")}>Все операторы</option>")
-                    @foreach (var op in ViewBag.Operators)
-                    {
-                        var selectedAttr = op.CodeOperator == selectedOperator ? "selected" : "";
-                        @Html.Raw($"<option value='{op.CodeOperator}' {selectedAttr}>{op.Title}</option>")
-                    }
-                </select>
-            </div>
-
-            <!-- Категория -->
-            <div class="col-md-3">
-                <label>Категория:</label>
-                <select class="form-select" name="categoryId" onchange="this.form.submit()">
-                    @Html.Raw($"<option value='0' {(selectedCategory == 0 ? "selected" : "")}>Все категории</option>")
-                    @foreach (var cat in ViewBag.Categories)
-                    {
-                        var selectedAttr = cat.CodeCategory == selectedCategory ? "selected" : "";
-                        @Html.Raw($"<option value='{cat.CodeCategory}' {selectedAttr}>{cat.Category}</option>")
-                    }
-                </select>
-            </div>
-
-            <!-- Корпоративный чекбокс -->
-            <div class="col-md-3 d-flex align-items-end">
-                <div class="form-check">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           name="onlyCorp"
-                           value="true"
-                           onchange="this.form.submit()"
-                           @(onlyCorp ? "checked" : "") />
-                    <label class="form-check-label">Только корп. группа</label>
+                <!-- Корпоративный чекбокс -->
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="onlyCorp"
+                               value="true"
+                               onchange="this.form.submit()"
+                               @(onlyCorp ? "checked" : "") />
+                        <label class="form-check-label">Только корп. группа</label>
+                    </div>
+                </div>
+                <!-- Поле для поиска номера -->
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="input-group mb-3">
+                        <input type="text" id="phoneSearch" class="form-control" placeholder="Поиск номера" />
+                        <button class="btn btn-outline-secondary" id="resetFiltersBtn">Сбросить</button>
+                    </div>
                 </div>
             </div>
-            <!-- Поле для поиска номера -->
-            <div class="col-md-3 d-flex align-items-end">
-                <div class="input-group mb-3">
-                    <input type="text" id="phoneSearch" class="form-control" placeholder="Поиск номера" />
-                    <button class="btn btn-outline-secondary" id="resetFiltersBtn">Сбросить</button>
-                </div>
-            </div>
+        </form>
+        <div style="margin-bottom: 20px">
+            <strong>Кол-во номеров:</strong>
+            <span class="badge bg-primary">@((int?)ViewBag.PhoneCount ?? 0)</span>
         </div>
-    </form>
-    <div style="margin-bottom: 20px">
-        <strong>Кол-во номеров:</strong>
-        <span class="badge bg-primary">@((int?)ViewBag.PhoneCount ?? 0)</span>
-    </div>
 
 
-    <!-- Обёртка таблицы с прокруткой -->
-<div style="max-height: 400px;max-width: 1350px ;overflow-y: auto; border: 1px solid #ccc; border-radius: 5px;margin: 0 auto;">
-        <table class="table table-bordered table-striped table-hover mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th>№</th>
-                    <th>Номер</th>
-                    <th>ICCID</th>
-                    <th>Оператор</th>
-                    <th>Счёт</th>
-                    <th>Тарифный план</th>
-                    <th>Состояние</th>
-                    <th>Интернет</th>
-                    <th>Лимит</th>
-                    <th>Корпоративный</th>
-                </tr>
-            </thead>
-            <tbody id="phoneTableBody">
-                @if (Model != null && Model.Any())
-                {
-                    foreach (var phone in Model)
+        <!-- Обёртка таблицы с прокруткой -->
+        <div style="max-height: 400px;max-width: 1350px ;overflow-y: auto; border: 1px solid #ccc; border-radius: 5px;margin: 0 auto;">
+            <table class="table table-bordered table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>№</th>
+                        <th>Номер</th>
+                        <th>ICCID</th>
+                        <th>Оператор</th>
+                        <th>Счёт</th>
+                        <th>Тарифный план</th>
+                        <th>Состояние</th>
+                        <th>Интернет</th>
+                        <th>Лимит</th>
+                        <th>Корпоративный</th>
+                    </tr>
+                </thead>
+                <tbody id="phoneTableBody">
+                    @if (Model != null && Model.Any())
                     {
-                        <tr class="phone-row" data-id="@phone.CodePhone">
-                            <td>@phone.CodePhone</td>
-                            <td><a href="#">@phone.Number</a></td>
-                            <td>@phone.ICCID</td>
-                            <td>@phone.Operator</td>
-                            <td>@phone.Account</td>
-                            <td>@phone.Tariff</td>
-                            <td>@phone.Status</td>
-                            <td>@phone.Internet</td>
-                            <td>@(phone.Limit?.ToString() ?? "—")</td>
-                            <td>
-                                <div class="form-check d-flex justify-content-center">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           @(phone.Corporative ? "checked" : "")
-                                           disabled
-                                           style="transform: scale(1.6); accent-color: #0d6efd; opacity: 1;" />
+                        foreach (var phone in Model)
+                        {
+                            <tr class="phone-row" data-id="@phone.CodePhone">
+                                <td>@phone.CodePhone</td>
+                                <td><a href="#">@phone.Number</a></td>
+                                <td>@phone.ICCID</td>
+                                <td>@phone.Operator</td>
+                                <td>@phone.Account</td>
+                                <td>@phone.Tariff</td>
+                                <td>@phone.Status</td>
+                                <td>@phone.Internet</td>
+                                <td>@(phone.Limit?.ToString() ?? "—")</td>
+                                <td>
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               @(phone.Corporative ? "checked" : "")
+                                               disabled
+                                               style="transform: scale(1.6); accent-color: #0d6efd; opacity: 1;" />
 
-                                </div>
-                            </td>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center">Нет данных для отображения</td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="10" class="text-center">Нет данных для отображения</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Динамическое окошко под таблицей -->
-    <div class="mt-4 p-3 border rounded bg-light" id="detailsPane" style="min-height: 200px;max-width:1350px;margin: 0 auto 60px auto;">
-        <div class="row">
-            <!-- Левая часть -->
-            <div class="col-md-8">
-                <div class="row mb-2">
-                    <div class="col-4 fw-bold">Категория владельца:</div>
-                    <div class="col-8" id="detailCategory">—</div>
+        <!-- Динамическое окошко под таблицей -->
+        <div class="mt-4 p-3 border rounded bg-light" id="detailsPane" style="min-height: 200px;max-width:1350px;margin: 0 auto 60px auto;">
+            <div class="row">
+                <!-- Левая часть -->
+                <div class="col-md-8">
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Категория владельца:</div>
+                        <div class="col-8" id="detailCategory">—</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Организация:</div>
+                        <div class="col-8" id="detailOrg">—</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Сотрудник:</div>
+                        <div class="col-8" id="detailEmployee">—</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Управление:</div>
+                        <div class="col-8" id="detailDepartment">—</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4 fw-bold">Должность:</div>
+                        <div class="col-8" id="detailPost">—</div>
+                    </div>
+
                 </div>
-                <div class="row mb-2">
-                    <div class="col-4 fw-bold">Организация:</div>
-                    <div class="col-8" id="detailOrg">—</div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-4 fw-bold">Сотрудник:</div>
-                    <div class="col-8" id="detailEmployee">—</div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-4 fw-bold">Управление:</div>
-                    <div class="col-8" id="detailDepartment">—</div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-4 fw-bold">Должность:</div>
-                    <div class="col-8" id="detailPost">—</div>
+
+                <!-- Правая часть: фотография -->
+                <div class="col-md-4 d-flex flex-column align-items-end">
+                    <!-- Кнопка всплывающего окна (аккуратная иконка с двумя смайликами) -->
+                    <div class="w-100 d-flex justify-content-end mb-2">
+                        <button id="infoPopupBtn" class="btn btn-sm btn-light border rounded-circle"
+                                title="Доп. информация"
+                                style="width: 48px; height: 32px; padding: 0 6px; font-size: 1.1rem; line-height: 1; display: flex; align-items: center; justify-content: center;">
+                            👷&nbsp;ℹ️
+                        </button>
+                    </div>
+
+
+                    <img src="~/images/default-profile.jpg" alt="Фото сотрудника" id="detailPhoto"
+                         style="max-height: 200px; max-width: 150px; object-fit: cover; border: 1px solid #999;" />
+
+                    <div class="mt-2 text-end">
+                        <strong>Таб. №:</strong> <span id="detailTabnum">—</span>
+                    </div>
                 </div>
 
             </div>
-         
-            <!-- Правая часть: фотография -->
-            <div class="col-md-4 d-flex flex-column align-items-end">
-                <!-- Кнопка всплывающего окна (аккуратная иконка с двумя смайликами) -->
-                <div class="w-100 d-flex justify-content-end mb-2">
-                    <button id="infoPopupBtn" class="btn btn-sm btn-light border rounded-circle"
-                            title="Доп. информация"
-                            style="width: 48px; height: 32px; padding: 0 6px; font-size: 1.1rem; line-height: 1; display: flex; align-items: center; justify-content: center;">
-                        👷&nbsp;ℹ️
-                    </button>
-                </div>
-
-
-                <img src="~/images/default-profile.jpg" alt="Фото сотрудника" id="detailPhoto"
-                     style="max-height: 200px; max-width: 150px; object-fit: cover; border: 1px solid #999;" />
-
-                <div class="mt-2 text-end">
-                    <strong>Таб. №:</strong> <span id="detailTabnum">—</span>
-                </div>
-            </div>
-
         </div>
     </div>
+    
     <!-- Модальное окно с информацией о сотруднике -->
     <div class="modal fade" id="employeeInfoModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 85vw;">
