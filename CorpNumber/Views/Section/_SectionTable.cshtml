@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<CorpNumber.Models.SectionViewModel>
-
+<div class="mb-2 fw-semibold">
+    Число записей: <span id="rowCount">@Model.Count()</span>
+</div>
 <div class="container-fluid" m-1>
     <table class="table">
         <thead>
