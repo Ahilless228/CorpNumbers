@@ -76,7 +76,7 @@ namespace CorpNumber.Controllers
                 inputDate = emp.InputDate?.ToString("dd.MM.yyyy"),
                 post = emp.PostNavigation?.Postt + " " + emp.PostNavigation?.PostCh,
                 department = emp.DepartmentNavigation?.DepartmentName + " " + emp.DepartmentNavigation?.DepartmentCh,
-                section = emp.SectionNavigation?.SectionName + " " + emp.SectionNavigation?.SectionCh,
+                section = emp.SectionNavigation?.Section + " " + emp.SectionNavigation?.SectionCh,
                 photoPath = webPhotoPath
             });
         }
@@ -204,7 +204,7 @@ namespace CorpNumber.Controllers
                 sections = _context.Sections.Select(s => new NamedId
                 {
                     Code = s.CodeSection,
-                    Title = s.SectionName + " " + s.SectionCh
+                    Title = s.Section + " " + s.SectionCh
                 }).ToList(),
 
                 quotas = _context.Quotas.Select(q => new NamedId
@@ -475,7 +475,7 @@ namespace CorpNumber.Controllers
                 Quota = quotaText,
                 Post = emp.PostNavigation?.Postt + " " + emp.PostNavigation?.PostCh,
                 Department = emp.DepartmentNavigation?.DepartmentName + " " + emp.DepartmentNavigation?.DepartmentCh,
-                Section = emp.SectionNavigation?.SectionName + " " + emp.SectionNavigation?.SectionCh,
+                Section = emp.SectionNavigation?.Section + " " + emp.SectionNavigation?.SectionCh,
                 Photo = photoPath,
                 Org = "ОсОО \"Алтынкен\"",
                 Hazard = emp.Hazard,

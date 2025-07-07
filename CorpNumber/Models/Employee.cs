@@ -38,7 +38,7 @@ namespace CorpNumber.Models
 
         public Post? PostNavigation { get; set; }
         public Department? DepartmentNavigation { get; set; }
-        public Section? SectionNavigation { get; set; }
+        public Sections? SectionNavigation { get; set; }
         public Quota? CodeQuotaNavigation { get; set; }
 
     }

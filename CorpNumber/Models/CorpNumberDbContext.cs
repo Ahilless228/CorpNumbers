@@ -32,7 +32,7 @@ namespace CorpNumber.Models
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostCategory> PostCategories { get; set; }
-        public DbSet<Section> Sections { get; set; }
+        public DbSet<Sections> Sections { get; set; }
         public DbSet<Sexes> Sexes { get; set; }
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<TempOwners> TempOwners { get; set; }

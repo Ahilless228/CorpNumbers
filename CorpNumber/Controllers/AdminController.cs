@@ -320,7 +320,7 @@ namespace CorpNumber.Controllers
                 Quota = quotaText,
                 Post = post?.Postt + " " + post?.PostCh,
                 Department = department?.DepartmentName + " " + department?.DepartmentCh,
-                Section = section?.SectionName,
+                Section = section?.Section,
                 Photo = photoPath,
                 Org = "ОсОО \"Алтынкен\"",
                 Hazard = emp.Hazard,

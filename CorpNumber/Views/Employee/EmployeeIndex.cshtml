@@ -42,7 +42,7 @@
             <button class="btn btn-outline-success">Прием на работу</button>
             <button class="btn btn-outline-danger">Увольнение</button>
             <button class="btn btn-outline-primary">Должности</button>
-            <button class="btn btn-outline-primary">Отделы</button>
+            <a class="btn btn-outline-primary" asp-controller="Section" asp-action="SectionIndex">Отделы</a>
             <button class="btn btn-outline-warning text-dark">Перевод</button>
             <button class="btn btn-outline-info text-dark">Управления</button>
             <button class="btn btn-outline-secondary">Уволенные</button>
@@ -101,7 +101,7 @@
                         <td>@emp.TabNum?.ToString("D5")</td>
                         <td>@(emp.PostNavigation?.Postt + " " + emp.PostNavigation?.PostCh)</td>
                         <td>@(emp.DepartmentNavigation?.DepartmentName + " " + emp.DepartmentNavigation?.DepartmentCh)</td>
-                        <td>@(emp.SectionNavigation?.SectionName + " " + emp.SectionNavigation?.SectionCh)</td>
+                        <td>@(emp.SectionNavigation?.Section + " " + emp.SectionNavigation?.SectionCh)</td>
                         <td>@emp.CodeQuotaNavigation?.Quotaa</td>
                     </tr>
                 }

@@ -148,19 +148,25 @@
     <div class="container-fluid mt-3">
         @* <h2>Телефонные номера</h2> *@
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="ms-auto" d-flex gap-2>
-                <!-- Кнопка напоминаний -->
-                <button class="btn btn-warning">
-                    🔔 (@ViewBag.TaskOverdue/@ViewBag.TaskTotal)
-                </button>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Лого или заголовок слева -->
+        <div class="fw-bold fs-4 text-dark">
+            <img src="~/images/altynken-logo.jpg" alt="Лого" style="height: 40px;" class="me-2" />
+            Телефонные номера
         </div>
 
-        <!-- Кнопочный блок 2xN -->
+        <!-- Кнопка напоминаний справа -->
+        <div class="d-flex gap-2">
+            <button class="btn btn-warning">
+                🔔 (@ViewBag.TaskOverdue/@ViewBag.TaskTotal)
+            </button>
+        </div>
+    </div>
+
+
         <!-- Блок действий -->
         <!-- Раздел 1: Телефонные операции -->
-    <div style="background-color: #FFAA40; padding: 16px;max-width:auto">
+    <div style="background-color: #ba271d; padding: 16px;max-width:auto">
             <div class="d-flex flex-wrap justify-content-start gap-2">
                 <div class="action-group">
                     <div class="action-header">📞 Тел. операции</div>
@@ -217,6 +223,7 @@
                     <div class="action-menu">
                         <div class="grid">
                             <button class="btn btn-outline-primary btn-sm">👥 Все операции</button>
+
                         </div>  
                     </div>
                 </div>
@@ -234,6 +241,8 @@
                             </form>
                             <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook1", "Admin")'">📒 Тел. справочник 1</button>
                             <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook2", "Admin")'">📕 Тел. справочник 2</button>
+                            <!--кнопку парсинга вот тут , оформление, стиль, ссылка-->
+                            <button class="btn btn-outline-info btn-sm">Парсинг</button>
                         </div>
                     </div>
                 </div>

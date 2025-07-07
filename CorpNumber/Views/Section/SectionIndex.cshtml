@@ -1,0 +1,27 @@
+﻿@*
+   SectionIndex.cshtml
+*@
+@model IEnumerable<CorpNumber.Models.SectionViewModel>
+@{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Раздел</th>
+                <th>Раздел (Ch)</th>
+                <th>Отдел</th>
+                <th>Актуальность</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Section</td>
+                    <td>@item.SectionCh</td>
+                    <td>@item.DepartmentName</td>
+                    <td>@(item.Actuality == true ? "✅" : "❌")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
