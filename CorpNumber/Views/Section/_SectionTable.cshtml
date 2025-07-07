@@ -1,0 +1,25 @@
+﻿@model IEnumerable<CorpNumber.Models.SectionViewModel>
+
+<div class="container-fluid" m-1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Отдел</th>
+                <th>Отдел (Ch)</th>
+                <th>Управление</th>
+                <th>Актуальность</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Section</td>
+                    <td>@item.SectionCh</td>
+                    <td>@item.DepartmentName</td>
+                    <td>@(item.Actuality == true ? "✅" : "❌")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

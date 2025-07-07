@@ -3,25 +3,75 @@
 *@
 @model IEnumerable<CorpNumber.Models.SectionViewModel>
 @{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Раздел</th>
-                <th>Раздел (Ch)</th>
-                <th>Отдел</th>
-                <th>Актуальность</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Section</td>
-                    <td>@item.SectionCh</td>
-                    <td>@item.DepartmentName</td>
-                    <td>@(item.Actuality == true ? "✅" : "❌")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+}
+<!--локальный Header-->
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="fw-bold fs-4 text-dark">
+            <img src="~/images/altynken-logo.jpg" alt="Лого" style="height: 40px;" class="me-2" />
+            Отделы
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" title="Добавить отдел">➕Добавить отдел</button>
+            <button type="button" class="btn btn-outline-secondary" title="Обновить данные">🔄Обновить</button>
+        </div>
+    </div>
+
+</div>
+<!--Фильтрация таблицы-->
+<div class="container-fluid mb-3">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input type="text" id="searchBox" class="form-control" placeholder="Поиск по имени отдела..." />
+        </div>
+        <div class="col-md-4">
+            <select id="departmentSelect" class="form-select">
+                <option value="">Все управления</option>
+                @foreach (var dep in ViewBag.Departments as List<Department>)
+                {
+                    <option value="@dep.CodeDepartment">
+                        @dep.DepartmentName @dep.DepartmentCh
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary w-100" id="resetFilters">Сбросить</button>
+        </div>
+    </div>
+</div>
+
+<!--Таблица-->
+
+<div id="sectionTable">
+    @await Html.PartialAsync("_SectionTable", Model)
+</div>
+
+    
+
+@section Scripts {
+    <script>
+        function loadFilteredData() {
+            const searchText = $('#searchBox').val();
+            const departmentId = $('#departmentSelect').val();
+
+            $.get('@Url.Action("FilterSections", "Section")', {
+                searchText: searchText,
+                departmentId: departmentId
+            }, function (data) {
+                $('#sectionTable').html(data);
+            });
+        }
+
+        $(document).ready(function () {
+            $('#searchBox').on('input', loadFilteredData);
+            $('#departmentSelect').on('change', loadFilteredData);
+            $('#resetFilters').on('click', function () {
+                $('#searchBox').val('');
+                $('#departmentSelect').val('');
+                loadFilteredData();
+            });
+        });
+    </script>
 }

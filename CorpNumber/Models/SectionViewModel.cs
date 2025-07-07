@@ -7,5 +7,6 @@
         public string? SectionCh { get; set; }
         public string? DepartmentName { get; set; } // Department + DepartmentCh
         public bool? Actuality { get; set; }
+        public int? CodeDepartment { get; set; }
     }
 }
