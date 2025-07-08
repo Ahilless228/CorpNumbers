@@ -13,8 +13,8 @@
             Отделы
         </div>
         <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-primary" title="Добавить отдел">➕Добавить отдел</button>
-            <button type="button" class="btn btn-outline-secondary" title="Обновить данные">🔄Обновить данные</button>
+            <button type="button" id="addSectionBtn" class="btn btn-outline-primary" title="Добавить отдел">➕Добавить отдел</button>
+            <button type="button" id="editSectionBtn" class="btn btn-outline-secondary" title="Обновить данные">🔄Обновить данные</button>
         </div>
     </div>
 
@@ -48,7 +48,55 @@
     @await Html.PartialAsync("_SectionTable", Model)
 </div>
 
-    
+<!--Мод окно добавления/изменения отделов-->
+<div class="modal fade" id="sectionModal" tabindex="-1" aria-labelledby="sectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sectionModalLabel">Редактирование отдела</h5>
+                <img src="/images/altynken-logo.jpg" alt="Logo" style="height: 40px; margin-left: auto;" />
+            </div>
+            <div class="modal-body">
+                <form id="sectionForm">
+                    <input type="hidden" id="CodeSection" name="CodeSection" />
+
+                    <div class="mb-3">
+                        <label for="Section" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="Section" name="Section" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="SectionCh" class="form-label">科室</label>
+                        <input type="text" class="form-control" id="SectionCh" name="SectionCh" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CodeDepartment" class="form-label">Управление</label>
+                        <select id="Department" name="Department" class="form-select">
+                            <option value="">-- Выберите управление --</option>
+                            @foreach (var dep in (ViewBag.Departments as List<Department>) ?? new List<Department>())
+                            {
+                                <option value="@dep.CodeDepartment">@dep.DepartmentName @dep.DepartmentCh</option>
+                            }
+                        </select>
+
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="Actuality" name="Actuality" value="true">
+                        <label class="form-check-label" for="Actuality">
+                            Актуальность
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelBtn">Отменить</button>
+                <button type="button" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -73,5 +121,85 @@
                 loadFilteredData();
             });
         });
+    </script>
+    <!--Скрипт Мод окна-->
+    <script>
+        let selectedCodeSection = null;
+        let formSaved = false;
+
+        $(document).ready(function () {
+            // выделение строки
+            $(document).on('click', '#sectionTable tbody tr', function () {
+                $('#sectionTable tbody tr').removeClass('table-active');
+                $(this).addClass('table-active');
+                selectedCodeSection = $(this).find('td:first').text().trim();
+            });
+
+            // кнопка "добавить"
+            $('#addSectionBtn').on('click', function () {
+                $('#sectionForm')[0].reset();
+                $('#CodeSection').val('');
+                formSaved = false;
+                $('#sectionModal').modal('show');
+            });
+
+            // кнопка "редактировать"
+            $('#editSectionBtn').on('click', function () {
+                if (!selectedCodeSection) {
+                    alert('Сначала выберите строку таблицы.');
+                    return;
+                }
+
+                $.get('/Section/GetSectionById', { id: selectedCodeSection }, function (data) {
+                    if (data) {
+                        $('#CodeSection').val(data.codeSection);
+                        $('#Section').val(data.section);
+                        $('#SectionCh').val(data.sectionCh);
+                        $('#Department').val(data.codeDepartment.toString());
+                        $('#Actuality').prop('checked', data.actuality);
+                        formSaved = false;
+                        $('#sectionModal').modal('show');
+                    }
+                });
+            });
+
+            // кнопка "сохранить"
+            $('#saveBtn').on('click', function () {
+                if (!confirm('Сохранить изменения?')) return;
+
+                const dept = $('#Department').val();
+                if (!dept) {
+                    alert('Пожалуйста, выберите управление.');
+                    return;
+                }
+
+                const formData = $('#sectionForm').serialize();
+
+                $.post('/Section/SaveSection', formData, function () {
+                    formSaved = true;
+                    $('#sectionModal').modal('hide');
+                    loadFilteredData();
+                });
+            });
+
+            // отмена
+            $('#cancelBtn').on('click', function () {
+                if (confirm('Вы действительно хотите выйти не сохранив данные?')) {
+                    formSaved = true; // иначе сработает обработчик ниже
+                    $('#sectionModal').modal('hide');
+                }
+            });
+
+            // подтверждение закрытия
+            $('#sectionModal').on('hide.bs.modal', function (e) {
+                if (!formSaved) {
+                    const confirmClose = confirm('Вы действительно хотите выйти не сохранив данные?');
+                    if (!confirmClose) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+
     </script>
 }

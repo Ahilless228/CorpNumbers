@@ -11,6 +11,7 @@ namespace CorpNumber.Models
         public string? SectionCh { get; set; }
         public int? Department { get; set; }
         public bool? Actuality { get; set; }
+        [Timestamp]
         public byte[]? SSMA_TimeStamp { get; set; }
 
         // Связь с Department
