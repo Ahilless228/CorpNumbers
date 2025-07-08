@@ -1,0 +1,34 @@
+﻿@*
+   _PostTable.cshtml
+*@
+@{
+}
+@model IEnumerable<CorpNumber.Models.PostViewModel>
+<div class="mb-2 fw-semibold">
+    Число записей: <span id="rowCount">@Model.Count()</span>
+</div>
+<div class="container" style="max-height:500px;width:70%;margin: 0 auto;overflow-y:auto;">
+    <table class="table table-hover table-striped table-bordered">
+        <thead class="sticky-top table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Название (中文)</th>
+                <th>Категория</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="post-row" data-id="@item.CodePost">
+                    <td>@item.CodePost</td>
+                    <td>@item.Post</td>
+                    <td>@item.PostCh</td>
+                    <td>@item.PostCategoryName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CorpNumber.Models
 {
@@ -6,8 +7,11 @@ namespace CorpNumber.Models
     {
         [Key]
         public int Code { get; set; }
-        public string Category { get; set; }
-        public string CategoryCh { get; set; }
+        public string? Category { get; set; }
+        public string? CategoryCh { get; set; }
+
+        
+
     }
 
 }

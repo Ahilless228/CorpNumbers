@@ -1,0 +1,182 @@
+﻿@model IEnumerable<CorpNumber.Models.PostViewModel>
+@{
+    ViewBag.Title = "Должности";
+}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="fw-bold fs-4 text-dark">
+            <img src="~/images/altynken-logo.jpg" alt="Лого" style="height: 40px;" class="me-2" />
+            Должности
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" id="addPostBtn" class="btn btn-outline-primary">➕Добавить</button>
+            <button type="button" id="editPostBtn" class="btn btn-outline-secondary">🔄Обновить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Фильтрация -->
+<div class="container-fluid mb-3">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input type="text" id="searchBox" class="form-control" placeholder="Поиск по названию должности..." />
+        </div>
+        <div class="col-md-4">
+            <select id="categorySelect" class="form-select">
+                <option value="">Все категории</option>
+                @foreach (var cat in (ViewBag.PostCategories as List<PostCategory>) ?? new List<PostCategory>())
+                {
+                    <option value="@cat.Code">@cat.Category @cat.CategoryCh</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary w-100" id="resetFilters">Сбросить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Таблица -->
+<div id="postTable">
+    @await Html.PartialAsync("_PostTable", Model)
+</div>
+
+<!-- Модальное окно -->
+<div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postModalLabel">Редактирование должности</h5>
+                <img src="/images/altynken-logo.jpg" alt="Logo" style="height: 40px; margin-left: auto;" />
+            </div>
+            <div class="modal-body">
+                <form id="postForm">
+                    <input type="hidden" id="CodePost" name="CodePost" />
+                    <div class="mb-3">
+                        <label for="Post" class="form-label">Должность</label>
+                        <input type="text" class="form-control" id="Post" name="Post" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="PostCh" class="form-label">职位</label>
+                        <input type="text" class="form-control" id="PostCh" name="PostCh" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Category" class="form-label">Категория</label>
+                        <select id="Category" name="Category" class="form-select" required>
+                            <option value="">-- Выберите категорию --</option>
+                            @foreach (var cat in (ViewBag.PostCategories as List<PostCategory>) ?? new List<PostCategory>())
+                            {
+                                <option value="@cat.Code">@cat.Category @cat.CategoryCh</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelBtn">Отменить</button>
+                <button type="button" class="btn btn-primary" id="saveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!--Скрипт мод окна + фильтрация-->
+    <script>
+        let selectedCodePost = null;
+        let formSaved = false;
+        //функция фильтрации
+        function loadFilteredPosts() {
+            const search = $('#searchBox').val();
+            const catId = $('#categorySelect').val();
+
+            $.get('/Post/FilterPosts', { searchText: search, categoryId: catId }, function (data) {
+                $('#postTable').html(data);
+            });
+        }
+
+
+        $(document).ready(function () {
+            $('#searchBox').on('input', loadFilteredPosts);
+            $('#categorySelect').on('change', loadFilteredPosts);
+            $('#resetFilters').on('click', function () {
+                $('#searchBox').val('');
+                $('#categorySelect').val('');
+                loadFilteredPosts();
+            });
+
+            // выделение строки
+            $(document).on('click', '#postTable tbody tr', function () {
+                $('#postTable tbody tr').removeClass('table-active');
+                $(this).addClass('table-active');
+                selectedCodePost = $(this).data('id');
+            });
+
+            // кнопка "добавить"
+            $('#addPostBtn').on('click', function () {
+                $('#postForm')[0].reset();
+                $('#CodePost').val('');
+                formSaved = false;
+                $('#postModal').modal('show');
+            });
+
+            // кнопка "редактировать"
+            $('#editPostBtn').on('click', function () {
+                if (!selectedCodePost) {
+                    alert('Сначала выберите строку таблицы.');
+                    return;
+                }
+
+                $.get('/Post/GetPostById', { id: selectedCodePost }, function (data) {
+                    if (data) {
+                        $('#CodePost').val(data.codePost);
+                        $('#Post').val(data.post);
+                        $('#PostCh').val(data.postCh);
+                        $('#Category').val(data.category?.toString());
+                        formSaved = false;
+                        $('#postModal').modal('show');
+                    }
+                });
+            });
+
+            // кнопка "сохранить"
+            $('#savePostBtn').on('click', function () {
+                const category = $('#Category').val();
+                if (!category) {
+                    alert('Пожалуйста, выберите категорию.');
+                    return;
+                }
+
+                if (!confirm('Сохранить изменения?')) return;
+
+                const formData = $('#postForm').serialize();
+                $.post('/Post/SavePost', formData, function () {
+                    formSaved = true;
+                    $('#postModal').modal('hide');
+                    loadFilteredPosts();
+                });
+            });
+
+            // отмена
+            $('#cancelPostBtn').on('click', function () {
+                if (confirm('Вы действительно хотите выйти не сохранив данные?')) {
+                    formSaved = true;
+                    $('#postModal').modal('hide');
+                }
+            });
+
+            // подтверждение закрытия
+            $('#postModal').on('hide.bs.modal', function (e) {
+                if (!formSaved) {
+                    const confirmClose = confirm('Вы действительно хотите выйти не сохранив данные?');
+                    if (!confirmClose) {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // фильтрация по категории
+            $('#categorySelect').on('change', loadFilteredPosts);
+        });
+    </script>
+}

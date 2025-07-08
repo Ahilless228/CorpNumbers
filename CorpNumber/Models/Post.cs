@@ -11,6 +11,9 @@ namespace CorpNumber.Models
         public string ?Postt { get; set; }
         public string ?PostCh { get; set; }
         public int? Category { get; set; }
+
+        [ForeignKey("Category")]
+        public PostCategory? PostCategoryNavigation { get; set; }
     }
 
 }
