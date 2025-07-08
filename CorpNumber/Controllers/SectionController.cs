@@ -44,7 +44,7 @@ namespace CorpNumber.Controllers
 
             if (!string.IsNullOrEmpty(searchText))
             {
-                query = query.Where(s => s.Section.Contains(searchText));
+                query = query.Where(s =>s.Section !=null && s.Section.Contains(searchText));
             }
 
             if (departmentId.HasValue)

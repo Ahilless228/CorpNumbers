@@ -14,7 +14,7 @@
         </div>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-outline-primary" title="Добавить отдел">➕Добавить отдел</button>
-            <button type="button" class="btn btn-outline-secondary" title="Обновить данные">🔄Обновить</button>
+            <button type="button" class="btn btn-outline-secondary" title="Обновить данные">🔄Обновить данные</button>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
         <div class="col-md-4">
             <select id="departmentSelect" class="form-select">
                 <option value="">Все управления</option>
-                @foreach (var dep in ViewBag.Departments as List<Department>)
+                @foreach (var dep in (ViewBag.Departments as List<Department>)?? new List<Department>())
                 {
                     <option value="@dep.CodeDepartment">
                         @dep.DepartmentName @dep.DepartmentCh

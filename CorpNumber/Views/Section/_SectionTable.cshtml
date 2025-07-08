@@ -2,10 +2,11 @@
 <div class="mb-2 fw-semibold">
     Число записей: <span id="rowCount">@Model.Count()</span>
 </div>
-<div class="container-fluid" m-1>
-    <table class="table">
-        <thead>
+<div class="container" style="max-height: 500px; width:60%;margin:0 auto;overflow-y:auto;">
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark sticky-top">
             <tr>
+                <th>ID</th>
                 <th>Отдел</th>
                 <th>Отдел (Ch)</th>
                 <th>Управление</th>
@@ -16,6 +17,7 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>@item.CodeSection</td>
                     <td>@item.Section</td>
                     <td>@item.SectionCh</td>
                     <td>@item.DepartmentName</td>
