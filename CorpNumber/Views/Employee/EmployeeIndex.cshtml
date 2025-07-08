@@ -22,6 +22,20 @@
         background-color: #d0ebff !important;
     }
 </style>
+<!--Стиль кнопок-->
+<style>
+    .custom-btn {
+        padding: 16px 0;
+        font-weight: 600;
+        border-width: 2px;
+        border-radius: 12px;
+        flex: 1; /* чтобы все кнопки в строке были одинаковой ширины */
+    }
+
+    .btn-group {
+        gap: 10px; /* отступы между кнопками внутри строки */
+    }
+</style>
 
 @{
     ViewData["Title"] = "Сотрудники ОсОО Алтынкен";
@@ -38,17 +52,20 @@
 
     <!-- Action Buttons -->
     <div class="mb-3">
-        <div class="btn-group" role="group">
-            <button class="btn btn-outline-success">Прием на работу</button>
-            <button class="btn btn-outline-danger">Увольнение</button>
-            <button class="btn btn-outline-primary">Должности</button>
-            <a class="btn btn-outline-primary" asp-controller="Section" asp-action="SectionIndex">Отделы</a>
-            <button class="btn btn-outline-warning text-dark">Перевод</button>
-            <button class="btn btn-outline-info text-dark">Управления</button>
-            <button class="btn btn-outline-secondary">Уволенные</button>
-            <button class="btn btn-outline-dark">Переводы</button>
+        <div class="d-flex flex-column gap-2">
+            <div class="btn-group w-100" role="group">
+                <button class="custom-btn btn btn-outline-success">🛂Прием на работу</button>
+                <button class="custom-btn btn btn-outline-danger">🚷Увольнение</button>
+                <button class="custom-btn btn btn-outline-warning text-dark">➡️Перевод</button>
+                <button class="custom-btn btn btn-outline-danger">❌Уволенные</button>
+            </div>
+            <div class="btn-group w-100" role="group">
+                <button class="custom-btn btn btn-outline-dark">💼Должности</button>
+                <button class="custom-btn btn btn-outline-dark">📍Переводы</button>
+                <a class="custom-btn btn btn-outline-dark" asp-controller="Section" asp-action="SectionIndex">🏢Отделы</a>
+                <button class="custom-btn btn btn-outline-dark">🏭Управления</button>
+            </div>
         </div>
-
     </div>
 
     <!-- Search & Controls -->
