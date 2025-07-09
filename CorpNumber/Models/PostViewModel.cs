@@ -8,5 +8,7 @@
         public int? Category { get; set; }
         public string? PostCategoryName { get; set; }
         public int Code { get; set; }
+        public int EmployeeCount { get; set; }
+
     }
 }

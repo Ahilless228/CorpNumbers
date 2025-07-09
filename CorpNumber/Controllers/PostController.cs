@@ -26,10 +26,11 @@ namespace CorpNumber.Controllers
                     Post = p.Postt,
                     PostCh = p.PostCh,
                     Category = p.Category,
-                    PostCategoryName = p.PostCategoryNavigation != null
-                        ? p.PostCategoryNavigation.Category + " " + p.PostCategoryNavigation.CategoryCh
-                        : "-"
+                    PostCategoryName = p.PostCategoryNavigation != null 
+                        ? p.PostCategoryNavigation.Category + " " + p.PostCategoryNavigation.CategoryCh : "-",
+                    EmployeeCount = _context.Employees.Count(e => e.Post == p.CodePost && (e.Fired == false || e.Fired == null))
                 })
+
                 .ToList();
 
             ViewBag.PostCategories = categories;
@@ -41,11 +42,6 @@ namespace CorpNumber.Controllers
         public IActionResult FilterPosts(string searchText, int? categoryId)
         {
             var query = _context.Posts.Include(p => p.PostCategoryNavigation).AsQueryable();
-            // ✅ Условие фильтрации по названию должности
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                query = query.Where(p => p.Postt != null && p.Postt.Contains(searchText));
-            }
 
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -65,11 +61,13 @@ namespace CorpNumber.Controllers
                 Category = p.Category,
                 PostCategoryName = p.PostCategoryNavigation != null
                     ? p.PostCategoryNavigation.Category + " " + p.PostCategoryNavigation.CategoryCh
-                    : "-"
+                    : "-",
+                EmployeeCount = _context.Employees.Count(e => e.Post == p.CodePost && (e.Fired == false || e.Fired == null))
             }).ToList();
 
             return PartialView("_PostTable", model);
         }
+
 
 
         [HttpGet]
