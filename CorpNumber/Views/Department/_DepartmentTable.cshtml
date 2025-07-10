@@ -1,0 +1,32 @@
+﻿@*
+    _DepartmentTable.cshtml
+*@
+@{
+}
+@model IEnumerable<CorpNumber.Models.Department>
+<div class="mb-2 fw-semibold">
+    Число записей: <span id="rowCount">@Model.Count()</span>
+</div>
+<div class="container" style="max-height:500px;width:70%;margin: 0 auto;overflow-y:auto;">
+    <table class="table table-hover table-striped table-bordered">
+        <thead class="sticky-top table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Название (中文)</th>
+                <th>Актуальность</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="post-row" data-id="@item.CodeDepartment">
+                    <td>@item.CodeDepartment</td>
+                    <td>@item.DepartmentName</td>
+                    <td>@item.DepartmentCh</td>
+                    <td>@(item.Actuality == true ? "✅" : "❌")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

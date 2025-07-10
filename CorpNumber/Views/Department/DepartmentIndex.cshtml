@@ -1,0 +1,168 @@
+﻿@*
+    DepartmentIndex.cshtml
+*@
+@model IEnumerable<CorpNumber.Models.Department>
+@{
+    ViewBag.Title = "Управления";
+}
+<!--Header-->
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="fw-bold fs-4 text-dark">
+            <img src="~/images/altynken-logo.jpg" alt="Лого" style="height: 40px;" class="me-2" />
+            Управления 
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" id="addDepartmentBtn" class="btn btn-outline-primary">➕Добавить</button>
+            <button type="button" id="editDepartmentBtn" class="btn btn-outline-secondary">🔄Обновить</button>
+        </div>
+    </div>
+</div>
+
+<!--Фильтрация-->
+<div class="container-fluid mb-3">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input type="text" id="searchBox" class="form-control" placeholder="Поиск по названию управления..." />
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-secondary w-100" id="resetFilters">Сбросить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Таблица -->
+<div id="departmentTable">
+    @await Html.PartialAsync("_DepartmentTable", Model)
+</div>
+
+<!-- Модальное окно -->
+<div class="modal fade" id="departmentModal" tabindex="-1" aria-labelledby="postCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="departmentForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="departmentModalLabel">Редактирование категории</h5>
+                    <img src="/images/altynken-logo.jpg" alt="Logo" style="height: 40px; margin-left: auto;" />
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="CodeDepartment" name="CodeDepartment" />
+                    <div class="mb-3">
+                        <label for="DepartmentName" class="form-label">Название управления</label>
+                        <input type="text" class="form-control" id="DepartmentName" name="DepartmentName" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="DepartmentCh" class="form-label">Название (中文)</label>
+                        <input type="text" class="form-control" id="DepartmentCh" name="DepartmentCh" />
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="Actuality" name="Actuality" />
+                        <label  class="form-check-label" for="Actuality">Актуальность </label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelDepartmentBtn">Отменить</button>
+                        <button type="button" class="btn btn-primary" id="saveDepartmentBtn">Сохранить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedDepartmentId = null;
+        let departmentSaved = false;
+
+        function loadFilteredDepartments() {
+            const search = $('#searchBox').val();
+            $.get('/Department/FilterDepartment', { searchText: search }, function (data) {
+                $('#departmentTable').html(data);
+            });
+        }
+
+        $(document).ready(function () {
+            // Поиск
+            $('#searchBox').on('input', loadFilteredDepartments);
+
+            // Сброс
+            $('#resetFilters').on('click', function () {
+                $('#searchBox').val('');
+                loadFilteredDepartments();
+            });
+
+            // Выбор строки
+            $(document).on('click', '#departmentTable tbody tr', function () {
+                $('#departmentTable tbody tr').removeClass('table-active');
+                $(this).addClass('table-active');
+                selectedDepartmentId = $(this).data('id');
+            });
+
+            // Добавление
+            $('#addDepartmentBtn').on('click', function () {
+                $('#departmentForm')[0].reset();
+                $('#CodeDepartment').val('');
+                $('#Actuality').prop('checked', true);
+                departmentSaved = false;
+                $('#departmentModalLabel').text('Добавление управления');
+                $('#departmentModal').modal('show');
+            });
+
+            // Редактирование
+            $('#editDepartmentBtn').on('click', function () {
+                if (!selectedDepartmentId) {
+                    alert('Сначала выберите строку таблицы.');
+                    return;
+                }
+
+                $.get('/Department/GetDepartmentById', { id: selectedDepartmentId }, function (data) {
+                    if (data) {
+                        $('#CodeDepartment').val(data.codeDepartment);
+                        $('#DepartmentName').val(data.departmentName);
+                        $('#DepartmentCh').val(data.departmentCh);
+                        $('#Actuality').prop('checked', data.actuality === true);
+                        departmentSaved = false;
+                        $('#departmentModalLabel').text('Редактирование управления');
+                        $('#departmentModal').modal('show');
+                    }
+                });
+            });
+
+            // Сохранить
+            $('#saveDepartmentBtn').on('click', function () {
+                if (!confirm('Сохранить изменения?')) return;
+
+                const formData = {
+                    CodeDepartment: $('#CodeDepartment').val(),
+                    DepartmentName: $('#DepartmentName').val(),
+                    DepartmentCh: $('#DepartmentCh').val(),
+                    Actuality: $('#Actuality').is(':checked')
+                };
+
+                $.post('/Department/SaveDepartment', formData, function () {
+                    departmentSaved = true;
+                    $('#departmentModal').modal('hide');
+                    loadFilteredDepartments();
+                });
+            });
+
+            // Отмена
+            $('#cancelDepartmentBtn').on('click', function () {
+                if (!departmentSaved && confirm('Вы действительно хотите выйти не сохранив данные?')) {
+                    $('#departmentModal').modal('hide');
+                }
+            });
+
+            // Блокировка закрытия, если не сохранено
+            $('#departmentModal').on('hide.bs.modal', function (e) {
+                if (!departmentSaved) {
+                    const confirmClose = confirm('Вы действительно хотите выйти не сохранив данные?');
+                    if (!confirmClose) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+    </script>
+
+}

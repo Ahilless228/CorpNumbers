@@ -14,7 +14,7 @@ namespace CorpNumber.Controllers
         }
         public IActionResult PostCategoryIndex() 
         {
-            var model= _context.PostCategories
+             var model= _context.PostCategories
                 .Select(c => new PostCategory
                 {
                     Code = c.Code,
