@@ -12,11 +12,12 @@ namespace CorpNumber
             // Слушать по IP и портам
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.Listen(System.Net.IPAddress.Parse("10.82.1.185"), 5299); // HTTP
-                options.Listen(System.Net.IPAddress.Parse("10.82.1.185"), 7091, listenOptions =>
+                options.ListenAnyIP(5299); // HTTP
+                options.ListenAnyIP(7091, listenOptions =>
                 {
                     listenOptions.UseHttps();
                 });
+
             });
 
             // Подключаем строку подключения к БД
