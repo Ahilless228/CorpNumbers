@@ -34,3 +34,122 @@
 <div id="postCategoryTable">
     @await Html.PartialAsync("_PostCategoryTable", Model)
 </div>
+
+<!-- Модальное окно -->
+<div class="modal fade" id="postCategoryModal" tabindex="-1" aria-labelledby="postCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="postCategoryForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postCategoryModalLabel">Редактирование категории</h5>
+                    <img src="/images/altynken-logo.jpg" alt="Logo" style="height: 40px; margin-left: auto;" />
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="Code" name="Code" />
+                    <div class="mb-3">
+                        <label for="Category" class="form-label">Название категории</label>
+                        <input type="text" class="form-control" id="Category" name="Category" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="CategoryCh" class="form-label">Название (中文)</label>
+                        <input type="text" class="form-control" id="CategoryCh" name="CategoryCh" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelCategoryBtn">Отменить</button>
+                    <button type="button" class="btn btn-primary" id="saveCategoryBtn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        let selectedCategoryId = null;
+        let categorySaved = false;
+
+        function loadFilteredCategories() {
+            const search = $('#searchBox').val();
+            $.get('/PostCategory/FilterPostCategories', { searchText: search }, function (data) {
+                $('#postCategoryTable').html(data);
+            });
+        }
+
+        $(document).ready(function () {
+            // Поиск
+            $('#searchBox').on('input', loadFilteredCategories);
+
+            // Сброс фильтров
+            $('#resetFilters').on('click', function () {
+                $('#searchBox').val('');
+                loadFilteredCategories();
+            });
+
+            // Выбор строки
+            $(document).on('click', '#postCategoryTable tbody tr', function () {
+                $('#postCategoryTable tbody tr').removeClass('table-active');
+                $(this).addClass('table-active');
+                selectedCategoryId = $(this).data('id');
+            });
+
+            // Добавить
+            $('#addPostCategoryBtn').on('click', function () {
+                $('#postCategoryForm')[0].reset();
+                $('#Code').val('');
+                categorySaved = false;
+                $('#postCategoryModal').modal('show');
+            });
+
+            // Редактировать
+            $('#editPostCategoryBtn').on('click', function () {
+                if (!selectedCategoryId) {
+                    alert('Сначала выберите строку таблицы.');
+                    return;
+                }
+
+                $.get('/PostCategory/GetPostCategoryById', { id: selectedCategoryId }, function (data) {
+                    if (data) {
+                        $('#Code').val(data.code);
+                        $('#Category').val(data.category);
+                        $('#CategoryCh').val(data.categoryCh);
+                        categorySaved = false;
+                        $('#postCategoryModal').modal('show');
+                    }
+                });
+            });
+
+            // Сохранить
+            $('#saveCategoryBtn').on('click', function () {
+                if (!confirm('Сохранить изменения?')) return;
+
+                const formData = $('#postCategoryForm').serialize();
+                $.post('/PostCategory/SavePostCategory', formData, function () {
+                    categorySaved = true;
+                    $('#postCategoryModal').modal('hide');
+                    loadFilteredCategories();
+                });
+            });
+
+            // Отмена
+            $('#cancelCategoryBtn').on('click', function () {
+                if (confirm('Вы действительно хотите выйти не сохранив данные?')) {
+                    categorySaved = true;
+                    $('#postCategoryModal').modal('hide');
+                }
+            });
+
+            // Подтверждение закрытия окна
+            $('#postCategoryModal').on('hide.bs.modal', function (e) {
+                if (!categorySaved) {
+                    const confirmClose = confirm('Вы действительно хотите выйти не сохранив данные?');
+                    if (!confirmClose) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+    </script>
+}
+
