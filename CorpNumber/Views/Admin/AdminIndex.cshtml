@@ -145,53 +145,36 @@
     string simBtnClass = simCount < 20 ? "btn-danger" : "btn-outline-secondary";
 }
 
-    <div class="container-fluid mt-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <!-- Лого или заголовок слева -->
-            <div class="fw-bold fs-4 text-dark">
-                <img src="~/images/altynken-logo.jpg" alt="Лого" style="height: 40px;" class="me-2" />
-                Телефонные номера
-            </div>
-
-            <!-- Кнопка напоминаний справа -->
-            <div class="d-flex gap-2">
-                <button class="btn btn-warning">
-                    🔔 (@ViewBag.TaskOverdue/@ViewBag.TaskTotal)
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Блок действий -->
     <!-- Раздел 1: Телефонные операции -->
     <div style="background-color: #ba271d; padding: 16px 32px ;width: 100%;">
         <div class="d-flex flex-wrap justify-content-start gap-2">
             <div class="action-group">
-                <div class="action-header">📞 Тел. операции</div>
+                <div class="action-header">📞 Основные операции</div>
                 <div class="action-menu">
                     <div class=" grid">
                         <button class="btn btn-outline-warning btn-sm">⏸️ Установка на паузу</button>
                         <button class="btn btn-outline-success btn-sm">▶️ Снятие с паузы</button>
                         <button class="btn btn-outline-primary btn-sm">🔁 Восстановление</button>
                         <button class="btn btn-outline-info btn-sm">💳 Изменение лимита</button>
-                        <button class="btn btn-outline-danger btn-sm">❎ Деактивация</button>
                         <button class="btn btn-outline-info btn-sm">📄 Запрос детализации</button>
                         <button class="btn @simBtnClass btn-sm">📦 Поступление сим-карт (@simCount)</button>
+                    <button class="btn btn-outline-info btn-sm">✈️ Подключение роуминга</button>
                     </div>
                 </div>
             </div>
 
             <!-- Раздел 2: Интернет операции -->
             <div class="action-group">
-                <div class="action-header">🌐 Интернет</div>
+                <div class="action-header">🌐 Изменение услуги/тарифа</div>
                 <div class="action-menu">
                     <div class=" grid">
-                        <button class="btn btn-outline-success btn-sm">🌐 Подключение интернета</button>
-                        <button class="btn btn-outline-secondary btn-sm">❌ Отключение интернета</button>
-                        <button class="btn btn-outline-dark btn-sm">🚫 Блокировка интернета</button>
+                        <button class="btn btn-outline-success btn-sm">🌐 Подключение услуги</button>
+                        <button class="btn btn-outline-secondary btn-sm">❌ Отключение услуги</button>
+                        <button class="btn btn-outline-dark btn-sm">🚫 Блокировка услуги</button>
                         <button class="btn btn-outline-primary btn-sm">📶 Изменение тарифа</button>
-                        <button class="btn btn-outline-info btn-sm">📡 Роутеры</button>
-                        <button class="btn btn-outline-info btn-sm">✈️ Подключение роуминга</button>
+                    <button class="btn btn-outline-danger btn-sm">❎ Деактивация</button>
                     </div>
                 </div>
             </div>
@@ -220,15 +203,25 @@
                 <div class="action-header">📋 Работа с таблицами БД</div>
                 <div class="action-menu">
                     <div class="grid">
-                        <button class="btn btn-outline-primary btn-sm">👥 Все операции</button>
-
+                        <button class="btn btn-outline-primary btn-sm">📠Счета</button>
+                        <button class="btn btn-outline-primary btn-sm">📋Статьи</button>
+                        <button class="btn btn-outline-primary btn-sm">🏴Гражданство</button>
+                        <button class="btn btn-outline-primary btn-sm">🗺️Районы</button>
+                        <button class="btn btn-outline-primary btn-sm">🛜Интернет услуги</button>
+                        <button class="btn btn-outline-primary btn-sm">👨Национальности</button>
+                        <button class="btn btn-outline-primary btn-sm">📳Операторы</button>
+                        <button class="btn btn-outline-primary btn-sm">🥸Прочие владельцы номеров</button>
+                        <button class="btn btn-outline-primary btn-sm">📄Квоты </button>
+                        <button class="btn btn-outline-primary btn-sm">📶Сим-карты</button>
+                        <button class="btn btn-outline-primary btn-sm">#️Статусы номеров</button>
+                        <button class="btn btn-outline-primary btn-sm">🌐Тарифы</button>
                     </div>
                 </div>
             </div>
 
             <!-- Раздел 5: Отчеты -->
             <div class="action-group">
-                <div class="action-header">📊 Отчёты</div>
+            <div class="action-header">📥 Экспорт в Excel</div>
                 <div class="action-menu">
                     <div class="grid">
                         <div>
@@ -236,7 +229,7 @@
                                 <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
                                 <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
                                 <input type="hidden" name="onlyCorp" value="@ViewBag.OnlyCorp" />
-                                <button type="submit" class="btn btn-success btn-sm">📥 Экспорт в Excel</button>
+                                <button type="submit" class="btn btn-success btn-sm">📥 Экспорт в Excel таблицы</button>
                             </form>
                         </div>
                         <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook1", "Admin")'">📒 Тел. справочник 1</button>
@@ -249,11 +242,10 @@
 
             <!-- Раздел 6: Сотрудники -->
             <div class="action-group">
-                <div class="action-header">🏢 Сотрудники</div>
+                <div class="action-header">⏬ Прочие операции</div>
                 <div class="action-menu">
                     <div class="grid">
-                        <a class="btn btn-outline-dark btn-sm" asp-controller="Employee" asp-action="EmployeeIndex">🏢 ОсОО "Алтынкен"</a>
-                        <button class="btn btn-outline-info btn-sm">🎉 Именинники (@ViewBag.BirthdayCount)</button>
+                        
                     </div>
                 </div>
             </div>
@@ -266,6 +258,8 @@
             <button class="btn @operBtnClass">
                 ❗ Невыполненные операции (@operCount)
             </button>
+            <a class="btn btn-outline-dark " asp-controller="Employee" asp-action="EmployeeIndex">🏢 ОсОО "Алтынкен"</a>
+            <button class="btn btn-outline-info ">📡 Роутеры</button>
         </div>
 
 

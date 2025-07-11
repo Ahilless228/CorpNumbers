@@ -1,0 +1,24 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model CorpNumber.Models.HeaderStatsViewModel
+
+<div class="d-flex flex-wrap align-items-center">
+    <button class="btn navbar-btn btn-birthday btn-sm">
+        🎉 Именинники (@Model.BirthdayCount)
+    </button>
+    <button class="btn navbar-btn btn-operations btn-sm">
+        ❗ Невыполненные операции (@Model.IncompleteOperations)
+    </button>
+    <button class="btn navbar-btn btn-all btn-sm">
+        👥 Все операции
+    </button>
+    <button class="btn navbar-btn btn-alert btn-sm">
+        🔔 (@Model.TaskOverdue/@Model.TaskTotal)
+    </button>
+    <a class="btn navbar-btn btn-back btn-sm" href="@Url.Action("AdminIndex", "Admin")">
+        ↩️ В Гл.Меню
+    </a>
+</div>

@@ -20,3 +20,49 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.navbar-btn {
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    margin-left: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    color: white;
+    white-space: nowrap;
+}
+
+/* Цвета */
+.btn-birthday {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-operations {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.btn-all {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-alert {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Наведение */
+.navbar-btn:hover {
+    opacity: 0.9;
+}
+
