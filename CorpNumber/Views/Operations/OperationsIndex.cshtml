@@ -12,6 +12,8 @@
         <div class="fw-bold fs-4 text-dark">Все операции</div>
         <div class="d-flex gap-2">
             <button type="button" id="changesPerMonth" class="btn btn-outline-primary">📑Изменения за месяц</button>
+            <button type="button" id="checkInfo" class="btn btn-outline-secondary">ℹ️Просмотр операции</button>
+            <button type="button" id="changeOperationInfo" class="btn btn-outline-success">📐Изменить инфо операции</button>
         </div>
     </div>
 </div>
@@ -28,7 +30,9 @@
             <option value="@type">@type</option>
         }
     </select>
+    <div>Период с</div>
     <input type="date" id="dateFrom" class="form-control" style="width: 180px;" />
+    <div>по</div>
     <input type="date" id="dateTo" class="form-control" style="width: 180px;" />
     <button id="resetFilters" class="btn btn-secondary">Сбросить</button>
 </div>
