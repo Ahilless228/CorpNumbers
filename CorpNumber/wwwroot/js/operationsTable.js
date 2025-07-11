@@ -4,12 +4,16 @@
         const searchNumber = $('#searchNumber').val();
         const dateFrom = $('#dateFrom').val();
         const dateTo = $('#dateTo').val();
+        const orderNumber = $('#orderNumber').val();
+        const operationType = $('#operationType').val();
 
         $.ajax({
             url: '/Operations/GetFilteredOperations',
             type: 'GET',
             data: {
                 searchNumber,
+                orderNumber,
+                operationType,
                 dateFrom,
                 dateTo,
                 page
@@ -70,7 +74,7 @@
     }
 
     // Обработчики событий
-    $('#searchNumber, #dateFrom, #dateTo').on('input change', function () {
+    $('#searchNumber, #dateFrom, #dateTo, #orderNumber, #operationType').on('input change', function () {
         loadTable(1);
     });
 
@@ -114,8 +118,11 @@
         $('#searchNumber').val('');
         $('#dateFrom').val('');
         $('#dateTo').val('');
+        $('#orderNumber').val('');
+        $('#operationType').val(''); // Или '0', если используешь value="0" для "Все операции"
         loadTable(1);
     });
+
 
     // Инициализация загрузки
     loadTable(1);

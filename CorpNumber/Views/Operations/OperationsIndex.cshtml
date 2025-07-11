@@ -19,6 +19,15 @@
 <!-- Filters Row -->
 <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
     <input type="text" id="searchNumber" class="form-control" placeholder="Поиск по номеру" style="width: 200px;" />
+    <input type="text" id="orderNumber" class="form-control" placeholder="Номер заявки" style="width: 150px;" />
+
+    <select id="operationType" class="form-select" style="width: 180px;">
+        <option value=''>Все операции</option>
+        @foreach (var type in ViewBag.OperationTypes as List<string>)
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
     <input type="date" id="dateFrom" class="form-control" style="width: 180px;" />
     <input type="date" id="dateTo" class="form-control" style="width: 180px;" />
     <button id="resetFilters" class="btn btn-secondary">Сбросить</button>

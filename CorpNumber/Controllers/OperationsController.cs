@@ -14,7 +14,7 @@ namespace CorpNumber.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> OperationsIndex(string? searchNumber, DateTime? dateFrom, DateTime? dateTo, int page = 1, int pageSize = 100)
+        public async Task<IActionResult> OperationsIndex(string? searchNumber, string? orderNumber, string? operationType, DateTime? dateFrom, DateTime? dateTo, int page = 1, int pageSize = 100)
         {
             var query = _context.Operations
                 .Include(o => o.OperationTypes)
@@ -38,6 +38,16 @@ namespace CorpNumber.Controllers
             {
                 query = query.Where(o => o.RequestDate <= dateTo.Value.Date);
             }
+            if (!string.IsNullOrEmpty(orderNumber))
+            {
+                query = query.Where(o => o.OrderN != null && o.OrderN.ToString().Contains(orderNumber));
+            }
+
+            if (!string.IsNullOrEmpty(operationType))
+            {
+                query = query.Where(o => o.OperationTypes != null && o.OperationTypes.Type == operationType);
+            }
+
 
             // 🔢 Подсчёт записей
             int totalItems = await query.CountAsync();
@@ -73,6 +83,11 @@ namespace CorpNumber.Controllers
             ViewBag.SearchNumber = searchNumber;
             ViewBag.DateFrom = dateFrom?.ToString("yyyy-MM-dd");
             ViewBag.DateTo = dateTo?.ToString("yyyy-MM-dd");
+            ViewBag.OperationTypes = await _context.OperationTypes
+                .Select(t => t.Type)
+                .Distinct()
+                .OrderBy(t => t)
+                .ToListAsync();
 
             // 🔁 Если это AJAX-запрос — возвращаем только таблицу
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -87,7 +102,7 @@ namespace CorpNumber.Controllers
 
         // 👉 Метод для фильтрации, пагинации, ajax-загрузки таблицы
         [HttpGet]
-        public async Task<IActionResult> GetFilteredOperations(string? searchNumber, DateTime? dateFrom, DateTime? dateTo, int page = 1)
+        public async Task<IActionResult> GetFilteredOperations(string? searchNumber, string? orderNumber, string? operationType, DateTime? dateFrom, DateTime? dateTo, int page = 1)
         {
             var query = _context.Operations
                 .Include(o => o.OperationTypes)
@@ -109,6 +124,16 @@ namespace CorpNumber.Controllers
             {
                 query = query.Where(o => o.RequestDate <= dateTo.Value.Date);
             }
+            if (!string.IsNullOrEmpty(orderNumber))
+            {
+                query = query.Where(o => o.OrderN != null && o.OrderN.ToString().Contains(orderNumber));
+            }
+
+            if (!string.IsNullOrEmpty(operationType))
+            {
+                query = query.Where(o => o.OperationTypes != null && o.OperationTypes.Type == operationType);
+            }
+
 
             var totalItems = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
@@ -141,6 +166,12 @@ namespace CorpNumber.Controllers
             ViewBag.SearchNumber = searchNumber;
             ViewBag.DateFrom = dateFrom?.ToString("yyyy-MM-dd");
             ViewBag.DateTo = dateTo?.ToString("yyyy-MM-dd");
+            ViewBag.OperationTypes = await _context.OperationTypes
+                .Select(t => t.Type)
+                .Distinct()
+                .OrderBy(t => t)
+                .ToListAsync();
+
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
