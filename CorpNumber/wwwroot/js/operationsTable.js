@@ -33,7 +33,9 @@
 
         let paginationHtml = '';
 
+        paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="firstPage" ${currentPage === 1 ? 'disabled' : ''}>⏮ В начало</button>`;
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>← Назад</button>`;
+
 
         // Контейнер с горизонтальной прокруткой
         paginationHtml += '<div class="pagination-scroll d-inline-block" style="max-width: 600px; overflow-x: auto; white-space: nowrap; vertical-align: middle;">';
@@ -54,6 +56,8 @@
         paginationHtml += '</div>';
 
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>Вперёд →</button>`;
+        paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="lastPage" ${currentPage === totalPages ? 'disabled' : ''}>В конец ⏭</button>`;
+
 
         $('#paginationBlock').html(paginationHtml);
 
@@ -90,6 +94,17 @@
             loadTable(currentPage + 1);
         }
     });
+    // В начало
+    $(document).on('click', '#firstPage', function () {
+        loadTable(1);
+    });
+
+    // В конец
+    $(document).on('click', '#lastPage', function () {
+        const totalPages = parseInt($('#paginationBlock').data('total-pages'));
+        loadTable(totalPages);
+    });
+
 
     // Кнопка сброса фильтров (добавим динамически)
     if ($('#resetFilters').length === 0) {
