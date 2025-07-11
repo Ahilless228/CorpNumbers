@@ -30,5 +30,7 @@ namespace CorpNumber.Models
         [ForeignKey(nameof(Account))]
         public virtual Accounts ?AccountNavigation { get; set; }
         public virtual Owner ?CodeOwnerNavigation { get; set; } // навигационное свойство
+        public virtual ICollection<Operations>? Operations { get; set; }
+
     }
 }

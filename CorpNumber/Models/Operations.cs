@@ -47,6 +47,7 @@ namespace CorpNumber.Models
         public byte[]? SSMA_TimeStamp { get; set; }
 
         // Навигационное свойство (если нужно)
-        // public virtual OperationType? OperationType { get; set; }
+        public virtual OperationTypes? OperationTypes { get; set; }
+        public virtual Phone? Phone { get; set; }
     }
 }

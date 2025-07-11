@@ -1,0 +1,39 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!-- OperationsIndex.cshtml -->
+@model IEnumerable<CorpNumber.Models.OperationViewModel>
+
+<!-- Header -->
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="fw-bold fs-4 text-dark">Все операции</div>
+        <div class="d-flex gap-2">
+            <button type="button" id="changesPerMonth" class="btn btn-outline-primary">📑Изменения за месяц</button>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Row -->
+<div class="mb-3 d-flex flex-wrap align-items-center gap-2">
+    <input type="text" id="searchNumber" class="form-control" placeholder="Поиск по номеру" style="width: 200px;" />
+    <input type="date" id="dateFrom" class="form-control" style="width: 180px;" />
+    <input type="date" id="dateTo" class="form-control" style="width: 180px;" />
+    <button id="resetFilters" class="btn btn-secondary">Сбросить</button>
+</div>
+
+<!-- Table Block -->
+<div id="operationTable">
+    <!-- Таблица подгружается через AJAX -->
+</div>
+
+
+<!-- Pagination Block -->
+<div id="paginationBlock" class="d-flex justify-content-between align-items-center mt-3 overflow-auto"></div>
+
+@section Scripts {
+    <script src="~/js/operationsTable.js"></script>
+}
+

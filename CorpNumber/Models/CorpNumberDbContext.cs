@@ -113,7 +113,19 @@ namespace CorpNumber.Models
                 .HasOne(e => e.CodeQuotaNavigation)
                 .WithMany()
                 .HasForeignKey(e => e.CodeQuota);
+            
 
+            modelBuilder.Entity<Operations>()
+                .HasOne(o => o.OperationTypes)
+                .WithMany(t => t.Operations)
+                .HasForeignKey(o => o.CodeOperType)
+                .HasPrincipalKey(t => t.CodeOperType);
+
+            modelBuilder.Entity<Operations>()
+                .HasOne(o => o.Phone)
+                .WithMany(p => p.Operations)
+                .HasForeignKey(o => o.Number)
+                .HasPrincipalKey(p => p.CodePhone);
 
 
 

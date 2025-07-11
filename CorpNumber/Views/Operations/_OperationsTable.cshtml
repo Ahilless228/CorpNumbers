@@ -1,0 +1,56 @@
+﻿@model IEnumerable<CorpNumber.Models.OperationViewModel>
+
+<div class="mb-2 fw-semibold">
+    @if (Model != null)
+    {
+        <div class="mb-2 fw-semibold">
+            Число записей: <span id="rowCount">@Model.Count()</span>
+        </div>
+    }
+
+</div>
+
+<div class="container" style="max-height:500px;width:70%;margin: 0 auto;overflow-y:auto;">
+    <table class="table table-hover table-striped table-bordered">
+        <thead class="sticky-top table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Номер</th>
+                <th>Дата заявки (中文)</th>
+                <th>Дата операции</th>
+                <th>Тип операции</th>
+                <th>Операция</th>
+                <th>Комментарий</th>
+                <th>Выполненно</th>
+                <th>Номер заявки</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="post-row" data-id="@item.CodeOperation">
+                    <td>@item.CodeOperation</td>
+                    <td>@item.PhoneNumber</td>
+                    <td>@item.RequestDate?.ToString("yyyy-MM-dd")</td>
+                    <td>@item.OperDate?.ToString("yyyy-MM-dd")</td>
+                    <td>@item.Type</td>
+                    <td>@item.Information</td>
+                    <td>@item.Comments</td>
+                    <td>@(item.Complete == true ? "✅" : "❌")</td>
+                    <td>@item.OrderN</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Данные для пагинации (скрипт считывает) -->
+<div id="paginationBlock"
+     data-total-pages="@ViewBag.TotalPages"
+     data-current-page="@ViewBag.CurrentPage"
+     data-start-item="@ViewBag.StartItem"
+     data-end-item="@ViewBag.EndItem"
+     data-total-items="@ViewBag.TotalItems">
+</div>
+<div id="showingRange" class="mt-2 text-center fw-semibold"></div>
+
