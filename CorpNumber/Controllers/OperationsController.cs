@@ -180,5 +180,43 @@ namespace CorpNumber.Controllers
 
             return View("OperationsIndex", operations);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetOperationInfo(int id)
+        {
+            var operation = await _context.Operations
+                .Include(o => o.OperationTypes)
+                .Include(o => o.Phone)
+                    .ThenInclude(p => p.OperatorNavigation) // навигац. свойство к оператору
+                .Include(o => o.Phone)
+                    .ThenInclude(p => p.AccountNavigation) // навигац. свойство к счёту
+                .FirstOrDefaultAsync(o => o.CodeOperation == id);
+
+
+            if (operation == null)
+            {
+                return NotFound();
+            }
+
+            var result = new
+            {
+                phoneNumber = operation.Phone?.Number.ToString(),
+                operatorName = operation.Phone?.OperatorNavigation?.Title, // ✅ не ключевое слово
+                account = operation.Phone?.AccountNavigation?.Type,
+                requestDate = operation.RequestDate?.ToString("yyyy-MM-dd"),
+                operDate = operation.OperDate?.ToString("yyyy-MM-dd"),
+                type = operation.OperationTypes?.Type,
+                information = operation.Information,
+                comments = operation.Comments,
+                oldValue = operation.Number,
+                newValue = operation.Complete?.ToString(),
+                complete = operation.Complete,
+                orderN = operation.OrderN
+            };
+
+
+            return Json(result);
+        }
+
+
     }
 }

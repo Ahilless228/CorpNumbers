@@ -66,3 +66,16 @@ body {
     opacity: 0.9;
 }
 
+
+/* site.css или в <style> секции _Layout.cshtml */
+/*table tr.table-rowactive {
+    background-color: #d0e6ff !important;
+    border: 2px solid red !important;
+}*/
+.table.table-striped > tbody > tr.table-rowactive > td {
+    background-color: #d0e6ff !important;
+}
+
+
+
+

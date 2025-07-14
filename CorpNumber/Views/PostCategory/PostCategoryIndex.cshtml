@@ -88,8 +88,8 @@
 
             // Выбор строки
             $(document).on('click', '#postCategoryTable tbody tr', function () {
-                $('#postCategoryTable tbody tr').removeClass('table-active');
-                $(this).addClass('table-active');
+                $('#postCategoryTable tbody tr').removeClass('table-rowactive');
+                $(this).addClass('table-rowactive');
                 selectedCategoryId = $(this).data('id');
             });
 

@@ -1,5 +1,6 @@
-﻿$(function () {
-    // Функция загрузки таблицы и пагинации с фильтрами и страницей
+﻿let selectedOperationId = null;
+
+$(function () {
     function loadTable(page = 1) {
         const searchNumber = $('#searchNumber').val();
         const dateFrom = $('#dateFrom').val();
@@ -20,14 +21,16 @@
             },
             success: function (data) {
                 $('#operationTable').html(data);
-
-                // Обновим пагинацию отдельно, т.к. она в _OperationsTable
                 updatePagination(page);
+
+                selectedOperationId = null; // сбрасываем выбранную строку
+                // ❗ Переинициализируем обработчик кликов после подгрузки
+                console.log('Данные загружены, подключаем обработчики');
+                
             }
         });
     }
 
-    // Обновление пагинации под текущие параметры
     function updatePagination(currentPage) {
         const totalPages = parseInt($('#paginationBlock').data('total-pages'));
         if (isNaN(totalPages) || totalPages < 1) {
@@ -36,24 +39,16 @@
         }
 
         let paginationHtml = '';
-
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="firstPage" ${currentPage === 1 ? 'disabled' : ''}>⏮ В начало</button>`;
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>← Назад</button>`;
 
-
-        // Контейнер с горизонтальной прокруткой
-        paginationHtml += '<div class="pagination-scroll d-inline-block" style="max-width: 600px; overflow-x: auto; white-space: nowrap; vertical-align: middle;">';
-
-        // Отображаем максимум 10 страниц вокруг текущей
+        paginationHtml += '<div class="pagination-scroll d-inline-block" style="max-width: 600px; overflow-x: auto; white-space: nowrap;">';
         const maxPagesToShow = 10;
         let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
         let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-
-        // Если на конце диапазона меньше страниц, сдвинем начало
         if (endPage - startPage + 1 < maxPagesToShow) {
             startPage = Math.max(1, endPage - maxPagesToShow + 1);
         }
-
         for (let i = startPage; i <= endPage; i++) {
             paginationHtml += `<button class="btn page-btn btn-sm ${i === currentPage ? 'btn-primary text-white' : 'btn-outline-secondary'}" data-page="${i}" style="margin-right:3px;">${i}</button>`;
         }
@@ -62,68 +57,90 @@
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>Вперёд →</button>`;
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="lastPage" ${currentPage === totalPages ? 'disabled' : ''}>В конец ⏭</button>`;
 
-
         $('#paginationBlock').html(paginationHtml);
 
-        // Показываем текущий диапазон строк
         const startItem = parseInt($('#paginationBlock').data('start-item'));
         const endItem = parseInt($('#paginationBlock').data('end-item'));
         const totalItems = parseInt($('#paginationBlock').data('total-items'));
-
         $('#showingRange').text(`Показано: ${startItem}-${endItem} / ${totalItems}`);
     }
 
-    // Обработчики событий
+    // 🔁 Обновление таблицы при изменении фильтров
     $('#searchNumber, #dateFrom, #dateTo, #orderNumber, #operationType').on('input change', function () {
         loadTable(1);
     });
 
-    // Клик по кнопкам страниц
     $(document).on('click', '.page-btn', function () {
         const page = $(this).data('page');
         loadTable(page);
     });
 
-    // Кнопки Вперёд и Назад
     $(document).on('click', '#prevPage', function () {
         let currentPage = $('.page-btn.btn-primary').data('page');
-        if (currentPage > 1) {
-            loadTable(currentPage - 1);
-        }
+        if (currentPage > 1) loadTable(currentPage - 1);
     });
+
     $(document).on('click', '#nextPage', function () {
         let currentPage = $('.page-btn.btn-primary').data('page');
         const totalPages = parseInt($('#paginationBlock').data('total-pages'));
-        if (currentPage < totalPages) {
-            loadTable(currentPage + 1);
-        }
+        if (currentPage < totalPages) loadTable(currentPage + 1);
     });
-    // В начало
+
     $(document).on('click', '#firstPage', function () {
         loadTable(1);
     });
 
-    // В конец
     $(document).on('click', '#lastPage', function () {
         const totalPages = parseInt($('#paginationBlock').data('total-pages'));
         loadTable(totalPages);
     });
 
-
-    // Кнопка сброса фильтров (добавим динамически)
-    if ($('#resetFilters').length === 0) {
-        $('.mb-3.d-flex').append('<button id="resetFilters" class="btn btn-secondary">Сбросить фильтры</button>');
-    }
     $('#resetFilters').on('click', function () {
         $('#searchNumber').val('');
         $('#dateFrom').val('');
         $('#dateTo').val('');
         $('#orderNumber').val('');
-        $('#operationType').val(''); // Или '0', если используешь value="0" для "Все операции"
+        $('#operationType').val('');
         loadTable(1);
     });
 
+    // ✅ Инициализация обработчика кликов по строкам
+    $(document).on('click', '.post-row', function () {
+        $('.post-row').removeClass('table-rowactive');
+        $(this).addClass('table-rowactive');
+        selectedOperationId = $(this).data('id');
+        console.log('Выбрана строка с ID:', selectedOperationId);
+    });
 
-    // Инициализация загрузки
+
+    // 👁 Кнопка просмотра операции
+    $(document).on('click', '#viewOperationBtn', function () {
+        if (!selectedOperationId) {
+            alert('Пожалуйста, выберите строку для просмотра.');
+            return;
+        }
+
+        $.get(`/Operations/GetOperationInfo/${selectedOperationId}`, function (data) {
+            $('#info-number').text(data.phoneNumber || '—');
+            $('#info-operator').text(data.operatorName || '—');
+            $('#info-account').text(data.account || '—');
+            $('#info-requestDate').text(data.requestDate || '—');
+            $('#info-operDate').text(data.operDate || '—');
+            $('#info-type').text(data.type || '—');
+            $('#info-information').text(data.information || '—');
+            $('#info-comments').text(data.comments || '—');
+            $('#info-oldValue').text(data.oldValue || '—');
+            $('#info-newValue').text(data.newValue || '—');
+            $('#info-complete').text(data.complete ? '✅' : '❌');
+            $('#info-orderN').text(data.orderN || '—');
+
+            const modal = new bootstrap.Modal(document.getElementById('infoModal'));
+            modal.show();
+        }).fail(function () {
+            alert('Ошибка загрузки данных операции.');
+        });
+    });
+
+    // Запуск первой загрузки
     loadTable(1);
 });

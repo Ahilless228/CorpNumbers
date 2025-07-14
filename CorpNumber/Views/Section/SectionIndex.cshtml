@@ -129,8 +129,8 @@
         $(document).ready(function () {
             // выделение строки
             $(document).on('click', '#sectionTable tbody tr', function () {
-                $('#sectionTable tbody tr').removeClass('table-active');
-                $(this).addClass('table-active');
+                $('#sectionTable tbody tr').removeClass('table-rowactive');
+                $(this).addClass('table-rowactive');
                 selectedCodeSection = $(this).find('td:first').text().trim();
             });
 

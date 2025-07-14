@@ -107,8 +107,8 @@
 
             // выделение строки
             $(document).on('click', '#postTable tbody tr', function () {
-                $('#postTable tbody tr').removeClass('table-active');
-                $(this).addClass('table-active');
+                $('#postTable tbody tr').removeClass('table-rowactive');
+                $(this).addClass('table-rowactive');
                 selectedCodePost = $(this).data('id');
             });
 

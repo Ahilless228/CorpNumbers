@@ -92,8 +92,8 @@
 
             // Выбор строки
             $(document).on('click', '#departmentTable tbody tr', function () {
-                $('#departmentTable tbody tr').removeClass('table-active');
-                $(this).addClass('table-active');
+                $('#departmentTable tbody tr').removeClass('table-rowactive');
+                $(this).addClass('table-rowactive');
                 selectedDepartmentId = $(this).data('id');
             });
 

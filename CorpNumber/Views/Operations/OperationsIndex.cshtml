@@ -1,10 +1,13 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+
 @{
 }
+
 <!-- OperationsIndex.cshtml -->
 @model IEnumerable<CorpNumber.Models.OperationViewModel>
+
 
 <!-- Header -->
 <div class="container-fluid">
@@ -12,7 +15,7 @@
         <div class="fw-bold fs-4 text-dark">Все операции</div>
         <div class="d-flex gap-2">
             <button type="button" id="changesPerMonth" class="btn btn-outline-primary">📑Изменения за месяц</button>
-            <button type="button" id="checkInfo" class="btn btn-outline-secondary">ℹ️Просмотр операции</button>
+            <button type="button" id="viewOperationBtn" class="btn btn-outline-secondary">👁Просмотр операции</button>
             <button type="button" id="changeOperationInfo" class="btn btn-outline-success">📐Изменить инфо операции</button>
         </div>
     </div>
@@ -45,6 +48,10 @@
 
 <!-- Pagination Block -->
 <div id="paginationBlock" class="d-flex justify-content-between align-items-center mt-3 overflow-auto"></div>
+
+<!--Мод окно инфо-->
+@await Html.PartialAsync("_InfoModal")
+
 
 @section Scripts {
     <script src="~/js/operationsTable.js"></script>
