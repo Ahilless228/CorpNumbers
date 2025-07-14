@@ -271,9 +271,13 @@ $(function () {
         switch (codeOperType) {
             case 1:
             case 2: // Статусы
-                oldContainer.html(input("Status_old", oldValue));
-                newContainer.html(input("Status_new", newValue));
+                $.get('/Operations/GetStatusOptions', function (statuses) {
+                    const options = statuses.map(s => ({ value: s.value, text: s.text }));
+                    oldContainer.html(select("Status_old", oldValue, options));
+                    newContainer.html(select("Status_new", newValue, options));
+                });
                 break;
+
 
             case 3: // ICCID
                 oldContainer.html(input("ICCID_old", oldValue));

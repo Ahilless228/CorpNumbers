@@ -213,9 +213,16 @@ namespace CorpNumber.Controllers
             {
                 case 1:
                 case 2:
-                    oldValue = operation.Status_old?.ToString() ?? "—";
-                    newValue = operation.Status_new?.ToString() ?? "—";
+                    oldValue = await _context.Statuses
+                        .Where(s => s.Code == operation.Status_old)
+                        .Select(s => s.StatusText)
+                        .FirstOrDefaultAsync() ?? "—";
+                    newValue = await _context.Statuses
+                        .Where(s => s.Code == operation.Status_new)
+                        .Select(s => s.StatusText)
+                        .FirstOrDefaultAsync() ?? "—";
                     break;
+
 
                 case 3:
                     oldValue = operation.ICCID_old ?? "—";
@@ -443,25 +450,19 @@ namespace CorpNumber.Controllers
             {
                 case 1:
                 case 2:
-                    oldValue = operation.Status_old?.ToString() ?? "—";
-                    newValue = operation.Status_new?.ToString() ?? "—";
+                    oldValue = operation.Status_old?.ToString() ?? "";
+                    newValue = operation.Status_new?.ToString() ?? "";
                     break;
 
                 case 3:
-                    oldValue = operation.ICCID_old ?? "—";
-                    newValue = operation.ICCID_new ?? "—";
+                    oldValue = operation.ICCID_old ?? "";
+                    newValue = operation.ICCID_new ?? "";
                     break;
 
                 case 4:
                 case 5:
-                    oldValue = await _context.InternetServices
-                        .Where(s => s.CodeServ == operation.Internet_old)
-                        .Select(s => s.Service)
-                        .FirstOrDefaultAsync() ?? "—";
-                    newValue = await _context.InternetServices
-                        .Where(s => s.CodeServ == operation.Internet_new)
-                        .Select(s => s.Service)
-                        .FirstOrDefaultAsync() ?? "—";
+                    oldValue = operation.Internet_old?.ToString() ?? "";
+                    newValue = operation.Internet_new?.ToString() ?? "";
                     break;
 
                 case 6:
@@ -471,20 +472,14 @@ namespace CorpNumber.Controllers
                     break;
 
                 case 8:
-                    oldValue = operation.Limit_old?.ToString() ?? "—";
-                    newValue = operation.Limit_new?.ToString() ?? "—";
+                    oldValue = operation.Limit_old?.ToString() ?? "";
+                    newValue = operation.Limit_new?.ToString() ?? "";
                     break;
 
                 case 9:
                 case 10:
-                    oldValue = await _context.Accounts
-                        .Where(a => a.Code == operation.Account_old)
-                        .Select(a => a.Type)
-                        .FirstOrDefaultAsync() ?? "—";
-                    newValue = await _context.Accounts
-                        .Where(a => a.Code == operation.Account_new)
-                        .Select(a => a.Type)
-                        .FirstOrDefaultAsync() ?? "—";
+                    oldValue = operation.Account_old?.ToString() ?? "";
+                    newValue = operation.Account_new?.ToString() ?? "";
                     break;
 
                 case 11:
@@ -506,15 +501,10 @@ namespace CorpNumber.Controllers
                     break;
 
                 case 16:
-                    oldValue = await _context.Tariffs
-                        .Where(t => t.CodeTariff == operation.Tariff_old)
-                        .Select(t => t.Title)
-                        .FirstOrDefaultAsync() ?? "—";
-                    newValue = await _context.Tariffs
-                        .Where(t => t.CodeTariff == operation.Tariff_new)
-                        .Select(t => t.Title)
-                        .FirstOrDefaultAsync() ?? "—";
+                    oldValue = operation.Tariff_old?.ToString() ?? "";
+                    newValue = operation.Tariff_new?.ToString() ?? "";
                     break;
+
 
                 default:
                     oldValue = "—";
@@ -689,6 +679,15 @@ namespace CorpNumber.Controllers
             }).ToList();
 
             return Json(list);
+        }
+        [HttpGet]
+        public IActionResult GetStatusOptions()
+        {
+            var statuses = _context.Statuses
+                .Select(s => new { value = s.Code, text = s.StatusText })
+                .ToList();
+
+            return Json(statuses);
         }
 
 
