@@ -164,6 +164,8 @@ $(function () {
             $('#edit-complete').prop('checked', data.complete);
             $('#edit-orderN').val(data.orderN || '');
 
+            renderValueFields(data.codeOperType, data.oldValue, data.newValue);
+
             // Загружаем справочники и выставляем значения
             loadDropdownsAndSetDefaults(data.operatorCode, data.accountCode, data.codeOperType).then(() => {
                 isModalChanged = false;
@@ -243,6 +245,91 @@ $(function () {
             if (selectedOperator) $('#edit-operator').val(selectedOperator);
         });
     }
+
+
+    function renderValueFields(codeOperType, oldValue, newValue) {
+        const oldContainer = $('#edit-oldValue-container');
+        const newContainer = $('#edit-newValue-container');
+
+        // Очистка
+        oldContainer.empty();
+        newContainer.empty();
+
+        const input = (name, value) => `<input type="text" class="form-control" name="${name}" value="${value || ''}" />`;
+
+        const select = (name, value, options) => {
+            let html = `<select class="form-select" name="${name}">`;
+            options.forEach(opt => {
+                const selected = opt.value == value ? 'selected' : '';
+                html += `<option value="${opt.value}" ${selected}>${opt.text}</option>`;
+            });
+            html += `</select>`;
+            return html;
+        };
+
+        // Логика по типу операции
+        switch (codeOperType) {
+            case 1:
+            case 2: // Статусы
+                oldContainer.html(input("Status_old", oldValue));
+                newContainer.html(input("Status_new", newValue));
+                break;
+
+            case 3: // ICCID
+                oldContainer.html(input("ICCID_old", oldValue));
+                newContainer.html(input("ICCID_new", newValue));
+                break;
+
+            case 4:
+            case 5: // Internet Service
+                $.get('/Operations/GetInternetServices', function (services) {
+                    const options = services.map(s => ({ value: s.codeServ, text: s.service }));
+                    oldContainer.html(select("Internet_old", oldValue, options));
+                    newContainer.html(select("Internet_new", newValue, options));
+                });
+                break;
+
+            case 6:
+            case 7: // Владельцы
+                $.get('/Operations/GetOwnerOptions', function (owners) {
+                    const options = owners.map(o => ({ value: o.codeOwner, text: o.display }));
+                    oldContainer.html(select("Owner_old", oldValue, options));
+                    newContainer.html(select("Owner_new", newValue, options));
+                });
+                break;
+
+            case 8: // Лимит
+                oldContainer.html(input("Limit_old", oldValue));
+                newContainer.html(input("Limit_new", newValue));
+                break;
+
+            case 9:
+            case 10:
+            case 11:
+            case 12: // Счета
+                $.get('/Operations/GetAccountOptions', function (accounts) {
+                    const options = accounts.map(a => ({ value: a.code, text: a.type }));
+                    oldContainer.html(select("Account_old", oldValue, options));
+                    newContainer.html(select("Account_new", newValue, options));
+                });
+                break;
+
+            case 16: // Тарифы
+                $.get('/Operations/GetTariffOptions', function (tariffs) {
+                    const options = tariffs.map(t => ({ value: t.codeTariff, text: t.title }));
+                    oldContainer.html(select("Tariff_old", oldValue, options));
+                    newContainer.html(select("Tariff_new", newValue, options));
+                });
+                break;
+
+            default:
+                oldContainer.html(input("OldValue", oldValue));
+                newContainer.html(input("NewValue", newValue));
+                break;
+        }
+    }
+
+
 
 
 

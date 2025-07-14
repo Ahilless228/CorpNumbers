@@ -432,9 +432,95 @@ namespace CorpNumber.Controllers
         {
             var operation = await _context.Operations
                 .Include(o => o.Phone)
+                .Include(o => o.OperationTypes)
                 .FirstOrDefaultAsync(o => o.CodeOperation == id);
 
             if (operation == null) return NotFound();
+
+            string oldValue = "—", newValue = "—";
+
+            switch (operation.CodeOperType)
+            {
+                case 1:
+                case 2:
+                    oldValue = operation.Status_old?.ToString() ?? "—";
+                    newValue = operation.Status_new?.ToString() ?? "—";
+                    break;
+
+                case 3:
+                    oldValue = operation.ICCID_old ?? "—";
+                    newValue = operation.ICCID_new ?? "—";
+                    break;
+
+                case 4:
+                case 5:
+                    oldValue = await _context.InternetServices
+                        .Where(s => s.CodeServ == operation.Internet_old)
+                        .Select(s => s.Service)
+                        .FirstOrDefaultAsync() ?? "—";
+                    newValue = await _context.InternetServices
+                        .Where(s => s.CodeServ == operation.Internet_new)
+                        .Select(s => s.Service)
+                        .FirstOrDefaultAsync() ?? "—";
+                    break;
+
+                case 6:
+                case 7:
+                    oldValue = await DescribeOwnerById(operation.Owner_old);
+                    newValue = await DescribeOwnerById(operation.Owner_new);
+                    break;
+
+                case 8:
+                    oldValue = operation.Limit_old?.ToString() ?? "—";
+                    newValue = operation.Limit_new?.ToString() ?? "—";
+                    break;
+
+                case 9:
+                case 10:
+                    oldValue = await _context.Accounts
+                        .Where(a => a.Code == operation.Account_old)
+                        .Select(a => a.Type)
+                        .FirstOrDefaultAsync() ?? "—";
+                    newValue = await _context.Accounts
+                        .Where(a => a.Code == operation.Account_new)
+                        .Select(a => a.Type)
+                        .FirstOrDefaultAsync() ?? "—";
+                    break;
+
+                case 11:
+                    oldValue = "Вне корпоратива";
+                    newValue = "В корпоративной группе. Счёт: " +
+                        (await _context.Accounts
+                            .Where(a => a.Code == operation.Account_new)
+                            .Select(a => a.Type)
+                            .FirstOrDefaultAsync() ?? "—");
+                    break;
+
+                case 12:
+                    oldValue = "В корпоративной группе. Счёт: " +
+                        (await _context.Accounts
+                            .Where(a => a.Code == operation.Phone.Account)
+                            .Select(a => a.Type)
+                            .FirstOrDefaultAsync() ?? "—");
+                    newValue = "Вне корпоратива";
+                    break;
+
+                case 16:
+                    oldValue = await _context.Tariffs
+                        .Where(t => t.CodeTariff == operation.Tariff_old)
+                        .Select(t => t.Title)
+                        .FirstOrDefaultAsync() ?? "—";
+                    newValue = await _context.Tariffs
+                        .Where(t => t.CodeTariff == operation.Tariff_new)
+                        .Select(t => t.Title)
+                        .FirstOrDefaultAsync() ?? "—";
+                    break;
+
+                default:
+                    oldValue = "—";
+                    newValue = "—";
+                    break;
+            }
 
             var result = new
             {
@@ -447,14 +533,58 @@ namespace CorpNumber.Controllers
                 operatorCode = operation.Phone?.Operator,
                 accountCode = operation.Phone?.Account,
                 complete = operation.Complete,
-                orderN = operation.OrderN
+                orderN = operation.OrderN,
+                oldValue,
+                newValue
             };
 
             return Json(result);
         }
 
+        private async Task<string> DescribeOwnerById(int? ownerId)
+        {
+            if (ownerId == null) return "—";
+
+            var owner = await _context.Owners
+                .Include(o => o.CategoryNavigation)
+                .Include(o => o.EmployeeNavigation)
+                .FirstOrDefaultAsync(o => o.CodeOwner == ownerId);
+
+            if (owner == null || owner.CodeCategory == null) return "—";
+
+            switch (owner.CodeCategory)
+            {
+                case 4:
+                    return "Резерв";
+
+                case 1:
+                case 6:
+                    var emp = owner.EmployeeNavigation;
+                    if (emp == null)
+                    {
+                        emp = await _context.Employees.FirstOrDefaultAsync(e => e.CodeEmployee == owner.CodeEmployee);
+                    }
+
+                    var dep = emp != null
+                        ? await _context.Departments.FirstOrDefaultAsync(d => d.CodeDepartment == emp.Department)
+                        : null;
+
+                    return emp == null ? "—" : $"{emp.Surname} {emp.Firstname} {emp.Midname} {emp.NameCh} ({dep?.DepartmentName} {dep?.DepartmentCh})";
+
+                case 3:
+                    var temp = await _context.TempOwners.FirstOrDefaultAsync(t => t.CodeTempOwner == owner.CodeTempOwner);
+                    if (temp == null) return "Временный пользователь";
+
+                    var hostDep = await _context.Departments.FirstOrDefaultAsync(d => d.CodeDepartment == temp.HostDepartment);
+                    return $"Временный пользователь: {temp.NameTO} {temp.NameTOCh}. Организация: {temp.Organization}. Принимающее управление: {hostDep?.DepartmentName} {hostDep?.DepartmentCh}.";
+
+                default:
+                    return "—";
+            }
+        }
 
 
+        //обновление таблицы после сохранения изменений
         [HttpPost]
         public async Task<IActionResult> UpdateOperation(Operations model)
         {
@@ -462,8 +592,10 @@ namespace CorpNumber.Controllers
                 .Include(o => o.Phone)
                 .FirstOrDefaultAsync(o => o.CodeOperation == model.CodeOperation);
 
-            if (operation == null) return NotFound();
+            if (operation == null)
+                return NotFound();
 
+            // Основные поля
             operation.RequestDate = model.RequestDate;
             operation.OperDate = model.OperDate;
             operation.Information = model.Information;
@@ -472,6 +604,29 @@ namespace CorpNumber.Controllers
             operation.Complete = model.Complete;
             operation.OrderN = model.OrderN;
 
+            // Справочные поля (если переданы)
+            operation.Status_old = model.Status_old;
+            operation.Status_new = model.Status_new;
+
+            operation.Tariff_old = model.Tariff_old;
+            operation.Tariff_new = model.Tariff_new;
+
+            operation.Account_old = model.Account_old;
+            operation.Account_new = model.Account_new;
+
+            operation.ICCID_old = model.ICCID_old;
+            operation.ICCID_new = model.ICCID_new;
+
+            operation.Internet_old = model.Internet_old;
+            operation.Internet_new = model.Internet_new;
+
+            operation.Owner_old = model.Owner_old;
+            operation.Owner_new = model.Owner_new;
+
+            operation.Limit_old = model.Limit_old;
+            operation.Limit_new = model.Limit_new;
+
+            // Телефон — оператор и счёт
             if (operation.Phone != null && model.Phone != null)
             {
                 operation.Phone.Operator = model.Phone.Operator;
@@ -484,7 +639,6 @@ namespace CorpNumber.Controllers
         }
 
 
-
         [HttpGet]
         public IActionResult GetDropdownData()
         {
@@ -493,6 +647,48 @@ namespace CorpNumber.Controllers
             var operators = _context.Operators.Select(o => new { o.CodeOperator, o.Title }).ToList();
 
             return Json(new { types, accounts, operators });
+        }
+
+
+
+        //-------------------------------------------Эндпоинты для получения данных для выпадающих списков-------------------------------------------
+        [HttpGet]
+        public IActionResult GetInternetServices()
+        {
+            var list = _context.InternetServices.Select(s => new { s.CodeServ, s.Service }).ToList();
+            return Json(list);
+        }
+
+        [HttpGet]
+        public IActionResult GetAccountOptions()
+        {
+            var list = _context.Accounts.Select(a => new { a.Code, a.Type }).ToList();
+            return Json(list);
+        }
+
+        [HttpGet]
+        public IActionResult GetTariffOptions()
+        {
+            var list = _context.Tariffs.Select(t => new { t.CodeTariff, t.Title }).ToList();
+            return Json(list);
+        }
+
+        [HttpGet]
+        public IActionResult GetOwnerOptions()
+        {
+            var list = _context.Owners.Select(o => new
+            {
+                o.CodeOwner,
+                Display = o.CodeCategory == 4 ? "Резерв" :
+                          o.EmployeeNavigation != null ? (
+                              o.EmployeeNavigation.Surname + " " +
+                              o.EmployeeNavigation.Firstname + " " +
+                              o.EmployeeNavigation.Midname
+                          ) :
+                          "—"
+            }).ToList();
+
+            return Json(list);
         }
 
 
