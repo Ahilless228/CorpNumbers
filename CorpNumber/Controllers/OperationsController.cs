@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Azure;
 using CorpNumber.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CorpNumber.Controllers
 {
@@ -419,6 +420,81 @@ namespace CorpNumber.Controllers
                     return "—";
             }
         }
+
+
+
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetOperationEditData(int id)
+        {
+            var operation = await _context.Operations
+                .Include(o => o.Phone)
+                .FirstOrDefaultAsync(o => o.CodeOperation == id);
+
+            if (operation == null) return NotFound();
+
+            var result = new
+            {
+                requestDate = operation.RequestDate?.ToString("yyyy-MM-dd"),
+                operDate = operation.OperDate?.ToString("yyyy-MM-dd"),
+                information = operation.Information,
+                comments = operation.Comments,
+                codeOperType = operation.CodeOperType,
+                phoneNumber = operation.Phone?.Number.ToString(),
+                operatorCode = operation.Phone?.Operator,
+                accountCode = operation.Phone?.Account,
+                complete = operation.Complete,
+                orderN = operation.OrderN
+            };
+
+            return Json(result);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateOperation(Operations model)
+        {
+            var operation = await _context.Operations
+                .Include(o => o.Phone)
+                .FirstOrDefaultAsync(o => o.CodeOperation == model.CodeOperation);
+
+            if (operation == null) return NotFound();
+
+            operation.RequestDate = model.RequestDate;
+            operation.OperDate = model.OperDate;
+            operation.Information = model.Information;
+            operation.Comments = model.Comments;
+            operation.CodeOperType = model.CodeOperType;
+            operation.Complete = model.Complete;
+            operation.OrderN = model.OrderN;
+
+            if (operation.Phone != null && model.Phone != null)
+            {
+                operation.Phone.Operator = model.Phone.Operator;
+                operation.Phone.Account = model.Phone.Account;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
+
+        [HttpGet]
+        public IActionResult GetDropdownData()
+        {
+            var types = _context.OperationTypes.Select(t => new { t.CodeOperType, t.Type }).ToList();
+            var accounts = _context.Accounts.Select(a => new { a.Code, a.Type }).ToList();
+            var operators = _context.Operators.Select(o => new { o.CodeOperator, o.Title }).ToList();
+
+            return Json(new { types, accounts, operators });
+        }
+
 
 
 

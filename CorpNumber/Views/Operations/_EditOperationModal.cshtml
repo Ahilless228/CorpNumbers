@@ -1,0 +1,73 @@
+﻿@*_EditOperationModal.cshtml *@
+<div class="modal fade" id="editOperationModal" tabindex="-1" aria-labelledby="editOperationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="editOperationModalLabel">Редактирование операции</h5>
+                <img src="/images/altynken-logo.jpg" alt="logo" height="30" class="ms-auto" />
+            </div>
+            <div class="modal-body">
+                <form id="editOperationForm">
+                    <input type="hidden" id="edit-codeOperation" name="CodeOperation" />
+
+                    <div class="mb-3">
+                        <label for="edit-requestDate" class="form-label">Дата заявки:</label>
+                        <input type="date" class="form-control" id="edit-requestDate" name="RequestDate" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-operDate" class="form-label">Дата операции:</label>
+                        <input type="date" class="form-control" id="edit-operDate" name="OperDate" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-information" class="form-label">Операция:</label>
+                        <input type="text" class="form-control" id="edit-information" name="Information" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-comments" class="form-label">Комментарий:</label>
+                        <input type="text" class="form-control" id="edit-comments" name="Comments" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-type" class="form-label">Тип операции:</label>
+                        <select class="form-select" id="edit-type" name="CodeOperType">
+                            <option value="">Выберите тип</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-account" class="form-label">Счёт:</label>
+                        <select class="form-select" id="edit-account" name="Account">
+                            <option value="">Выберите счёт</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-operator" class="form-label">Оператор:</label>
+                        <select class="form-select" id="edit-operator" name="Operator">
+                            <option value="">Выберите оператора</option>
+                        </select>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="edit-complete" name="Complete" />
+                        <label class="form-check-label" for="edit-complete">Выполнено</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit-orderN" class="form-label">Номер заявки:</label>
+                        <input type="text" class="form-control" id="edit-orderN" name="OrderN" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-secondary" id="cancelEdit">Отменить изменения</button>
+                <button type="button" class="btn btn-success" id="saveEdit">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+{
+}

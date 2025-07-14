@@ -142,11 +142,85 @@ $(function () {
             alert('Ошибка загрузки данных операции.');
         });
     });
-
-
-
-    
-
     // Запуск первой загрузки
     loadTable(1);
+
+
+
+    let isModalChanged = false;
+
+    $(document).on('click', '#changeOperationInfo', function () {
+        if (!selectedOperationId) {
+            alert('Выберите строку для редактирования.');
+            return;
+        }
+
+        // Получаем данные
+        $.get(`/Operations/GetOperationEditData/${selectedOperationId}`, function (data) {
+            $('#edit-codeOperation').val(selectedOperationId);
+            $('#edit-requestDate').val(data.requestDate || '');
+            $('#edit-operDate').val(data.operDate || '');
+            $('#edit-information').val(data.information || '');
+            $('#edit-comments').val(data.comments || '');
+            $('#edit-type').val(data.codeOperType || '');
+            $('#edit-account').val(data.account || '');
+            $('#edit-operator').val(data.operator || '');
+            $('#edit-complete').prop('checked', data.complete);
+            $('#edit-orderN').val(data.orderN || '');
+
+            isModalChanged = false;
+
+            const modal = new bootstrap.Modal(document.getElementById('editOperationModal'));
+            modal.show();
+        });
+    });
+
+    // Слежение за изменениями
+    $(document).on('change input', '#editOperationForm input, #editOperationForm select', function () {
+        isModalChanged = true;
+    });
+
+    // Отмена
+    $(document).on('click', '#cancelEdit', function () {
+        if (isModalChanged && !confirm("Вы уверены, что хотите отменить изменения?")) return;
+
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editOperationModal'));
+        modal.hide();
+    });
+
+    // Сохранение
+    $(document).on('click', '#saveEdit', function () {
+        if (!confirm("Сохранить изменения?")) return;
+
+        // Используем массив, чтобы можно было делать push
+        let formData = $('#editOperationForm').serializeArray();
+
+        // Добавляем или обновляем поле Complete
+        const isChecked = $('#edit-complete').is(':checked');
+
+        // Удалим старую запись, если она уже есть
+        formData = formData.filter(f => f.name !== 'Complete');
+
+        // Добавим правильное значение
+        formData.push({ name: 'Complete', value: isChecked });
+
+        // Отправляем сериализованный массив как query string
+        $.post('/Operations/UpdateOperation', $.param(formData), function () {
+            alert("Операция обновлена.");
+            isModalChanged = false;
+            bootstrap.Modal.getInstance(document.getElementById('editOperationModal')).hide();
+            loadTable(); // обновляем таблицу
+        }).fail(function () {
+            alert("Ошибка при сохранении изменений.");
+        });
+    });
+
+
+    $.get('/Operations/GetDropdownData', function (data) {
+        data.types.forEach(t => $('#edit-type').append(new Option(t.type, t.codeOperType)));
+        data.accounts.forEach(a => $('#edit-account').append(new Option(a.type, a.code)));
+        data.operators.forEach(o => $('#edit-operator').append(new Option(o.title, o.codeOperator)));
+    });
+
+
 });
