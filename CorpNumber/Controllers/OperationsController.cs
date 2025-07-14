@@ -180,22 +180,172 @@ namespace CorpNumber.Controllers
 
             return View("OperationsIndex", operations);
         }
+
+        // 👉 Метод для получения информации об операции по ID
         [HttpGet]
         public async Task<IActionResult> GetOperationInfo(int id)
         {
             var operation = await _context.Operations
                 .Include(o => o.OperationTypes)
                 .Include(o => o.Phone)
-                    .ThenInclude(p => p.OperatorNavigation) // навигац. свойство к оператору
+                    .ThenInclude(p => p.OperatorNavigation) // предполагается навигация
                 .Include(o => o.Phone)
-                    .ThenInclude(p => p.AccountNavigation) // навигац. свойство к счёту
+                    .ThenInclude(p => p.AccountNavigation) // предполагается навигация
+                .Include(o => o.OwnerOld)
+                    .ThenInclude(owner => owner.EmployeeNavigation)
+                .Include(o => o.OwnerOld)
+                    .ThenInclude(owner => owner.CategoryNavigation)
+                .Include(o => o.OwnerNew)
+                    .ThenInclude(owner => owner.EmployeeNavigation)
+                .Include(o => o.OwnerNew)
+                    .ThenInclude(owner => owner.CategoryNavigation)
                 .FirstOrDefaultAsync(o => o.CodeOperation == id);
+                
 
 
             if (operation == null)
-            {
                 return NotFound();
+
+            string oldValue = "—", newValue = "—";
+
+            switch (operation.CodeOperType)
+            {
+                case 1:
+                case 2:
+                    oldValue = operation.Status_old?.ToString() ?? "—";
+                    newValue = operation.Status_new?.ToString() ?? "—";
+                    break;
+
+                case 3:
+                    oldValue = operation.ICCID_old ?? "—";
+                    newValue = operation.ICCID_new ?? "—";
+                    break;
+
+                case 4:
+                case 5:
+                    oldValue = await _context.InternetServices
+                        .Where(s => s.CodeServ == operation.Internet_old)
+                        .Select(s => s.Service)
+                        .FirstOrDefaultAsync() ?? "—";
+                    newValue = await _context.InternetServices
+                        .Where(s => s.CodeServ == operation.Internet_new)
+                        .Select(s => s.Service)
+                        .FirstOrDefaultAsync() ?? "—";
+                    break;
+
+                case 6:
+                case 7:
+                    {
+                        string FormatEmployeeInfo(Employee employee)
+                        {
+                            var dep = _context.Departments.FirstOrDefault(d => d.CodeDepartment == employee.Department);
+                            return $"{employee.Surname} {employee.Firstname} {employee.Midname} {employee.NameCh} ({dep?.DepartmentName} {dep?.DepartmentCh})";
+                        }
+
+                        string FormatTempOwnerInfo(TempOwners temp)
+                        {
+                            var dep = _context.Departments.FirstOrDefault(d => d.CodeDepartment == temp.HostDepartment);
+                            return $"Временный пользователь: {temp.NameTO} {temp.NameTOCh}. Организация: {temp.Organization}. Принимающее управление: {dep?.DepartmentName} {dep?.DepartmentCh}.";
+                        }
+
+                        async Task<string> ResolveOwnerInfo(int? ownerId)
+                        {
+                            if (ownerId == null) return "—";
+
+                            var owner = await _context.Owners
+                                .Include(o => o.CategoryNavigation)
+                                .Include(o => o.EmployeeNavigation)
+                                .FirstOrDefaultAsync(o => o.CodeOwner == ownerId);
+
+                            if (owner == null || owner.CodeCategory == null)
+                                return "—";
+
+                            switch (owner.CodeCategory)
+                            {
+                                case 4:
+                                    return "Резерв";
+                                case 1:
+                                case 6:
+                                    if (owner.EmployeeNavigation != null)
+                                        return FormatEmployeeInfo(owner.EmployeeNavigation);
+                                    break;
+                                case 3:
+                                    var temp = await _context.TempOwners.FirstOrDefaultAsync(t => t.CodeTempOwner == owner.CodeTempOwner);
+                                    if (temp != null)
+                                        return FormatTempOwnerInfo(temp);
+                                    break;
+                            }
+
+                            return "—";
+                        }
+
+                        oldValue = await ResolveOwnerInfo(operation.Owner_old);
+                        newValue = await ResolveOwnerInfo(operation.Owner_new);
+                        break;
+                    }
+
+
+                case 8:
+                    oldValue = operation.Limit_old?.ToString() ?? "—";
+                    newValue = operation.Limit_new?.ToString() ?? "—";
+                    break;
+
+                case 9:
+                case 10:
+                    oldValue = await _context.Accounts
+                        .Where(a => a.Code == operation.Account_old)
+                        .Select(a => a.Type)
+                        .FirstOrDefaultAsync() ?? "—";
+                    newValue = await _context.Accounts
+                        .Where(a => a.Code == operation.Account_new)
+                        .Select(a => a.Type)
+                        .FirstOrDefaultAsync() ?? "—";
+                    break;
+
+                case 11:
+                    oldValue = "Вне корпоратива";
+                    newValue = "В корпоративной группе. Счёт: " +
+                        (await _context.Accounts
+                            .Where(a => a.Code == operation.Account_new)
+                            .Select(a => a.Type)
+                            .FirstOrDefaultAsync() ?? "—");
+                    break;
+
+                case 12:
+                    oldValue = "В корпоративной группе. Счёт: " +
+                        (await _context.Accounts
+                            .Where(a => a.Code == operation.Phone.Account)
+                            .Select(a => a.Type)
+                            .FirstOrDefaultAsync() ?? "—");
+                    newValue = "Вне корпоратива";
+                    break;
+
+                case 16:
+                    oldValue = await _context.Tariffs
+                        .Where(t => t.CodeTariff == operation.Tariff_old)
+                        .Select(t => t.Title)
+                        .FirstOrDefaultAsync() ?? "—";
+                    newValue = await _context.Tariffs
+                        .Where(t => t.CodeTariff == operation.Tariff_new)
+                        .Select(t => t.Title)
+                        .FirstOrDefaultAsync() ?? "—";
+                    break;
+
+                default:
+                    oldValue =  "—";
+                    newValue = "—";
+                    break;
             }
+
+            var operatorTitle = await _context.Operators
+                .Where(o => o.CodeOperator == operation.Phone.Operator)
+                .Select(o => o.Title)
+                .FirstOrDefaultAsync();
+
+            var accountType = await _context.Accounts
+                .Where(a => a.Code == operation.Phone.Account)
+                .Select(a => a.Type)
+                .FirstOrDefaultAsync();
 
             var result = new
             {
@@ -207,15 +357,69 @@ namespace CorpNumber.Controllers
                 type = operation.OperationTypes?.Type,
                 information = operation.Information,
                 comments = operation.Comments,
-                oldValue = operation.Number,
-                newValue = operation.Complete?.ToString(),
+                oldValue,
+                newValue,
                 complete = operation.Complete,
                 orderN = operation.OrderN
             };
 
-
             return Json(result);
         }
+
+        //дополнительный метод для получения владельца для кейсов 6 и 7
+        private async Task<string> DescribeOwner(Owner? owner)
+        {
+            if (owner == null || owner.CodeCategory == null)
+                return "—";
+
+            switch (owner.CodeCategory)
+            {
+                case 4:
+                    return "Резерв";
+
+                case 1:
+                case 6:
+                    if (owner.EmployeeNavigation == null)
+                    {
+                        var emp = await _context.Employees
+                            .FirstOrDefaultAsync(e => e.CodeEmployee == owner.CodeEmployee);
+
+                        if (emp == null) return "—";
+
+                        var dep = await _context.Departments
+                            .FirstOrDefaultAsync(d => d.CodeDepartment == emp.Department);
+
+                        return $"{emp.Surname} {emp.Firstname} {emp.Midname} {emp.NameCh} " +
+                               $"({dep?.DepartmentName} {dep?.DepartmentCh})";
+                    }
+                    else
+                    {
+                        var emp = owner.EmployeeNavigation;
+                        var dep = await _context.Departments
+                            .FirstOrDefaultAsync(d => d.CodeDepartment == emp.Department);
+
+                        return $"{emp.Surname} {emp.Firstname} {emp.Midname} {emp.NameCh} " +
+                               $"({dep?.DepartmentName} {dep?.DepartmentCh})";
+                    }
+
+                case 3:
+                    var temp = await _context.TempOwners
+                        .FirstOrDefaultAsync(t => t.CodeTempOwner == owner.CodeTempOwner);
+
+                    if (temp == null) return "Временный пользователь";
+
+                    var hostDep = await _context.Departments
+                        .FirstOrDefaultAsync(d => d.CodeDepartment == temp.HostDepartment);
+
+                    return $"Временный пользователь: {temp.NameTO} {temp.NameTOCh}. " +
+                           $"Организация: {temp.Organization}. " +
+                           $"Принимающее управление: {hostDep?.DepartmentName} {hostDep?.DepartmentCh}.";
+
+                default:
+                    return "—";
+            }
+        }
+
 
 
     }

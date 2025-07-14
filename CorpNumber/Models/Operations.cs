@@ -49,5 +49,13 @@ namespace CorpNumber.Models
         // Навигационное свойство (если нужно)
         public virtual OperationTypes? OperationTypes { get; set; }
         public virtual Phone? Phone { get; set; }
+
+
+        [ForeignKey("Owner_old")]
+        public virtual Owner? OwnerOld { get; set; }
+
+        [ForeignKey("Owner_new")]
+        public virtual Owner? OwnerNew { get; set; }
+
     }
 }

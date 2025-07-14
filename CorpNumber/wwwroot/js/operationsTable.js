@@ -104,7 +104,8 @@ $(function () {
         loadTable(1);
     });
 
-    // ✅ Инициализация обработчика кликов по строкам
+  
+    // ✅ Одинарный клик — выделение строки
     $(document).on('click', '.post-row', function () {
         $('.post-row').removeClass('table-rowactive');
         $(this).addClass('table-rowactive');
@@ -112,15 +113,12 @@ $(function () {
         console.log('Выбрана строка с ID:', selectedOperationId);
     });
 
+    // ✅ Двойной клик — открытие модального окна
+    $(document).on('dblclick', '.post-row', function () {
+        const operationId = $(this).data('id');
+        if (!operationId) return;
 
-    // 👁 Кнопка просмотра операции
-    $(document).on('click', '#viewOperationBtn', function () {
-        if (!selectedOperationId) {
-            alert('Пожалуйста, выберите строку для просмотра.');
-            return;
-        }
-
-        $.get(`/Operations/GetOperationInfo/${selectedOperationId}`, function (data) {
+        $.get(`/Operations/GetOperationInfo/${operationId}`, function (data) {
             $('#info-number').text(data.phoneNumber || '—');
             $('#info-operator').text(data.operatorName || '—');
             $('#info-account').text(data.account || '—');
@@ -140,6 +138,10 @@ $(function () {
             alert('Ошибка загрузки данных операции.');
         });
     });
+
+
+
+    
 
     // Запуск первой загрузки
     loadTable(1);
