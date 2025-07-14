@@ -38,7 +38,8 @@ $(function () {
             return;
         }
 
-        let paginationHtml = '';
+        let paginationHtml = '<div class="d-flex align-items-center justify-content-center flex-wrap gap-1">';
+
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="firstPage" ${currentPage === 1 ? 'disabled' : ''}>⏮ В начало</button>`;
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>← Назад</button>`;
 
@@ -57,6 +58,8 @@ $(function () {
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>Вперёд →</button>`;
         paginationHtml += `<button class="btn btn-outline-secondary btn-sm" id="lastPage" ${currentPage === totalPages ? 'disabled' : ''}>В конец ⏭</button>`;
 
+        paginationHtml += '</div>'; // Закрытие d-flex wrapper
+
         $('#paginationBlock').html(paginationHtml);
 
         const startItem = parseInt($('#paginationBlock').data('start-item'));
@@ -64,6 +67,7 @@ $(function () {
         const totalItems = parseInt($('#paginationBlock').data('total-items'));
         $('#showingRange').text(`Показано: ${startItem}-${endItem} / ${totalItems}`);
     }
+
 
     // 🔁 Обновление таблицы при изменении фильтров
     $('#searchNumber, #dateFrom, #dateTo, #orderNumber, #operationType').on('input change', function () {
