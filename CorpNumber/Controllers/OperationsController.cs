@@ -467,9 +467,10 @@ namespace CorpNumber.Controllers
 
                 case 6:
                 case 7:
-                    oldValue = await DescribeOwnerById(operation.Owner_old);
-                    newValue = await DescribeOwnerById(operation.Owner_new);
+                    oldValue = operation.Owner_old?.ToString() ?? "";
+                    newValue = operation.Owner_new?.ToString() ?? "";
                     break;
+
 
                 case 8:
                     oldValue = operation.Limit_old?.ToString() ?? "";
@@ -666,20 +667,24 @@ namespace CorpNumber.Controllers
         [HttpGet]
         public IActionResult GetOwnerOptions()
         {
-            var list = _context.Owners.Select(o => new
-            {
-                o.CodeOwner,
-                Display = o.CodeCategory == 4 ? "Резерв" :
-                          o.EmployeeNavigation != null ? (
-                              o.EmployeeNavigation.Surname + " " +
-                              o.EmployeeNavigation.Firstname + " " +
-                              o.EmployeeNavigation.Midname
-                          ) :
-                          "—"
-            }).ToList();
+            var owners = _context.Owners
+                .Include(o => o.EmployeeNavigation)
+                .Include(o => o.TempOwnerNavigation)
+                .Include(o => o.CategoryNavigation)
+                .Select(o => new
+                {
+                    codeOwner = o.CodeOwner,
+                    display = o.CodeCategory == 4
+                        ? "Резерв"
+                        : o.CodeCategory == 3
+                            ? "Временный пользователь"
+                            : o.EmployeeNavigation.Surname + " " + o.EmployeeNavigation.Firstname
+                })
+                .ToList();
 
-            return Json(list);
+            return Json(owners);
         }
+
         [HttpGet]
         public IActionResult GetStatusOptions()
         {

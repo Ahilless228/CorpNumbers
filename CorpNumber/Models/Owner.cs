@@ -18,6 +18,8 @@ namespace CorpNumber.Models
         public virtual ICollection<Phone> Phones { get; set; } = new List<Phone>();
         [ForeignKey("CodeEmployee")]
         public virtual Employee? EmployeeNavigation { get; set; }
+        [ForeignKey("CodeTempOwner")]
+        public virtual TempOwners? TempOwnerNavigation { get; set; }
 
     }
 
