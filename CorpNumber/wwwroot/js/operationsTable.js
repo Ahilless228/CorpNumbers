@@ -155,25 +155,24 @@ $(function () {
             return;
         }
 
-        // Получаем данные
         $.get(`/Operations/GetOperationEditData/${selectedOperationId}`, function (data) {
             $('#edit-codeOperation').val(selectedOperationId);
             $('#edit-requestDate').val(data.requestDate || '');
             $('#edit-operDate').val(data.operDate || '');
             $('#edit-information').val(data.information || '');
             $('#edit-comments').val(data.comments || '');
-            $('#edit-type').val(data.codeOperType || '');
-            $('#edit-account').val(data.account || '');
-            $('#edit-operator').val(data.operator || '');
             $('#edit-complete').prop('checked', data.complete);
             $('#edit-orderN').val(data.orderN || '');
 
-            isModalChanged = false;
-
-            const modal = new bootstrap.Modal(document.getElementById('editOperationModal'));
-            modal.show();
+            // Загружаем справочники и выставляем значения
+            loadDropdownsAndSetDefaults(data.operatorCode, data.accountCode, data.codeOperType).then(() => {
+                isModalChanged = false;
+                const modal = new bootstrap.Modal(document.getElementById('editOperationModal'));
+                modal.show();
+            });
         });
     });
+
 
     // Слежение за изменениями
     $(document).on('change input', '#editOperationForm input, #editOperationForm select', function () {
@@ -216,11 +215,35 @@ $(function () {
     });
 
 
-    $.get('/Operations/GetDropdownData', function (data) {
-        data.types.forEach(t => $('#edit-type').append(new Option(t.type, t.codeOperType)));
-        data.accounts.forEach(a => $('#edit-account').append(new Option(a.type, a.code)));
-        data.operators.forEach(o => $('#edit-operator').append(new Option(o.title, o.codeOperator)));
-    });
+    function loadDropdownsAndSetDefaults(selectedOperator, selectedAccount, selectedType) {
+        return $.get('/Operations/GetDropdownData').then(function (data) {
+            // Очищаем перед заполнением
+            $('#edit-type').empty().append('<option value="">Выберите тип</option>');
+            $('#edit-account').empty().append('<option value="">Выберите счёт</option>');
+            $('#edit-operator').empty().append('<option value="">Выберите оператора</option>');
+
+            data.types.forEach(t => {
+                const option = new Option(t.type, t.codeOperType);
+                $('#edit-type').append(option);
+            });
+
+            data.accounts.forEach(a => {
+                const option = new Option(a.type, a.code);
+                $('#edit-account').append(option);
+            });
+
+            data.operators.forEach(o => {
+                const option = new Option(o.title, o.codeOperator);
+                $('#edit-operator').append(option);
+            });
+
+            // Устанавливаем значения по умолчанию
+            if (selectedType) $('#edit-type').val(selectedType);
+            if (selectedAccount) $('#edit-account').val(selectedAccount);
+            if (selectedOperator) $('#edit-operator').val(selectedOperator);
+        });
+    }
+
 
 
 });
