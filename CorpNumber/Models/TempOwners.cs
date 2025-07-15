@@ -13,5 +13,8 @@ namespace CorpNumber.Models
         public int? Officer { get; set; }
         public short? Period { get; set; }
 
+
+        [ForeignKey("HostDepartment")]
+        public virtual Department? DepartmentNavigation { get; set; }
     }
 }

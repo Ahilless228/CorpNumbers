@@ -642,6 +642,52 @@ namespace CorpNumber.Controllers
 
 
 
+        private string DescribeOwnerFast(Owner? owner)
+        {
+            if (owner == null || owner.CodeCategory == null)
+                return "—";
+
+            switch (owner.CodeCategory)
+            {
+                case 4:
+                    return "Резерв";
+
+                case 1:
+                case 6:
+                    var emp = owner.EmployeeNavigation;
+                    if (emp == null) return "—";
+
+                    var dep = emp.DepartmentNavigation;
+                    string depText = dep != null
+                        ? $"{dep.DepartmentName} {dep.DepartmentCh}".Trim()
+                        : "";
+
+                    return $"{emp.Surname} {emp.Firstname} {emp.Midname} {emp.NameCh}".Trim() +
+                           (string.IsNullOrWhiteSpace(depText) ? "" : $" ({depText})");
+
+                case 3:
+                    var temp = owner.TempOwnerNavigation;
+                    if (temp == null) return "Временный пользователь";
+
+                    var hostDep = temp.DepartmentNavigation;
+                    string hostDepText = hostDep != null
+                        ? $"{hostDep.DepartmentName} {hostDep.DepartmentCh}".Trim()
+                        : "";
+
+                    return $"Временный пользователь: {temp.NameTO} {temp.NameTOCh}. " +
+                           $"Организация: {temp.Organization}. " +
+                           (string.IsNullOrWhiteSpace(hostDepText) ? "" : $"Принимающее управление: {hostDepText}.");
+
+                default:
+                    return "—";
+            }
+        }
+
+
+
+
+
+
         //-------------------------------------------Эндпоинты для получения данных для выпадающих списков-------------------------------------------
         [HttpGet]
         public IActionResult GetInternetServices()
@@ -669,7 +715,9 @@ namespace CorpNumber.Controllers
         {
             var owners = await _context.Owners
                 .Include(o => o.EmployeeNavigation)
+                    .ThenInclude(e => e.DepartmentNavigation)
                 .Include(o => o.TempOwnerNavigation)
+                    .ThenInclude(t => t.DepartmentNavigation)
                 .Include(o => o.CategoryNavigation)
                 .ToListAsync();
 
@@ -677,7 +725,7 @@ namespace CorpNumber.Controllers
 
             foreach (var owner in owners)
             {
-                string? text = await DescribeOwner(owner);
+                string text = DescribeOwnerFast(owner);
                 if (!string.IsNullOrWhiteSpace(text) && text != "—")
                 {
                     results.Add(new
@@ -690,6 +738,7 @@ namespace CorpNumber.Controllers
 
             return Json(results);
         }
+
 
 
         [HttpGet]
