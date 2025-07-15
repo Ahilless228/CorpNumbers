@@ -764,28 +764,12 @@ namespace CorpNumber.Controllers
             return Json(statuses);
         }
 
+        // OperationsController.cs
         public IActionResult GetIncompleteOperations()
         {
-            var operations = _context.Operations
-                .Where(o => o.Complete == false || o.Complete == null)
-                .Include(o => o.Phone)
-                .Include(o => o.OperationTypes)
-                .Select(o => new OperationViewModel
-                {
-                    CodeOperation = o.CodeOperation,
-                    RequestDate = o.RequestDate,
-                    OperDate = o.OperDate,
-                    Comments = o.Comments,
-                    Information = o.Information,
-                    CodeOperType = o.CodeOperType,
-                    Type = o.OperationTypes.Type,
-                    PhoneNumber = o.Phone.Number.HasValue ? o.Phone.Number.Value.ToString() : "",
-                    Complete = o.Complete
-                })
-                .ToList();
-
-            return PartialView("_InCompleteOperationsRows", operations);
+            return ViewComponent("IncompleteOperations");
         }
+
 
 
 

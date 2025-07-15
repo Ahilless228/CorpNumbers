@@ -12,18 +12,19 @@
             <div class="modal-body">
                 <div class="d-flex justify-content-between flex-wrap mb-3">
                     <div class="btn-group" role="group">
-                        <input type="checkbox" class="btn-check" id="filterToday" autocomplete="off">
+                        <input type="radio" class="btn-check" name="filter" id="filterToday" autocomplete="off" checked>
                         <label class="btn btn-outline-primary" for="filterToday">Сегодня</label>
 
-                        <input type="checkbox" class="btn-check" id="filterYesterday" autocomplete="off">
+                        <input type="radio" class="btn-check" name="filter" id="filterYesterday" autocomplete="off">
                         <label class="btn btn-outline-primary" for="filterYesterday">Вчера</label>
 
-                        <input type="checkbox" class="btn-check" id="filterDeferred" autocomplete="off">
+                        <input type="radio" class="btn-check" name="filter" id="filterDeferred" autocomplete="off">
                         <label class="btn btn-outline-primary" for="filterDeferred">Отложенные</label>
 
-                        <input type="checkbox" class="btn-check" id="filterAll" autocomplete="off" checked>
+                        <input type="radio" class="btn-check" name="filter" id="filterAll" autocomplete="off">
                         <label class="btn btn-outline-primary" for="filterAll">Все</label>
                     </div>
+
 
                     <div>
                         <label class="form-check-label me-2" for="selectAllCheckbox">Выбрать все</label>
@@ -80,3 +81,5 @@
         </div>
     </div>
 </div>
+
+
