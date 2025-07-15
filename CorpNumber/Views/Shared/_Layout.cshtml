@@ -10,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 </head>
+
 <body style="background-color: #FFFFFF;">
     <!--Определение страницы , чтобы  скрыть кнопку-->
     @{
@@ -53,7 +54,10 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
-   
+    @await Component.InvokeAsync("IncompleteOperations")
+
+    
+
 </body>
 
 

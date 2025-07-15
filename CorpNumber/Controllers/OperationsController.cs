@@ -15,7 +15,8 @@ namespace CorpNumber.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> OperationsIndex(string? searchNumber, string? orderNumber, string? operationType, DateTime? dateFrom, DateTime? dateTo, int page = 1, int pageSize = 100)
+        public async Task<IActionResult> OperationsIndex(string? searchNumber, string? orderNumber, string? operationType, DateTime? dateFrom, DateTime? dateTo,
+            int page = 1, int pageSize = 100, bool isComplete = false)
         {
             var query = _context.Operations
                 .Include(o => o.OperationTypes)
@@ -48,6 +49,11 @@ namespace CorpNumber.Controllers
             {
                 query = query.Where(o => o.OperationTypes != null && o.OperationTypes.Type == operationType);
             }
+            if (isComplete)
+            {
+                query = query.Where(o => o.Complete == true);
+            }
+
 
 
             // 🔢 Подсчёт записей
@@ -103,7 +109,8 @@ namespace CorpNumber.Controllers
 
         // 👉 Метод для фильтрации, пагинации, ajax-загрузки таблицы
         [HttpGet]
-        public async Task<IActionResult> GetFilteredOperations(string? searchNumber, string? orderNumber, string? operationType, DateTime? dateFrom, DateTime? dateTo, int page = 1)
+        public async Task<IActionResult> GetFilteredOperations(string? searchNumber, string? orderNumber, string? operationType,
+            DateTime? dateFrom, DateTime? dateTo, int page = 1, bool isComplete = false)
         {
             var query = _context.Operations
                 .Include(o => o.OperationTypes)
@@ -134,6 +141,11 @@ namespace CorpNumber.Controllers
             {
                 query = query.Where(o => o.OperationTypes != null && o.OperationTypes.Type == operationType);
             }
+            if (isComplete)
+            {
+                query = query.Where(o => o.Complete == true);
+            }
+
 
 
             var totalItems = await query.CountAsync();
@@ -167,6 +179,7 @@ namespace CorpNumber.Controllers
             ViewBag.SearchNumber = searchNumber;
             ViewBag.DateFrom = dateFrom?.ToString("yyyy-MM-dd");
             ViewBag.DateTo = dateTo?.ToString("yyyy-MM-dd");
+            ViewBag.IsComplete = isComplete;
             ViewBag.OperationTypes = await _context.OperationTypes
                 .Select(t => t.Type)
                 .Distinct()
@@ -751,6 +764,28 @@ namespace CorpNumber.Controllers
             return Json(statuses);
         }
 
+        public IActionResult GetIncompleteOperations()
+        {
+            var operations = _context.Operations
+                .Where(o => o.Complete == false || o.Complete == null)
+                .Include(o => o.Phone)
+                .Include(o => o.OperationTypes)
+                .Select(o => new OperationViewModel
+                {
+                    CodeOperation = o.CodeOperation,
+                    RequestDate = o.RequestDate,
+                    OperDate = o.OperDate,
+                    Comments = o.Comments,
+                    Information = o.Information,
+                    CodeOperType = o.CodeOperType,
+                    Type = o.OperationTypes.Type,
+                    PhoneNumber = o.Phone.Number.HasValue ? o.Phone.Number.Value.ToString() : "",
+                    Complete = o.Complete
+                })
+                .ToList();
+
+            return PartialView("_InCompleteOperationsRows", operations);
+        }
 
 
 

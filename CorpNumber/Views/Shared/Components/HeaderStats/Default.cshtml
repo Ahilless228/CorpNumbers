@@ -1,5 +1,5 @@
 ﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+    Deafault.cshtml      Views/Shared/Components/HeaderStats/Default.cshtml
 *@
 @{
 }
@@ -9,7 +9,7 @@
     <button class="btn navbar-btn btn-birthday btn-sm">
         🎉 Именинники (@Model.BirthdayCount)
     </button>
-    <button class="btn navbar-btn btn-operations btn-sm">
+    <button class="btn navbar-btn btn-operations btn-sm" id="showIncompleteOperationsModal">
         ❗ Невыполненные операции (@Model.IncompleteOperations)
     </button>
     <a class="btn navbar-btn btn-all btn-sm" asp-controller="Operations" asp-action="OperationsIndex">

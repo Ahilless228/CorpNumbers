@@ -1,0 +1,82 @@
+﻿@model IEnumerable<CorpNumber.Models.OperationViewModel>
+
+<!-- Модальное окно -->
+<div class="modal fade" id="incompleteOperationsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between">
+                <h5 class="modal-title">Невыполненные операции</h5>
+                <img src="~/images/altynken-logo.jpg" style="height: 30px;" />
+            </div>
+
+            <div class="modal-body">
+                <div class="d-flex justify-content-between flex-wrap mb-3">
+                    <div class="btn-group" role="group">
+                        <input type="checkbox" class="btn-check" id="filterToday" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="filterToday">Сегодня</label>
+
+                        <input type="checkbox" class="btn-check" id="filterYesterday" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="filterYesterday">Вчера</label>
+
+                        <input type="checkbox" class="btn-check" id="filterDeferred" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="filterDeferred">Отложенные</label>
+
+                        <input type="checkbox" class="btn-check" id="filterAll" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="filterAll">Все</label>
+                    </div>
+
+                    <div>
+                        <label class="form-check-label me-2" for="selectAllCheckbox">Выбрать все</label>
+                        <input type="checkbox" id="selectAllCheckbox" class="form-check-input" />
+                    </div>
+                </div>
+
+                <table class="table table-bordered table-sm align-middle text-center" id="incompleteOpsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Номер</th>
+                            <th>Дата заявки</th>
+                            <th>Дата операции</th>
+                            <th>Операция</th>
+                            <th>Комментарий</th>
+                            <th>Информация</th>
+                            <th>Выбор</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var op in Model)
+                        {
+                            <tr>
+                                <td>@op.PhoneNumber</td>
+                                <td>@op.RequestDate?.ToString("dd.MM.yyyy")</td>
+                                <td>@op.OperDate?.ToString("dd.MM.yyyy")</td>
+                                <td>@op.Type</td>
+                                <td>@op.Comments</td>
+                                <td>@op.Information</td>
+                                <td>
+                                    <input type="checkbox" class="row-checkbox form-check-input" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between mt-3 flex-wrap">
+                    <div>
+                        <div>Общее количество операций: <span id="totalCount">@Model.Count()</span></div>
+                        <div>Выбрано операций: <span id="selectedCount">0</span></div>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger">Удалить операцию</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer justify-content-end">
+                <button class="btn btn-primary">Отправить заявку</button>
+                <button class="btn btn-success">Выполнить</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,34 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿$(function () {
+    $('#showIncompleteOperationsModal').on('click', function () {
+        $.ajax({
+            url: '/Operations/GetIncompleteOperations',
+            method: 'GET',
+            success: function (data) {
+                $('#incompleteOperationsTable tbody').html(data);
+                const modal = new bootstrap.Modal(document.getElementById('incompleteOperationsModal'));
+                modal.show();
+            },
+            error: function () {
+                alert('Ошибка при загрузке данных.');
+            }
+        });
+    });
+});
 
-// Write your JavaScript code.
+$(function () {
+    // Выделить все
+    $('#selectAllCheckbox').on('change', function () {
+        const checked = this.checked;
+        $('.row-checkbox').prop('checked', checked);
+        updateSelectedCount();
+    });
+
+    // Подсчет выбранных
+    $(document).on('change', '.row-checkbox', updateSelectedCount);
+
+    function updateSelectedCount() {
+        const count = $('.row-checkbox:checked').length;
+        $('#selectedCount').text(count);
+    }
+});
+

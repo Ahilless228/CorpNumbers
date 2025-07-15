@@ -10,6 +10,8 @@ $(function () {
         const dateTo = $('#dateTo').val();
         const orderNumber = $('#orderNumber').val();
         const operationType = $('#operationType').val();
+        const isComplete = $('#filterComplete').is(':checked');
+
 
         $.ajax({
             url: '/Operations/GetFilteredOperations',
@@ -20,6 +22,7 @@ $(function () {
                 operationType,
                 dateFrom,
                 dateTo,
+                isComplete,
                 page
             },
             success: function (data) {
@@ -73,7 +76,7 @@ $(function () {
 
 
     // 🔁 Обновление таблицы при изменении фильтров
-    $('#searchNumber, #dateFrom, #dateTo, #orderNumber, #operationType').on('input change', function () {
+    $('#searchNumber, #dateFrom, #dateTo, #orderNumber, #operationType, #filterComplete').on('input change', function () {
         loadTable(1);
     });
 
@@ -108,6 +111,7 @@ $(function () {
         $('#dateTo').val('');
         $('#orderNumber').val('');
         $('#operationType').val('');
+        $('#filterComplete').prop('checked', false);
         loadTable(1);
     });
 
