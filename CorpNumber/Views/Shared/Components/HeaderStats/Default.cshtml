@@ -15,9 +15,9 @@
     <a class="btn navbar-btn btn-all btn-sm" asp-controller="Operations" asp-action="OperationsIndex">
         👥 Все операции
     </a>
-    <button class="btn navbar-btn btn-alert btn-sm">
+    <a class="btn navbar-btn btn-alert btn-sm" asp-controller="Tasks" asp-action="TasksIndex">
         🔔 (@Model.TaskOverdue/@Model.TaskTotal)
-    </button>
+    </a>
     <a class="btn navbar-btn btn-back btn-sm" href="@Url.Action("AdminIndex", "Admin")">
         ↩️ В Гл.Меню
     </a>
