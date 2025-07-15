@@ -1,5 +1,8 @@
 ﻿let selectedOperationId = null;
 
+
+
+
 $(function () {
     function loadTable(page = 1) {
         const searchNumber = $('#searchNumber').val();
@@ -257,8 +260,9 @@ $(function () {
 
         const input = (name, value) => `<input type="text" class="form-control" name="${name}" value="${value || ''}" />`;
 
-        const select = (name, value, options) => {
-            let html = `<select class="form-select" name="${name}">`;
+        const select = (name, id, value, options) => {
+            let html = `<select class="form-select" name="${name}" id="${id}">`;
+            html += `<option value="">Выберите...</option>`;
             options.forEach(opt => {
                 const selected = opt.value == value ? 'selected' : '';
                 html += `<option value="${opt.value}" ${selected}>${opt.text}</option>`;
@@ -266,6 +270,8 @@ $(function () {
             html += `</select>`;
             return html;
         };
+
+
 
         // Логика по типу операции
         switch (codeOperType) {
@@ -294,13 +300,20 @@ $(function () {
                 break;
 
             case 6:
-            case 7: // Владельцы
+            case 7:
                 $.get('/Operations/GetOwnerOptions', function (owners) {
                     const options = owners.map(o => ({ value: o.codeOwner, text: o.display }));
-                    oldContainer.html(select("Owner_old", oldValue, options));
-                    newContainer.html(select("Owner_new", newValue, options));
+
+                    const oldSelectHtml = select("Owner_old", "edit-owner-old", oldValue, options);
+                    const newSelectHtml = select("Owner_new", "edit-owner-new", newValue, options);
+
+                    oldContainer.html(oldSelectHtml);
+                    newContainer.html(newSelectHtml);
                 });
                 break;
+
+
+
 
             case 8: // Лимит
                 oldContainer.html(input("Limit_old", oldValue));

@@ -663,27 +663,34 @@ namespace CorpNumber.Controllers
             var list = _context.Tariffs.Select(t => new { t.CodeTariff, t.Title }).ToList();
             return Json(list);
         }
-
+        //метод отображения владельцев в выпадающем списке
         [HttpGet]
-        public IActionResult GetOwnerOptions()
+        public async Task<IActionResult> GetOwnerOptions()
         {
-            var owners = _context.Owners
+            var owners = await _context.Owners
                 .Include(o => o.EmployeeNavigation)
                 .Include(o => o.TempOwnerNavigation)
                 .Include(o => o.CategoryNavigation)
-                .Select(o => new
-                {
-                    codeOwner = o.CodeOwner,
-                    display = o.CodeCategory == 4
-                        ? "Резерв"
-                        : o.CodeCategory == 3
-                            ? "Временный пользователь"
-                            : o.EmployeeNavigation.Surname + " " + o.EmployeeNavigation.Firstname
-                })
-                .ToList();
+                .ToListAsync();
 
-            return Json(owners);
+            var results = new List<object>();
+
+            foreach (var owner in owners)
+            {
+                string? text = await DescribeOwner(owner);
+                if (!string.IsNullOrWhiteSpace(text) && text != "—")
+                {
+                    results.Add(new
+                    {
+                        codeOwner = owner.CodeOwner,
+                        display = text
+                    });
+                }
+            }
+
+            return Json(results);
         }
+
 
         [HttpGet]
         public IActionResult GetStatusOptions()
