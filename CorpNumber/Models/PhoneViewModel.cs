@@ -14,6 +14,7 @@
         public bool Corporative { get; set; }
         public string? FullName { get; set; }        // ФИО
         public string? NameCh { get; set; }          // 姓名
+        public bool? Phonebook { get; set; }
     }
 
 }

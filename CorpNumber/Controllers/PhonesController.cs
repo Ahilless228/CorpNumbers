@@ -34,9 +34,11 @@ public class PhonesController : Controller
                 .ThenInclude(o => o.EmployeeNavigation)
             .Include(p => p.CodeOwnerNavigation.CategoryNavigation)
             .Where(p => p.Corporative == true &&
-                        p.Account == 1 &&
-                        p.CodeOwnerNavigation != null &&
-                        allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
+                    p.Account == 1 &&
+                    p.Phonebook == true &&  // ✅ фильтрация по PhoneBook
+                    p.CodeOwnerNavigation != null &&
+                    allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
+
         switch (sortField)
         {
             case "Number":
@@ -111,9 +113,10 @@ public class PhonesController : Controller
                 .ThenInclude(o => o.EmployeeNavigation)
             .Include(p => p.CodeOwnerNavigation.CategoryNavigation)
             .Where(p => p.Corporative == true &&
-                        p.Account == 1 &&
-                        p.CodeOwnerNavigation != null &&
-                        allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
+                p.Account == 1 &&
+                p.Phonebook == true &&  // ✅ фильтрация по PhoneBook
+                p.CodeOwnerNavigation != null &&
+                allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
 
         if (operatorId.HasValue && operatorId.Value != 0)
             query = query.Where(p => p.Operator == operatorId.Value);
