@@ -6,6 +6,24 @@
     int selectedOperator = ViewBag.SelectedOperator ?? 0;
     int selectedCategory = ViewBag.SelectedCategory ?? 0;
     bool onlyCorp = ViewBag.OnlyCorp ?? false;
+    string currentSort = ViewBag.SortField ?? "CodePhone";
+    bool sortAsc = ViewBag.SortAsc ?? true;
+    string GetSortLink(string field)
+    {
+        bool isCurrent = currentSort == field;
+        bool nextAsc = isCurrent ? !sortAsc : true;
+
+        var query = new
+        {
+            operatorId = ViewBag.SelectedOperator,
+            categoryId = ViewBag.SelectedCategory,
+            sortField = field,
+            sortAsc = nextAsc
+        };
+
+        return Url.Action("Index", "Phones", query);
+    }
+
 }
 <style>
     tbody tr.selected-row td {
@@ -115,11 +133,11 @@
         <table class="table table-bordered table-hover table-striped mb-0" style="position: relative;">
             <thead class="table-dark sticky-top" style="top: 0; z-index: 10;">
                 <tr>
-                    <th style="min-width: 60px;">№</th>
-                    <th style="min-width: 120px;">Номер</th>
-                    <th style="min-width: 200px;">ФИО</th>
-                    <th style="min-width: 120px;">姓名</th>
-                    <th style="min-width: 160px;">Оператор</th>
+                    <th><a href="@GetSortLink("CodePhone")">№</a></th>
+                    <th><a href="@GetSortLink("Number")">Номер</a></th>
+                    <th><a href="@GetSortLink("FullName")">ФИО</a></th>
+                    <th><a href="@GetSortLink("NameCh")">姓名</a></th>
+                    <th><a href="@GetSortLink("Operator")">Оператор</a></th>
                 </tr>
             </thead>
             <tbody id="phoneTableBody">

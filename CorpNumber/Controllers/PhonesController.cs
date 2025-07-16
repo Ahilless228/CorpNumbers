@@ -22,7 +22,7 @@ public class PhonesController : Controller
     }
     // Метод для отображения списка телефонов
 
-    public async Task<IActionResult> Index(int? operatorId, int? categoryId)
+    public async Task<IActionResult> Index(int? operatorId, int? categoryId, string sortField = "CodePhone", bool sortAsc = true)
     {
         ViewBag.IsAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
 
@@ -37,6 +37,31 @@ public class PhonesController : Controller
                         p.Account == 1 &&
                         p.CodeOwnerNavigation != null &&
                         allowedCategories.Contains(p.CodeOwnerNavigation.CodeCategory ?? -1));
+        switch (sortField)
+        {
+            case "Number":
+                query = sortAsc ? query.OrderBy(p => p.Number) : query.OrderByDescending(p => p.Number);
+                break;
+            case "FullName":
+                query = sortAsc
+                    ? query.OrderBy(p => p.CodeOwnerNavigation.EmployeeNavigation.Surname)
+                           .ThenBy(p => p.CodeOwnerNavigation.EmployeeNavigation.Firstname)
+                    : query.OrderByDescending(p => p.CodeOwnerNavigation.EmployeeNavigation.Surname)
+                           .ThenByDescending(p => p.CodeOwnerNavigation.EmployeeNavigation.Firstname);
+                break;
+            case "NameCh":
+                query = sortAsc ? query.OrderBy(p => p.CodeOwnerNavigation.EmployeeNavigation.NameCh)
+                                : query.OrderByDescending(p => p.CodeOwnerNavigation.EmployeeNavigation.NameCh);
+                break;
+            case "Operator":
+                query = sortAsc ? query.OrderBy(p => p.OperatorNavigation.Title)
+                                : query.OrderByDescending(p => p.OperatorNavigation.Title);
+                break;
+            default:
+                query = sortAsc ? query.OrderBy(p => p.CodePhone)
+                                : query.OrderByDescending(p => p.CodePhone);
+                break;
+        }
 
         if (operatorId.HasValue && operatorId.Value != 0)
             query = query.Where(p => p.Operator == operatorId.Value);
@@ -66,6 +91,9 @@ public class PhonesController : Controller
 
         ViewBag.SelectedOperator = operatorId ?? 0;
         ViewBag.SelectedCategory = categoryId ?? 0;
+        ViewBag.SortField = sortField;
+        ViewBag.SortAsc = sortAsc;
+
 
         return View(phoneViewModels);
     }
