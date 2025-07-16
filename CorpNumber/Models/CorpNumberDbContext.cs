@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using ParsingPDF;
 using System.Security.Cryptography.Xml;
 using static System.Collections.Specialized.BitVector32;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -15,7 +16,11 @@ namespace CorpNumber.Models
         }
 
         // DbSet-свойства для таблиц
-        public DbSet<Accounts> Accounts { get; set; }
+
+        public DbSet<ReportEntry> ReportEntries { get; set; }
+        public DbSet<ServiceCharge> ServiceCharges { get; set; }
+        public DbSet<ServiceName> ServiceNames { get; set; }
+
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Districts> Districts { get; set; }
@@ -129,19 +134,49 @@ namespace CorpNumber.Models
                 .HasPrincipalKey(p => p.CodePhone);
 
 
+            modelBuilder.Entity<ServiceCharge>()
+                .Property(s => s.Amount)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<ReportEntry>().Ignore(r => r.Phone);
 
-            // Если появятся модели Status и InternetService:
-            // modelBuilder.Entity<Phone>()
-            //     .HasOne(p => p.StatusNavigation)
-            //     .WithMany()
-            //     .HasForeignKey(p => p.Status)
-            //     .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ReportEntry>()
+                .HasMany(r => r.Services)
+                .WithOne(s => s.ReportEntry)
+                .HasForeignKey(s => s.ReportEntryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // modelBuilder.Entity<Phone>()
-            //     .HasOne(p => p.InternetNavigation)
-            //     .WithMany()
-            //     .HasForeignKey(p => p.Internet)
-            //     .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ReportEntry>()
+                .HasIndex(r => new { r.PhoneId, r.ReportDate });
         }
+
+        public void EnsureServiceNameExists(string serviceName)
+        {
+            // Загрузить все ServiceNames в память
+            var serviceNamesDict = ServiceNames.ToDictionary(s => s.Name, s => s);
+
+            // ... в цикле:
+            if (!serviceNamesDict.TryGetValue(serviceName, out var service))
+            {
+                service = new ServiceName { Name = serviceName };
+                ServiceNames.Add(service);
+                SaveChanges();
+                serviceNamesDict[serviceName] = service;
+            }
+        }
+
+        // Если появятся модели Status и InternetService:
+        // modelBuilder.Entity<Phone>()
+        //     .HasOne(p => p.StatusNavigation)
+        //     .WithMany()
+        //     .HasForeignKey(p => p.Status)
+        //     .OnDelete(DeleteBehavior.Restrict);
+
+        // modelBuilder.Entity<Phone>()
+        //     .HasOne(p => p.InternetNavigation)
+        //     .WithMany()
+        //     .HasForeignKey(p => p.Internet)
+        //     .OnDelete(DeleteBehavior.Restrict);
     }
 }
+
+

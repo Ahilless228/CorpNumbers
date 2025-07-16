@@ -235,7 +235,7 @@
                         <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook1", "Admin")'">📒 Тел. справочник 1</button>
                         <button class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("Phonebook2", "Admin")'">📕 Тел. справочник 2</button>
                         <!--кнопку парсинга вот тут , оформление, стиль, ссылка-->
-                        <button class="btn btn-outline-info btn-sm">Парсинг</button>
+                        <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#parseMenuModal">Парсинг</button>
                     </div>
                 </div>
             </div>
@@ -571,11 +571,154 @@
         </div>
     </div>
 
-
+    <div class="modal fade" id="parseMenuModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Меню парсинга отчёта</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="parseForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="parseType" class="form-label">Тип парсинга</label>
+                            <input type="text" class="form-control" id="parseType" name="parseType" readonly value="—" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportFile" class="form-label">Файл отчёта</label>
+                            <input class="form-control" type="file" id="reportFile" name="file" required />
+                        </div>
+                        <div id="parseProgressWrapper" class="mb-2" style="display:none;">
+                            <div class="progress">
+                                <div id="parseProgressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                                     role="progressbar" style="width: 0%">
+                                    0%
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="parseResult" class="mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="startParseBtn">Начать парсинг</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Автоматическое определение типа парсинга по имени файла
+        $('#reportFile').on('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const name = file.name;
+            let type = '';
+            if (name.startsWith('O!') || name.startsWith('О!')) type = 'O!';
+            else if (name.startsWith('MegaCom')) type = 'MegaCom';
+            else if (name.startsWith('Beeline')) type = 'Beeline';
+            else type = 'Неизвестно';
+            $('#parseType').val(type);
+        });
+
+        // Имитация прогресс-бара (frontend-only)
+        function simulateProgressBar(durationMs, callback) {
+            $('#parseProgressWrapper').show();
+            let progress = 0;
+            $('#parseProgressBar').css('width', '0%').text('0%');
+            const interval = setInterval(function () {
+                progress += 10;
+                if (progress > 100) progress = 100;
+                $('#parseProgressBar').css('width', progress + '%').text(progress + '%');
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        $('#parseProgressWrapper').hide();
+                        callback();
+                    }, 200);
+                }
+            }, durationMs / 10);
+        }
+
+        // Запуск парсинга с прогресс-баром
+        $('#startParseBtn').on('click', function () {
+            $('#parseResult').html('');
+            var formData = new FormData($('#parseForm')[0]);
+            simulateProgressBar(1200, function () {
+                $.ajax({
+                    url: '/api/PdfParse/parse',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (resp) {
+                        $('#parseResult').html(
+                            `<div class="alert alert-success">
+                                <b>Успешно!</b><br>
+                                Всего строк: ${resp.parsed}<br>
+                                Сохранено: ${resp.saved}<br>
+                                Пропущено: ${resp.skipped.length}
+                                <ul>${resp.skipped.map(x => `<li>${x}</li>`).join('')}</ul>
+                                <button class="btn btn-outline-primary mt-2" id="createExcelBtn">Создать Excel-файл</button>
+                            </div>`
+                        );
+                        window.lastParseFormData = formData; // сохраняем для экспорта
+                    },
+                    error: function (xhr) {
+                        let msg = xhr.responseJSON?.message || xhr.responseText || 'Ошибка загрузки';
+                        $('#parseResult').html(`<div class="alert alert-danger">${msg}</div>`);
+                    }
+                });
+            });
+        });
+
+        // Генерация Excel-файла после парсинга с динамическим именем
+        $('#parseResult').on('click', '#createExcelBtn', function () {
+            if (!window.lastParseFormData) return;
+
+            // Передаём тип парсинга явно
+            window.lastParseFormData.set('parseType', $('#parseType').val());
+
+            $.ajax({
+                url: '/api/PdfParse/exportExcel',
+                type: 'POST',
+                data: window.lastParseFormData,
+                processData: false,
+                contentType: false,
+                xhrFields: { responseType: 'blob' },
+                success: function (blob, status, xhr) {
+                    let fileName = 'Отчёт.xlsx';
+
+                    // Получаем имя файла из заголовка Content-Disposition
+                    const disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition) {
+                        const filenameRegex = /filename\*?=(?:UTF-8''|")(.*?)(?=[";]|$)/i;
+                        const matches = filenameRegex.exec(disposition);
+                        if (matches && matches.length > 1) {
+                            try {
+                                fileName = decodeURIComponent(matches[1]);
+                            } catch (e) {
+                                fileName = matches[1];
+                            }
+                        }
+                    }
+
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+                error: function () {
+                    alert('Ошибка при создании Excel-файла');
+                }
+            });
+        });
+    </script>
 
     <script>
         $(document).ready(function () {
