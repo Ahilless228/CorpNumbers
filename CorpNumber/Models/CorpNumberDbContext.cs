@@ -20,7 +20,7 @@ namespace CorpNumber.Models
         public DbSet<ReportEntry> ReportEntries { get; set; }
         public DbSet<ServiceCharge> ServiceCharges { get; set; }
         public DbSet<ServiceName> ServiceNames { get; set; }
-
+        public DbSet<Accounts> Accounts { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Districts> Districts { get; set; }
