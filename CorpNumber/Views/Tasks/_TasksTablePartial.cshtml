@@ -1,0 +1,39 @@
+﻿@model IEnumerable<CorpNumber.Models.TaskItem>
+
+@{
+    var incompleteTasks = Model.Where(t => t.Complete != true)
+                               .OrderByDescending(t => t.TaskDate)
+                               .ToList();
+    var completeTasks = Model.Where(t => t.Complete == true)
+                             .OrderByDescending(t => t.TaskDate)
+                             .ToList();
+    var allTasks = incompleteTasks.Concat(completeTasks).ToList();
+}
+
+<!-- Прокручиваемый контейнер -->
+<div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+    <table class="table table-bordered table-sm text-center align-middle" id="taskTable">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 5%;"></th>
+                <th>Дата создания</th>
+                <th>Дата выполнения</th>
+                <th>Задача/Напоминание</th>
+                <th>Выполнено</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in allTasks)
+            {
+                var rowClass = task.Complete == true ? "table-success" : "";
+                <tr class="@rowClass" data-id="@task.CodeTask">
+                    <td><input type="radio" name="selectedTask" value="@task.CodeTask" /></td>
+                    <td>@task.CreateDate?.ToString("dd.MM.yyyy")</td>
+                    <td>@task.TaskDate?.ToString("dd.MM.yyyy")</td>
+                    <td class="text-start">@task.TaskText</td>
+                    <td>@(task.Complete == true ? "Да" : "Нет")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
