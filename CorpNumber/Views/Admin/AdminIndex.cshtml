@@ -214,7 +214,7 @@
                     {
                         foreach (var phone in Model)
                         {
-                            <tr class="phone-row" data-id="@phone.CodePhone">
+                            <tr class="phone-row" data-id="@phone.CodePhone" data-status="@phone.StatusCode">
                                 <td>@phone.CodePhone</td>
                                 <td><a href="#">@phone.Number</a></td>
                                 <td>@phone.ICCID</td>

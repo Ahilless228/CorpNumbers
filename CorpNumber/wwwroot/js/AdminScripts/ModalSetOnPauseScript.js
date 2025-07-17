@@ -1,34 +1,53 @@
-﻿
-    let selectedPhoneId = null;
-    let selectedPhoneStatus = null;
+﻿let selectedPhoneId = null;
+let selectedPhoneStatus = null;
+let normalizedStatus = null;
 
     // При клике на кнопку "⏸️ Установка на паузу"
     $(document).on("click", ".btn-set-pause", function () {
         const row = $("tr.selected-row");
-    selectedPhoneId = row.data("id");
-    selectedPhoneStatus = row.data("status");
+        selectedPhoneId = row.data("id");
+        selectedPhoneStatus = row.data("status");
+
+        console.log("selectedPhoneStatus:", selectedPhoneStatus);
+        console.log("normalizedStatus:", normalizedStatus);
+
 
     if (!selectedPhoneId) {
         alert("Выберите номер для установки на паузу.");
     return;
         }
 
+        // Проверка: статус должен быть 1 или null
+        normalizedStatus = (selectedPhoneStatus === null ||
+            selectedPhoneStatus === "null" ||
+            selectedPhoneStatus === "")
+            ? null
+            : parseInt(selectedPhoneStatus);
+
+
+        if (normalizedStatus !== 1 && normalizedStatus !== null) {
+            alert("Установить на паузу можно только активный номер (статус: Активен).");
+            return;
+        }
+
+
+
     $.get('/Admin/GetPhoneInfo', {codePhone: selectedPhoneId }, function (model) {
         $("#CodePhone").val(model.codePhone);
-    $("#Status_old").val(model.status);
-    $("#pauseModal input[type='text']").first().val(model.number);
-    $("#pauseModal input[type='text']").eq(1).val(model.statusText);
+        $("#Status_old").val(model.status);
+        $("#pauseModal input[type='text']").first().val(model.number);
+        $("#pauseModal input[type='text']").eq(1).val(model.statusText);
 
-    $.get('/Operations/GetStatusOptions', function (statuses) {
-                const statusSelect = $("#Status_new");
-    statusSelect.empty();
+        $.get('/Operations/GetStatusOptions', function (statuses) {
+            const statusSelect = $("#Status_new");
+            statusSelect.empty();
 
-                statuses.forEach(s => {
-                    const selected = s.value === 4 ? 'selected' : '';
-    statusSelect.append(`<option value="${s.value}" ${selected}>${s.text}</option>`);
-                });
+            statuses.forEach(s => {
+                const selected = s.value === 4 ? 'selected' : '';
+                statusSelect.append(`<option value="${s.value}" ${selected}>${s.text}</option>`);
+            });
 
-    $("#pauseModal").modal("show");
+            $("#pauseModal").modal("show");
             });
         });
     });

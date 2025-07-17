@@ -9,6 +9,7 @@
         public string ?Account { get; set; }          // Название счёта (если есть)
         public string ?Tariff { get; set; }           // Название тарифа
         public string ?Status { get; set; }           // Название состояния
+        public int? StatusCode { get; set; } // ← добавь для data-status
         public string ?Internet { get; set; }         // Название интернет-пакета
         public short? Limit { get; set; }
         public bool Corporative { get; set; }

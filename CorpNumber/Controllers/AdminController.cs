@@ -54,6 +54,7 @@ namespace CorpNumber.Controllers
                 Account = p.AccountNavigation?.Type ?? "—",
                 Tariff = p.TariffNavigation?.Title ?? "—",
                 Status = p.StatusNavigation?.StatusText ?? "—",
+                StatusCode = p.Status, // ← это int? из таблицы Phones
                 Internet = p.InternetNavigation?.Service ?? "—",
                 Limit = p.Limit,
                 Corporative = p.Corporative ?? false
