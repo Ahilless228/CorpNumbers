@@ -788,6 +788,16 @@ namespace CorpNumber.Controllers
             var monthStart = new DateTime(y, m, 1);
             var monthEnd = monthStart.AddMonths(1);
 
+            // Список нужных типов операций
+            var allowedTypes = new[]
+            {
+                "Выдача номера",
+                "Возврат номера",
+                "Перевод на личный счет",
+                "Перевод на корпоративный счет",
+                "Вывод из корпоратива"
+            };
+
             var operations = await _context.Operations
                 .Include(o => o.Phone)
                     .ThenInclude(p => p.OperatorNavigation)
@@ -798,7 +808,9 @@ namespace CorpNumber.Controllers
                     .ThenInclude(owner => owner.EmployeeNavigation)
                         .ThenInclude(emp => emp.DepartmentNavigation)
                 .Include(o => o.OperationTypes)
-                .Where(o => o.OperDate >= monthStart && o.OperDate < monthEnd)
+                .Where(o => o.OperDate >= monthStart && o.OperDate < monthEnd
+                    && o.OperationTypes != null
+                    && allowedTypes.Contains(o.OperationTypes.Type))
                 .OrderBy(o => o.OperDate)
                 .ToListAsync();
 
@@ -815,6 +827,9 @@ namespace CorpNumber.Controllers
             ws.Cell(1, 8).Value = "Операция";
             ws.Cell(1, 9).Value = "Примечания";
 
+            // Сделать заголовки жирными
+            ws.Range(1, 1, 1, 9).Style.Font.Bold = true;
+
             int row = 2;
             foreach (var op in operations)
             {
@@ -830,7 +845,7 @@ namespace CorpNumber.Controllers
                     var emp = owner.EmployeeNavigation;
                     group = "Кыргызский сотрудник";
                     userFio = $"{emp.Surname ?? ""} {emp.Firstname ?? ""} {emp.Midname ?? ""}".Trim();
-                    tabNum = emp.TabNum?.ToString() ?? "";
+                    tabNum = emp.TabNum.HasValue ? emp.TabNum.Value.ToString("D5") : "";
                     department = emp.DepartmentNavigation?.DepartmentName ?? "";
                 }
                 else
@@ -860,6 +875,11 @@ namespace CorpNumber.Controllers
             }
 
             ws.Columns().AdjustToContents();
+
+            // Установить границы для всей таблицы
+            var usedRange = ws.Range(1, 1, row - 1, 9);
+            usedRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            usedRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
 
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
