@@ -24,11 +24,17 @@
     <input type="text" id="searchNumber" class="form-control" placeholder="Поиск по номеру" style="width: 200px;" />
     <input type="text" id="orderNumber" class="form-control" placeholder="Номер заявки" style="width: 150px;" />
 
+    @{
+        var operationTypes = ViewBag.OperationTypes as List<string>;
+    }
     <select id="operationType" class="form-select" style="width: 180px;">
         <option value=''>Все операции</option>
-        @foreach (var type in ViewBag.OperationTypes as List<string>)
+        @if (operationTypes != null)
         {
-            <option value="@type">@type</option>
+            foreach (var type in operationTypes)
+            {
+                <option value="@type">@type</option>
+            }
         }
     </select>
     <div>Период с</div>
@@ -69,18 +75,21 @@
       <div class="modal-body">
         <div class="mb-3">
           <label for="yearSelect" class="form-label">Год</label>
+          @{
+              var years = ViewBag.OperationYears as List<int>;
+          }
           <select id="yearSelect" class="form-select">
-            @{
-                int currentYear = DateTime.Now.Year;
-                for (int y = currentYear - 3; y <= currentYear + 1; y++)
-                {
-                    var selected = y == currentYear ? "selected" : "";
-            }
-            }
-            @for (int y = currentYear - 3; y <= currentYear + 1; y++)
-            {
-                <option value="@y" selected="@(y == currentYear ? "selected" : null)">@y</option>
-            }
+              @if (years != null)
+              {
+                  foreach (var y in years)
+                  {
+                      <option value="@y" selected="@(y == DateTime.Now.Year ? "selected" : null)">@y</option>
+                  }
+              }
+              else
+              {
+                  <option disabled selected>Нет данных</option>
+              }
           </select>
         </div>
         <div class="mb-3">

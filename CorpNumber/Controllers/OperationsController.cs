@@ -97,6 +97,12 @@ namespace CorpNumber.Controllers
                 .Distinct()
                 .OrderBy(t => t)
                 .ToListAsync();
+            ViewBag.OperationYears = await _context.Operations
+                .Where(o => o.OperDate != null)
+                .Select(o => o.OperDate.Value.Year)
+                .Distinct()
+                .OrderBy(y => y)
+                .ToListAsync();
 
             // 🔁 Если это AJAX-запрос — возвращаем только таблицу
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
