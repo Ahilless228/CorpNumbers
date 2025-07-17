@@ -25,7 +25,7 @@
                 <div class="action-header">📞 Основные операции</div>
                 <div class="action-menu">
                     <div class=" grid">
-                        <button class="btn btn-outline-warning btn-sm">⏸️ Установка на паузу</button>
+                        <button class="btn btn-outline-warning btn-sm btn-set-pause">⏸️ Установка на паузу</button>
                         <button class="btn btn-outline-success btn-sm">▶️ Снятие с паузы</button>
                         <button class="btn btn-outline-primary btn-sm">🔁 Восстановление</button>
                         <button class="btn btn-outline-info btn-sm">💳 Изменение лимита</button>
@@ -443,11 +443,13 @@
     </div>
 
 
+@await Html.PartialAsync("_ModalSetOnPause", Model.FirstOrDefault())
+
+
+
 
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
         $(document).ready(function () {
             // 🔎 Живой поиск по номеру
@@ -626,6 +628,9 @@
             });
         });
     </script>
+
+    <script src="~/js/AdminScripts/ModalSetOnPauseScript.js"></script>
+
 }
 
 

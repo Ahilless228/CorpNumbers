@@ -89,6 +89,7 @@ namespace CorpNumber.Controllers
             ViewBag.Categories = await _context.OwnerCategories.ToListAsync();
             ViewBag.SelectedOperator = operatorId ?? 0;
             ViewBag.SelectedCategory = categoryId ?? 0;
+            ViewBag.Statuses = _context.Statuses.ToList();
             ViewBag.OnlyCorp = onlyCorp ?? false;
             //кнопки с счетчиками
             ViewBag.IncompleteOperations = await _context.Operations.CountAsync(op => op.Complete == false);
@@ -521,6 +522,44 @@ namespace CorpNumber.Controllers
             var file = package.GetAsByteArray();
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ТелСправочник2_{DateTime.Now:yyyyMMdd}.xlsx");
         }
+
+
+        // Создание операции "Установка на паузу"
+        [HttpPost]
+        public async Task<IActionResult> CreatePauseOperation([FromForm] Operations model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Comments))
+                return BadRequest("Не указана причина установки на паузу.");
+
+            model.CodeOperType = 1; // или другой код "Установка на паузу"
+            model.Complete = false;
+
+            _context.Operations.Add(model);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
+        //Метод для получения информации о телефоне по его коду
+        [HttpGet]
+        public IActionResult GetPhoneInfo(int codePhone)
+        {
+            var phone = _context.Phones
+                .Include(p => p.StatusNavigation)
+                .FirstOrDefault(p => p.CodePhone == codePhone);
+
+            if (phone == null) return NotFound();
+
+            return Json(new
+            {
+                codePhone = phone.CodePhone,
+                number = phone.Number,
+                status = phone.Status, // код статуса (int)
+                statusText = phone.StatusNavigation?.StatusText // текст статуса
+            });
+        }
+
 
 
 
