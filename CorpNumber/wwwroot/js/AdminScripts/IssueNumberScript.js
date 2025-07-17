@@ -3,6 +3,10 @@
 $(document).on("click", ".btn-issue-phone", function () {
     const row = $("tr.selected-row");
     selectedPhoneId = row.data("id");
+    const today = new Date().toISOString().slice(0, 10);
+    $("#RequestDate").val(today);
+    $("#OperDate").val(today);
+
 
     if (!selectedPhoneId) {
         alert("Выберите номер для выдачи.");
@@ -10,10 +14,10 @@ $(document).on("click", ".btn-issue-phone", function () {
     }
 
     $.get('/Admin/GetPhoneInfo', { codePhone: selectedPhoneId }, function (model) {
-        $("#issuePhoneModal #CodePhone").val(model.codePhone);
-        $("#issuePhoneModal #PhoneNumber").val(model.number);
-        $("#issuePhoneModal #RequestDate").val(new Date().toISOString().slice(0, 10));
-        $("#issuePhoneModal #OperDate").val(new Date().toISOString().slice(0, 10));
+        $("#issueNumberModal #CodePhone").val(model.codePhone);
+        $("#issueNumberModal #PhoneNumber").val(model.number);
+        $("#issueNumberModal #RequestDate").val(new Date().toISOString().slice(0, 10));
+        $("#issueNumberModal #OperDate").val(new Date().toISOString().slice(0, 10));
 
         // Отобразим прежнего владельца (если он CodeCategory == 4)
         $.get('/Operations/GetOwnerCategory', { codePhone: selectedPhoneId }, function (owner) {
