@@ -581,6 +581,75 @@ namespace CorpNumber.Controllers
 
 
 
+        //сохранение операции "Выдача номера"
+        [HttpPost]
+        public async Task<IActionResult> CreateIssueOperation([FromForm] Operations model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Comments))
+                return BadRequest("Комментарий обязателен.");
+
+            model.CodeOperType = 3; // выдача
+            model.Complete = false;
+
+            _context.Operations.Add(model);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOwnerCategory(int codePhone)
+        {
+            var phone = await _context.Phones
+                .Include(p => p.CodeOwnerNavigation)
+                    .ThenInclude(o => o.CategoryNavigation)
+                .FirstOrDefaultAsync(p => p.CodePhone == codePhone);
+
+            var cat = phone?.CodeOwnerNavigation?.CategoryNavigation?.Category;
+            return Ok(new { categoryName = cat });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableEmployees()
+        {
+            var owners = await _context.Owners
+                .Include(o => o.EmployeeNavigation)
+                .Where(o => o.CodeCategory == 1 || o.CodeCategory == 6)
+                .Select(o => new
+                {
+                    codeOwner = o.CodeOwner,
+                    fullName = o.EmployeeNavigation.Surname + " " + o.EmployeeNavigation.Firstname,
+                    nameCh = o.EmployeeNavigation.NameCh
+                }).ToListAsync();
+
+            return Ok(owners);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeDetailsModal(int ownerId)
+        {
+            var owner = await _context.Owners
+                .Include(o => o.EmployeeNavigation)
+                    .ThenInclude(e => e.DepartmentNavigation)
+                .Include(o => o.EmployeeNavigation.PostNavigation)
+                .FirstOrDefaultAsync(o => o.CodeOwner == ownerId);
+
+            if (owner?.EmployeeNavigation == null)
+                return NotFound();
+
+            var emp = owner.EmployeeNavigation;
+            return Ok(new
+            {
+                tabNum = emp.TabNum,
+                department = emp.DepartmentNavigation.DepartmentName + " " + emp.DepartmentNavigation.DepartmentCh,
+                post = emp.PostNavigation.Postt + " " + emp.PostNavigation.PostCh
+            });
+        }
+
+
+
+
+
 
 
     }

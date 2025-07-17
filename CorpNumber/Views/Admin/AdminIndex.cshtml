@@ -55,7 +55,7 @@
                 <div class="action-header">👥 Выдача/Перевод</div>
                 <div class="action-menu">
                     <div class=" grid">
-                        <button class="btn btn-outline-success btn-sm">👤 Выдача сотруднику</button>
+                        <button class="btn btn-outline-success btn-sm btn-issue-phone">👤 Выдача сотруднику</button>
                         <button class="btn btn-outline-warning btn-sm">🕒 Выдача временных</button>
                         <button class="btn btn-outline-secondary btn-sm">🧍‍♂️ Выдача прочим</button>
                         <button class="btn btn-outline-secondary btn-sm">📞 Выдача стационар.</button>
@@ -445,7 +445,7 @@
 
 @await Html.PartialAsync("_ModalSetOnPause", Model.FirstOrDefault())
 @await Html.PartialAsync("_ModalPauseOff" , Model.FirstOrDefault()))
-
+@await Html.PartialAsync("_IssueNumberModal", Model)
 
 
 
@@ -631,6 +631,7 @@
 
     <script src="~/js/AdminScripts/ModalSetOnPauseScript.js"></script>
     <script src="~/js/AdminScripts/ModalPauseOffScript.js"></script>
+    <script src="~/js/AdminScripts/IssueNumberScript.js"></script>
 }
 
 
