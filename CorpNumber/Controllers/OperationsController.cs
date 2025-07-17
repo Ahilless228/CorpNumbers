@@ -2,6 +2,8 @@
 using CorpNumber.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ClosedXML.Excel;
+using System.Globalization;
 
 namespace CorpNumber.Controllers
 {
@@ -771,6 +773,97 @@ namespace CorpNumber.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> ExportMonthlyChangesRaw(int? year, int? month)
+        {
+            var now = DateTime.Now;
+            int y = year ?? now.Year;
+            int m = month ?? now.Month;
+            var monthStart = new DateTime(y, m, 1);
+            var monthEnd = monthStart.AddMonths(1);
+
+            var operations = await _context.Operations
+                .Include(o => o.Phone)
+                    .ThenInclude(p => p.OperatorNavigation)
+                .Include(o => o.OwnerNew)
+                    .ThenInclude(owner => owner.EmployeeNavigation)
+                        .ThenInclude(emp => emp.DepartmentNavigation)
+                .Include(o => o.OwnerOld)
+                    .ThenInclude(owner => owner.EmployeeNavigation)
+                        .ThenInclude(emp => emp.DepartmentNavigation)
+                .Include(o => o.OperationTypes)
+                .Where(o => o.OperDate >= monthStart && o.OperDate < monthEnd)
+                .OrderBy(o => o.OperDate)
+                .ToListAsync();
+
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Изменения");
+
+            ws.Cell(1, 1).Value = "Дата";
+            ws.Cell(1, 2).Value = "Оператор";
+            ws.Cell(1, 3).Value = "Номер";
+            ws.Cell(1, 4).Value = "Группа";
+            ws.Cell(1, 5).Value = "Пользователь";
+            ws.Cell(1, 6).Value = "Таб.№";
+            ws.Cell(1, 7).Value = "Управление";
+            ws.Cell(1, 8).Value = "Операция";
+            ws.Cell(1, 9).Value = "Примечания";
+
+            int row = 2;
+            foreach (var op in operations)
+            {
+                var operatorName = op.Phone?.OperatorNavigation?.Title ?? "";
+                var owner = op.OwnerNew ?? op.OwnerOld;
+                string group = "";
+                string userFio = "";
+                string tabNum = "";
+                string department = "";
+
+                if (owner?.EmployeeNavigation != null)
+                {
+                    var emp = owner.EmployeeNavigation;
+                    group = "Кыргызский сотрудник";
+                    userFio = $"{emp.Surname ?? ""} {emp.Firstname ?? ""} {emp.Midname ?? ""}".Trim();
+                    tabNum = emp.TabNum?.ToString() ?? "";
+                    department = emp.DepartmentNavigation?.DepartmentName ?? "";
+                }
+                else
+                {
+                    group = "Временный";
+                    userFio = "Гость";
+                    tabNum = "";
+                    department = "";
+                }
+
+                ws.Cell(row, 1).Value = op.OperDate?.ToString("dd.MM.yyyy");
+                ws.Cell(row, 2).Value = operatorName;
+                ws.Cell(row, 3).Value = op.Phone?.Number?.ToString() ?? (op.Number?.ToString() ?? "");
+                ws.Cell(row, 4).Value = group;
+                ws.Cell(row, 5).Value = userFio;
+                ws.Cell(row, 6).Value = tabNum;
+                ws.Cell(row, 7).Value = department;
+                ws.Cell(row, 8).Value = op.OperationTypes?.Type ?? "";
+                ws.Cell(row, 9).Value = op.Comments ?? "";
+
+                if (op.OperationTypes?.Type?.Contains("Возврат номера") == true)
+                    ws.Cell(row, 8).Style.Fill.BackgroundColor = XLColor.LightGreen;
+                else if (op.OperationTypes?.Type?.Contains("Выдача номера") == true)
+                    ws.Cell(row, 8).Style.Fill.BackgroundColor = XLColor.LightYellow;
+
+                row++;
+            }
+
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            var fileName = $"Изменения_за_{CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.GetMonthName(m)}_{y}.xlsx";
+            return File(stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
 
 
     }

@@ -58,7 +58,67 @@
 @await Html.PartialAsync("_EditOperationModal")
 
 
+<!-- Модальное окно выбора месяца -->
+<div class="modal fade" id="monthModal" tabindex="-1" aria-labelledby="monthModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="monthModalLabel">Выбор месяца</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="yearSelect" class="form-label">Год</label>
+          <select id="yearSelect" class="form-select">
+            @{
+                int currentYear = DateTime.Now.Year;
+                for (int y = currentYear - 3; y <= currentYear + 1; y++)
+                {
+                    var selected = y == currentYear ? "selected" : "";
+            }
+            }
+            @for (int y = currentYear - 3; y <= currentYear + 1; y++)
+            {
+                <option value="@y" selected="@(y == currentYear ? "selected" : null)">@y</option>
+            }
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="monthSelect" class="form-label">Месяц</label>
+          <select id="monthSelect" class="form-select">
+            @{
+                var months = System.Globalization.CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.MonthNames;
+                int currentMonth = DateTime.Now.Month;
+                for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m" selected="@(m == currentMonth ? "selected" : null)">@months[m-1]</option>
+                }
+            }
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="exportExcelBtn" class="btn btn-success">Отчёт <i class="bi bi-file-earmark-excel"></i></button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 @section Scripts {
     <script src="~/js/operationsTable.js"></script>
+    <script>
+        document.getElementById('changesPerMonth').addEventListener('click', function () {
+            var modal = new bootstrap.Modal(document.getElementById('monthModal'));
+            modal.show();
+        });
+
+        document.getElementById('exportExcelBtn').addEventListener('click', function () {
+            var year = document.getElementById('yearSelect').value;
+            var month = document.getElementById('monthSelect').value;
+            window.location.href = `/Operations/ExportMonthlyChangesRaw?year=${year}&month=${month}`;
+            bootstrap.Modal.getInstance(document.getElementById('monthModal')).hide();
+        });
+    </script>
 }
 

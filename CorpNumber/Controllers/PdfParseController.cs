@@ -129,7 +129,7 @@ namespace CorpNumber.Controllers
                 if (fileName.StartsWith("О!"))
                 {
                     reports = PdfParser.Parse(tempPath);
-                    reportType = "О!";
+                    reportType = "O!";
                 }
                 else if (fileName.StartsWith("MegaCom"))
                 {
@@ -163,6 +163,14 @@ namespace CorpNumber.Controllers
                         worksheet.Cell(i + 2, 2).Value = reports[i].TotalAmount;
                         worksheet.Cell(i + 2, 2).Style.NumberFormat.Format = "#,##0.00";
                     }
+                    // Добавляем строку "Итого начислений"
+                    int totalRow = reports.Count + 2;
+                    worksheet.Cell(totalRow, 1).Value = "Итого начислений";
+                    worksheet.Cell(totalRow, 2).FormulaA1 = $"SUM(B2:B{reports.Count + 1})";
+                    worksheet.Cell(totalRow, 2).Style.NumberFormat.Format = "#,##0.00";
+                    worksheet.Cell(totalRow, 1).Style.Font.SetBold();
+                    worksheet.Cell(totalRow, 2).Style.Font.SetBold();
+
                     worksheet.Columns().AdjustToContents();
                     workbook.SaveAs(ms);
                 }
@@ -181,7 +189,8 @@ namespace CorpNumber.Controllers
                 return result;
             }
             catch (Exception ex)
-            {
+            { 
+                System.IO.File.WriteAllText("C:\\temp\\excel_error.txt", ex.ToString());
                 return BadRequest($"Ошибка при создании Excel-файла: {ex.Message}");
             }
         }

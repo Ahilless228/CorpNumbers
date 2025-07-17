@@ -1,6 +1,128 @@
 ﻿@model IEnumerable<CorpNumber.Models.OperationViewModel>
 
+<!-- Логика кнопки Отправить заявку -->
+<script>
+$(document).on('click', '#sendRequestBtn', function () {
+    let greeting;
+    const hour = new Date().getHours();
+    if (hour < 11) greeting = "Доброе утро!";
+    else if (hour < 17) greeting = "Добрый день!";
+    else greeting = "Добрый вечер!";
+
+    let body = `${greeting}\n\nПрошу Вас:\n`;
+    let n = 1;
+    let lastPhone = null;
+    let opsByPhone = {};
+
+    // Сначала собираем все выбранные операции по номерам
+    $('#incompleteOpsTable tbody tr').each(function () {
+        const $row = $(this);
+        if ($row.find('.row-checkbox').is(':checked')) {
+            const phone = $row.find('td').eq(0).text().trim();
+            const codeOperType = +$row.data('codeopertype');
+            const typeText = $row.find('td').eq(3).text().trim();
+            const comment = $row.find('td').eq(4).text().trim();
+            const info = $row.find('td').eq(5).text().trim();
+
+            if (!opsByPhone[phone]) opsByPhone[phone] = [];
+            opsByPhone[phone].push({ codeOperType, typeText, comment, info });
+        }
+    });
+
+    // Теперь формируем текст по каждому номеру
+    Object.keys(opsByPhone).forEach((phone, idx) => {
+        body += `\n\n${idx + 1}. 996${phone}: \n`;
+        let opTexts = [];
+        let hasTariff = false, tariffText = '';
+        let hasBlockInternet = false;
+
+        opsByPhone[phone].forEach(op => {
+            let opText = '';
+            switch (op.codeOperType) {
+                case 1: opText = "Установить на паузу."; break;
+                case 2: opText = "Снять с паузы."; break;
+                case 3: opText = op.info ? `Восстановить номер ${op.info}.` : "Восстановить номер."; break;
+                case 4: opText = op.info ? `Подключить услугу «${op.info}» и разрешить доступ в интернет.` : "Подключить услугу и разрешить доступ в интернет."; break;
+                case 5: opText = op.info ? `Отключить услугу «${op.info}» и заблокировать доступ в интернет.` : "Отключить услугу и заблокировать доступ в интернет."; break;
+                case 8:
+                    if (op.info && /с\s+\d+\s+на\s+\d+/.test(op.info)) {
+                        opText = `Изменить персональный лимит ${op.info.replace(/^Изменение лимита\s*/i, '')}`;
+                    } else if (op.info) {
+                        opText = `Установить персональный лимит ${op.info} сомов.`;
+                    } else {
+                        opText = "Изменить персональный лимит.";
+                    }
+                    break;
+                case 9:
+                    opText = "Перевести с корпоративного (общего) счета на личный счет";
+                    if (op.info) opText += ` (${op.info})`;
+                    opText += ".";
+                    break;
+                case 10: opText = "Перевести с личного счета на корпоративный (общий) счет."; break;
+                case 11: opText = op.info ? `Переоформить в корпоративную группу ${op.info}.` : "Переоформить в корпоративную группу."; break;
+                case 12: opText = "Переоформить из корпоративной группы на частное обслуживание."; break;
+                case 13: hasBlockInternet = true; break;
+                case 16:
+                    if (op.info) {
+                        const match = op.info.match(/на\s+(.+)/i);
+                        if (match) {
+                            tariffText = `Изменить тарифный план ${match[1].trim()}`;
+                        } else {
+                            tariffText = `Изменить тарифный план ${op.info}`;
+                        }
+                    } else {
+                        tariffText = "Изменить тарифный план";
+                    }
+                    hasTariff = true;
+                    break;
+                case 18: opText = "Подключить услугу «Международный роуминг»."; break;
+                default:
+                    opText = op.info ? op.info : op.typeText;
+                    if (opText && !opText.endsWith('.')) opText += ".";
+            }
+            if (op.codeOperType !== 13 && op.codeOperType !== 16 && opText) {
+                opTexts.push(opText);
+            }
+        });
+
+        // Объединяем тариф и блокировку интернета, если оба есть
+        if (hasTariff && hasBlockInternet) {
+            opTexts.push(`${tariffText} и заблокировать интернет.`);
+        } else if (hasTariff) {
+            opTexts.push(`${tariffText}.`);
+        } else if (hasBlockInternet) {
+            opTexts.push("Заблокировать доступ в интернет.");
+        }
+
+        // Добавляем табуляцию (4 пробела) перед каждой операцией
+        opTexts.forEach(opText => {
+            body += `    ${opText}\n`;
+        });
+    });
+
+    body += `\nС уважением,\n Николай\nОсОО «Алтынкен»`;
+
+    navigator.clipboard.writeText(body).then(function () {
+        alert('Текст заявки скопирован в буфер обмена!');
+    }, function () {
+        alert('Ошибка копирования в буфер обмена.');
+    });
+});
+
+// Подсчёт выбранных чекбоксов
+$(document).on('change', '.row-checkbox', function () {
+    const selected = $('.row-checkbox:checked').length;
+    $('#selectedCount').text(selected);
+});
+
+// "Выбрать все"
+$(document).on('change', '#selectAllCheckbox', function () {
+    $('.row-checkbox').prop('checked', this.checked).trigger('change');
+});
+</script>
+
 <!-- Модальное окно -->
+
 <div class="modal fade" id="incompleteOperationsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -47,7 +169,7 @@
                     <tbody>
                         @foreach (var op in Model)
                         {
-                            <tr>
+                            <tr data-codeopertype="@op.CodeOperType">
                                 <td>@op.PhoneNumber</td>
                                 <td>@op.RequestDate?.ToString("dd.MM.yyyy")</td>
                                 <td>@op.OperDate?.ToString("dd.MM.yyyy")</td>
@@ -74,12 +196,10 @@
             </div>
 
             <div class="modal-footer justify-content-end">
-                <button class="btn btn-primary">Отправить заявку</button>
+                <button class="btn btn-primary" id="sendRequestBtn">Отправить заявку</button>
                 <button class="btn btn-success">Выполнить</button>
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
             </div>
         </div>
     </div>
 </div>
-
-
