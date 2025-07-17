@@ -26,7 +26,7 @@
                 <div class="action-menu">
                     <div class=" grid">
                         <button class="btn btn-outline-warning btn-sm btn-set-pause">⏸️ Установка на паузу</button>
-                        <button class="btn btn-outline-success btn-sm">▶️ Снятие с паузы</button>
+                        <button class="btn btn-outline-success btn-sm btn-remove-pause">▶️ Снятие с паузы</button>
                         <button class="btn btn-outline-primary btn-sm">🔁 Восстановление</button>
                         <button class="btn btn-outline-info btn-sm">💳 Изменение лимита</button>
                         <button class="btn btn-outline-info btn-sm">📄 Запрос детализации</button>
@@ -444,7 +444,7 @@
 
 
 @await Html.PartialAsync("_ModalSetOnPause", Model.FirstOrDefault())
-
+@await Html.PartialAsync("_ModalPauseOff" , Model.FirstOrDefault()))
 
 
 
@@ -630,7 +630,7 @@
     </script>
 
     <script src="~/js/AdminScripts/ModalSetOnPauseScript.js"></script>
-
+    <script src="~/js/AdminScripts/ModalPauseOffScript.js"></script>
 }
 
 

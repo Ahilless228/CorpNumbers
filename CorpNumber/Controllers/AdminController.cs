@@ -1,11 +1,12 @@
-﻿using CorpNumber.Models;
+﻿using Azure;
+using CorpNumber.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using OfficeOpenXml;
 
 namespace CorpNumber.Controllers
 {
@@ -560,6 +561,23 @@ namespace CorpNumber.Controllers
                 statusText = phone.StatusNavigation?.StatusText // текст статуса
             });
         }
+
+        // Создание операции "Снятие с паузы"
+        [HttpPost]
+        public async Task<IActionResult> CreateUnpauseOperation([FromForm] Operations model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Comments))
+                return BadRequest("Не указана причина снятия с паузы.");
+
+            model.CodeOperType = 2; // Код операции "Снятие с паузы"
+            model.Complete = false;
+
+            _context.Operations.Add(model);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
 
 
 
