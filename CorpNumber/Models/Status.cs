@@ -11,5 +11,5 @@ namespace CorpNumber.Models
         public string ?StatusText { get; set; }
 
         public virtual ICollection<Phone>? Phones { get; set; }
-    }
+    }   
 }

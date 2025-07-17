@@ -6,6 +6,24 @@
     int selectedOperator = ViewBag.SelectedOperator ?? 0;
     int selectedCategory = ViewBag.SelectedCategory ?? 0;
     bool onlyCorp = ViewBag.OnlyCorp ?? false;
+    string currentSort = ViewBag.SortField ?? "CodePhone";
+    bool sortAsc = ViewBag.SortAsc ?? true;
+    string GetSortLink(string field)
+    {
+        bool isCurrent = currentSort == field;
+        bool nextAsc = isCurrent ? !sortAsc : true;
+
+        var query = new
+        {
+            operatorId = ViewBag.SelectedOperator,
+            categoryId = ViewBag.SelectedCategory,
+            sortField = field,
+            sortAsc = nextAsc
+        };
+
+        return Url.Action("Index", "Phones", query);
+    }
+
 }
 <style>
     tbody tr.selected-row td {
@@ -20,7 +38,10 @@
 
 
 <div class="container-fluid mt-3">
-    <h2>Телефонные номера</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Список телефонных номеров</h2>
+        <a class="btn btn-outline-dark" asp-controller="Phones" asp-action="EditPanel">⚙️</a>
+    </div>
 
     <!-- Верхняя панель -->
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -30,39 +51,25 @@
         </div>
     </div>
 
-    @if (ViewBag.IsAdmin != true)
-    {
-        <div class="mb-3">
-            <a class="btn btn-outline-dark" asp-controller="Phones" asp-action="EditPanel">Редактирование ⚙️</a>
-        </div>
-    }
-
-    <form method="get" asp-controller="Phones" asp-action="ExportToExcel" style="display: inline;">
-        <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
-        <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
-        <button type="submit" class="btn btn-success">📥 Экспорт в Excel</button>
-    </form>
-
-
-   
     <!-- Панель фильтров и поиска -->
-    <form method="get" asp-controller="Phones" asp-action="Index">
-        <div class="row mb-3 align-items-end">
+    <div class="row mb-3 align-items-end gx-2">
+        <form id="filterForm" method="get" asp-controller="Phones" asp-action="Index" class="row gx-2">
             <!-- Оператор -->
             <div class="col-md-2">
                 <label>Оператор:</label>
                 <select class="form-select" name="operatorId" onchange="this.form.submit()">
-                    <option value="0" selected>Все операторы</option>
+                    <option value="0">Все операторы</option>
                     @foreach (var op in ViewBag.Operators)
                     {
-                        if (selectedOperator == op.CodeOperator)
+                        @if (selectedOperator == op.CodeOperator)
                         {
-                            <option value="@op.CodeOperator" selected="selected">@op.Title</option>
+                            <option value="@op.CodeOperator" selected>@op.Title</option>
                         }
                         else
                         {
                             <option value="@op.CodeOperator">@op.Title</option>
                         }
+                    }
                     }
                 </select>
             </div>
@@ -71,17 +78,18 @@
             <div class="col-md-2">
                 <label>Категория:</label>
                 <select class="form-select" name="categoryId" onchange="this.form.submit()">
-                    <option value="0" selected>Все категории</option>
+                    <option value="0">Все категории</option>
                     @foreach (var cat in ViewBag.Categories)
                     {
-                        if (selectedCategory == cat.CodeCategory)
+                        @if (selectedCategory == cat.CodeCategory)
                         {
-                            <option value="@cat.CodeCategory" selected="selected">@cat.Category</option>
+                            <option value="@cat.CodeCategory" selected>@cat.Category</option>
                         }
                         else
                         {
                             <option value="@cat.CodeCategory">@cat.Category</option>
                         }
+                    }
                     }
                 </select>
             </div>
@@ -89,22 +97,35 @@
             <!-- Поиск по номеру -->
             <div class="col-md-3">
                 <label>Поиск по номеру:</label>
-                <input type="text" id="phoneSearch" class="form-control" placeholder="Введите номер" />
+                <input type="text" id="phoneSearch" class="form-control" name="number" placeholder="Введите номер" />
             </div>
 
             <!-- Поиск по ФИО -->
             <div class="col-md-3">
                 <label>Поиск по ФИО:</label>
-                <input type="text" id="fioSearch" class="form-control" placeholder="Введите ФИО" />
+                <input type="text" id="fioSearch" class="form-control" name="fio" placeholder="Введите ФИО" />
             </div>
 
             <!-- Сброс -->
-            <div class="col-md-2 d-grid">
-                <label>&nbsp;</label>
+            <div class="col-auto d-flex align-items-end">
                 <button type="button" class="btn btn-outline-secondary" id="resetFiltersBtn">Сбросить</button>
             </div>
+        </form>
+
+        <!-- Экспорт -->
+        <div class="col-auto d-flex align-items-end">
+            <form method="get" asp-controller="Phones" asp-action="ExportToExcel" class="m-0">
+                <input type="hidden" name="operatorId" value="@ViewBag.SelectedOperator" />
+                <input type="hidden" name="categoryId" value="@ViewBag.SelectedCategory" />
+                <button type="submit" class="btn btn-success">📥 Экспорт в Excel</button>
+            </form>
         </div>
-    </form>
+    </div>
+
+
+
+
+
 
 
 
@@ -115,11 +136,11 @@
         <table class="table table-bordered table-hover table-striped mb-0" style="position: relative;">
             <thead class="table-dark sticky-top" style="top: 0; z-index: 10;">
                 <tr>
-                    <th style="min-width: 60px;">№</th>
-                    <th style="min-width: 120px;">Номер</th>
-                    <th style="min-width: 200px;">ФИО</th>
-                    <th style="min-width: 120px;">姓名</th>
-                    <th style="min-width: 160px;">Оператор</th>
+                    <th><a href="@GetSortLink("CodePhone")">№</a></th>
+                    <th><a href="@GetSortLink("Number")">Номер</a></th>
+                    <th><a href="@GetSortLink("FullName")">ФИО</a></th>
+                    <th><a href="@GetSortLink("NameCh")">姓名</a></th>
+                    <th><a href="@GetSortLink("Operator")">Оператор</a></th>
                 </tr>
             </thead>
             <tbody id="phoneTableBody">
@@ -228,20 +249,21 @@
             $('#fioSearch, #phoneSearch').on('input', filterTable);
 
             // Кнопка сброса
-            $('#resetFiltersBtn').click(function () {
+             $('#resetFiltersBtn').click(function () {
                 $('#phoneSearch').val('');
                 $('#fioSearch').val('');
                 $('#noResultsRow').remove();
                 $('table tbody tr').show();
 
                 // Сбросить выпадающие списки
-                $('select').each(function () {
+                $('#filterForm select').each(function () {
                     this.selectedIndex = 0;
                 });
 
-                // Перезапустить форму
-                $('form').submit();
+                // Отправляем только форму фильтра
+                $('#filterForm').submit();
             });
+
 
             // Клик по строке
             $('#phoneTableBody').on('click', '.phone-row', function () {

@@ -1,11 +1,12 @@
-﻿using CorpNumber.Models;
+﻿using Azure;
+using CorpNumber.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using OfficeOpenXml;
 
 namespace CorpNumber.Controllers
 {
@@ -54,6 +55,7 @@ namespace CorpNumber.Controllers
                 Account = p.AccountNavigation?.Type ?? "—",
                 Tariff = p.TariffNavigation?.Title ?? "—",
                 Status = p.StatusNavigation?.StatusText ?? "—",
+                StatusCode = p.Status, // ← это int? из таблицы Phones
                 Internet = p.InternetNavigation?.Service ?? "—",
                 Limit = p.Limit,
                 Corporative = p.Corporative ?? false
@@ -89,6 +91,7 @@ namespace CorpNumber.Controllers
             ViewBag.Categories = await _context.OwnerCategories.ToListAsync();
             ViewBag.SelectedOperator = operatorId ?? 0;
             ViewBag.SelectedCategory = categoryId ?? 0;
+            ViewBag.Statuses = _context.Statuses.ToList();
             ViewBag.OnlyCorp = onlyCorp ?? false;
             //кнопки с счетчиками
             ViewBag.IncompleteOperations = await _context.Operations.CountAsync(op => op.Complete == false);
@@ -521,6 +524,130 @@ namespace CorpNumber.Controllers
             var file = package.GetAsByteArray();
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ТелСправочник2_{DateTime.Now:yyyyMMdd}.xlsx");
         }
+
+
+        // Создание операции "Установка на паузу"
+        [HttpPost]
+        public async Task<IActionResult> CreatePauseOperation([FromForm] Operations model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Comments))
+                return BadRequest("Не указана причина установки на паузу.");
+
+            model.CodeOperType = 1; // или другой код "Установка на паузу"
+            model.Complete = false;
+
+            _context.Operations.Add(model);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
+        //Метод для получения информации о телефоне по его коду
+        [HttpGet]
+        public IActionResult GetPhoneInfo(int codePhone)
+        {
+            var phone = _context.Phones
+                .Include(p => p.StatusNavigation)
+                .FirstOrDefault(p => p.CodePhone == codePhone);
+
+            if (phone == null) return NotFound();
+
+            return Json(new
+            {
+                codePhone = phone.CodePhone,
+                number = phone.Number,
+                status = phone.Status, // код статуса (int)
+                statusText = phone.StatusNavigation?.StatusText // текст статуса
+            });
+        }
+
+        // Создание операции "Снятие с паузы"
+        [HttpPost]
+        public async Task<IActionResult> CreateUnpauseOperation([FromForm] Operations model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Comments))
+                return BadRequest("Не указана причина снятия с паузы.");
+
+            model.CodeOperType = 2; // Код операции "Снятие с паузы"
+            model.Complete = false;
+
+            _context.Operations.Add(model);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
+
+
+        //сохранение операции "Выдача номера"
+        [HttpPost]
+        public async Task<IActionResult> CreateIssueOperation([FromForm] Operations model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Comments))
+                return BadRequest("Комментарий обязателен.");
+
+            model.CodeOperType = 3; // выдача
+            model.Complete = false;
+
+            _context.Operations.Add(model);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOwnerCategory(int codePhone)
+        {
+            var phone = await _context.Phones
+                .Include(p => p.CodeOwnerNavigation)
+                    .ThenInclude(o => o.CategoryNavigation)
+                .FirstOrDefaultAsync(p => p.CodePhone == codePhone);
+
+            var cat = phone?.CodeOwnerNavigation?.CategoryNavigation?.Category;
+            return Ok(new { categoryName = cat });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableEmployees()
+        {
+            var owners = await _context.Owners
+                .Include(o => o.EmployeeNavigation)
+                .Where(o => o.CodeCategory == 1 || o.CodeCategory == 6)
+                .Select(o => new
+                {
+                    codeOwner = o.CodeOwner,
+                    fullName = o.EmployeeNavigation.Surname + " " + o.EmployeeNavigation.Firstname,
+                    nameCh = o.EmployeeNavigation.NameCh
+                }).ToListAsync();
+
+            return Ok(owners);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeDetailsModal(int ownerId)
+        {
+            var owner = await _context.Owners
+                .Include(o => o.EmployeeNavigation)
+                    .ThenInclude(e => e.DepartmentNavigation)
+                .Include(o => o.EmployeeNavigation.PostNavigation)
+                .FirstOrDefaultAsync(o => o.CodeOwner == ownerId);
+
+            if (owner?.EmployeeNavigation == null)
+                return NotFound();
+
+            var emp = owner.EmployeeNavigation;
+            return Ok(new
+            {
+                tabNum = emp.TabNum,
+                department = emp.DepartmentNavigation.DepartmentName + " " + emp.DepartmentNavigation.DepartmentCh,
+                post = emp.PostNavigation.Postt + " " + emp.PostNavigation.PostCh
+            });
+        }
+
+
+
 
 
 

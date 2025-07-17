@@ -276,18 +276,21 @@ $(function () {
         };
 
 
-
         // Логика по типу операции
         switch (codeOperType) {
             case 1:
             case 2: // Статусы
                 $.get('/Operations/GetStatusOptions', function (statuses) {
+                    if (!Array.isArray(statuses)) {
+                        console.error('GetStatusOptions вернул не массив:', statuses);
+                        return;
+                    }
+
                     const options = statuses.map(s => ({ value: s.value, text: s.text }));
-                    oldContainer.html(select("Status_old", oldValue, options));
-                    newContainer.html(select("Status_new", newValue, options));
+                    oldContainer.html(select("Status_old", "edit-status-old", oldValue, options));
+                    newContainer.html(select("Status_new", "edit-status-new", newValue, options));
                 });
                 break;
-
 
             case 3: // ICCID
                 oldContainer.html(input("ICCID_old", oldValue));
@@ -297,27 +300,30 @@ $(function () {
             case 4:
             case 5: // Internet Service
                 $.get('/Operations/GetInternetServices', function (services) {
+                    if (!Array.isArray(services)) {
+                        console.error('GetInternetServices вернул не массив:', services);
+                        return;
+                    }
+
                     const options = services.map(s => ({ value: s.codeServ, text: s.service }));
-                    oldContainer.html(select("Internet_old", oldValue, options));
-                    newContainer.html(select("Internet_new", newValue, options));
+                    oldContainer.html(select("Internet_old", "edit-internet-old", oldValue, options));
+                    newContainer.html(select("Internet_new", "edit-internet-new", newValue, options));
                 });
                 break;
 
             case 6:
-            case 7:
+            case 7: // Владельцы
                 $.get('/Operations/GetOwnerOptions', function (owners) {
+                    if (!Array.isArray(owners)) {
+                        console.error('GetOwnerOptions вернул не массив:', owners);
+                        return;
+                    }
+
                     const options = owners.map(o => ({ value: o.codeOwner, text: o.display }));
-
-                    const oldSelectHtml = select("Owner_old", "edit-owner-old", oldValue, options);
-                    const newSelectHtml = select("Owner_new", "edit-owner-new", newValue, options);
-
-                    oldContainer.html(oldSelectHtml);
-                    newContainer.html(newSelectHtml);
+                    oldContainer.html(select("Owner_old", "edit-owner-old", oldValue, options));
+                    newContainer.html(select("Owner_new", "edit-owner-new", newValue, options));
                 });
                 break;
-
-
-
 
             case 8: // Лимит
                 oldContainer.html(input("Limit_old", oldValue));
@@ -329,17 +335,27 @@ $(function () {
             case 11:
             case 12: // Счета
                 $.get('/Operations/GetAccountOptions', function (accounts) {
+                    if (!Array.isArray(accounts)) {
+                        console.error('GetAccountOptions вернул не массив:', accounts);
+                        return;
+                    }
+
                     const options = accounts.map(a => ({ value: a.code, text: a.type }));
-                    oldContainer.html(select("Account_old", oldValue, options));
-                    newContainer.html(select("Account_new", newValue, options));
+                    oldContainer.html(select("Account_old", "edit-account-old", oldValue, options));
+                    newContainer.html(select("Account_new", "edit-account-new", newValue, options));
                 });
                 break;
 
             case 16: // Тарифы
                 $.get('/Operations/GetTariffOptions', function (tariffs) {
+                    if (!Array.isArray(tariffs)) {
+                        console.error('GetTariffOptions вернул не массив:', tariffs);
+                        return;
+                    }
+
                     const options = tariffs.map(t => ({ value: t.codeTariff, text: t.title }));
-                    oldContainer.html(select("Tariff_old", oldValue, options));
-                    newContainer.html(select("Tariff_new", newValue, options));
+                    oldContainer.html(select("Tariff_old", "edit-tariff-old", oldValue, options));
+                    newContainer.html(select("Tariff_new", "edit-tariff-new", newValue, options));
                 });
                 break;
 
@@ -348,6 +364,7 @@ $(function () {
                 newContainer.html(input("NewValue", newValue));
                 break;
         }
+
     }
 
 

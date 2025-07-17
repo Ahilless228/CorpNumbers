@@ -1,0 +1,71 @@
+﻿@model IEnumerable<CorpNumber.Models.PhoneViewModel>
+<div class="modal fade" id="issueNumberModal" tabindex="-1" aria-labelledby="issuePhoneLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-3">
+            <div class="modal-header">
+                <h5 class="modal-title" id="issuePhoneLabel">📱 Выдача номера сотруднику</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="CodePhone" name="CodePhone" />
+
+                <div class="mb-2">
+                    <label>Номер:</label>
+                    <input type="text" class="form-control" id="PhoneNumber" readonly />
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Дата заявки:</label>
+                        <input type="date" class="form-control" id="RequestDate" />
+                    </div>
+                    <div class="col">
+                        <label>Дата операции:</label>
+                        <input type="date" class="form-control" id="OperDate" />
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label>Прежний владелец:</label>
+                    <input type="text" class="form-control" id="OldOwner" readonly />
+                </div>
+
+                <div class="mt-3">
+                    <label>Новый владелец:</label>
+                    <select id="NewOwnerSelect" class="form-select">
+                        <option value="">-- Выберите сотрудника --</option>
+                    </select>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col">
+                        <label>Таб. номер:</label>
+                        <input type="text" class="form-control" id="TabNum" readonly />
+                    </div>
+                    <div class="col">
+                        <label>Управление:</label>
+                        <input type="text" class="form-control" id="Department" readonly />
+                    </div>
+                    <div class="col">
+                        <label>Должность:</label>
+                        <input type="text" class="form-control" id="Post" readonly />
+                    </div>
+                </div>
+
+                <div class="form-check mt-3">
+                    <input type="checkbox" class="form-check-input" id="EmploymentCheckbox" />
+                    <label class="form-check-label" for="EmploymentCheckbox">Приём на работу</label>
+                </div>
+
+                <div class="mt-2">
+                    <label>Комментарий:</label>
+                    <textarea class="form-control" id="Comments" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                <button type="button" class="btn btn-primary" id="saveIssueBtn">Сохранить операцию</button>
+            </div>
+        </div>
+    </div>
+</div>

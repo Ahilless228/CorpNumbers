@@ -1,0 +1,65 @@
+﻿<!--_ModalSetOnPause.cshtml-->
+@model CorpNumber.Models.PhoneViewModel
+
+<div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Установка на паузу</h5>
+                <img src="~/images/altynken-logo.jpg" alt="Logo" style="height: 32px;" />
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="pauseForm">
+                    <input type="hidden" id="CodePhone" name="Number" value="@Model.CodePhone" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Номер</label>
+                        <input type="text" class="form-control" value="@Model.Number" disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Текущее состояние</label>
+                        <input type="text" class="form-control" value="@Model.Status" disabled />
+                        <input type="hidden" id="Status_old" name="Status_old" value="@Model.Status" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Новое состояние</label>
+                        <select class="form-select" id="Status_new" name="Status_new"></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Дата заявки</label>
+                        <input type="date" class="form-control" id="RequestDate" name="RequestDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Дата операции</label>
+                        <input type="date" class="form-control" id="OperDate" name="OperDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" value="" id="LossCheckbox" />
+                        <label class="form-check-label" for="LossCheckbox">
+                            В связи с утерей (кражей)
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Комментарии <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="Comments" name="Comments" required></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savePauseBtn">Сохранить операцию</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+            </div>
+        </div>
+    </div>
+</div>

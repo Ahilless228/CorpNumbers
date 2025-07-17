@@ -1,135 +1,6 @@
 ﻿@model IEnumerable<CorpNumber.Models.PhoneViewModel>
-<style>
-    /* Скрываем нативный чекбокс */
-    input[type="checkbox"].custom-checkbox {
-        position: relative;
-        width: 24px;
-        height: 24px;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        border: 2px solid #0d6efd;
-        border-radius: 4px;
-        cursor: default;
-        outline: none;
-        background-color: white;
-    }
+<link href="~/css/AdminStyle.css" rel="stylesheet" />
 
-        /* Когда чекбокс отмечен */
-        input[type="checkbox"].custom-checkbox:checked::before {
-            content: "";
-            position: absolute;
-            left: 6px;
-            top: 2px;
-            width: 6px;
-            height: 12px;
-            border: solid #0d6efd;
-            border-width: 0 3px 3px 0;
-            transform: rotate(45deg);
-        }
-
-        /* Состояние disabled: не серый фон, галочка яркая */
-        input[type="checkbox"].custom-checkbox:disabled {
-            border-color: #0d6efd;
-            background-color: #e7f1ff; /* светлый голубой фон */
-            cursor: not-allowed;
-        }
-
-        input[type="checkbox"].custom-checkbox:checked:disabled::before {
-            border-color: #0d6efd;
-        }
-
-    /* Улучшение всех disabled-чекбоксов: иконка цветная и заметная */
-    input[type="checkbox"][disabled] {
-        transform: scale(0.9);
-        accent-color: #0d6efd;
-        opacity: 1 !important;
-        cursor: default;
-        filter: none !important; /* Убираем серость */
-    }
-
-    /* Если хочешь именно для "Уволен" сделать красным — по id */
-    #empFired[disabled] {
-        accent-color: #dc3545;
-    }
-</style>
-<!--стили кнопок-->
-<style>
-    .action-group {
-        position: relative;
-        display: inline-block;
-        margin: 8px;
-    }
-
-        .action-group:hover .action-menu {
-            display: block;
-        }
-
-    .action-header {
-        padding: 12px 16px;
-        border: 1px solid #0d6efd;
-        border-radius: 10px;
-        background-color: #f8f9fa;
-        cursor: pointer;
-        font-weight: bold;
-        text-align: center;
-        min-width: 180px;
-        transition: background-color 0.3s;
-    }
-
-        .action-header:hover {
-            background-color: #e2e6ea;
-        }
-
-    .action-menu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        padding: 12px;
-        min-width: 260px;
-        max-width: 300px;
-    }
-
-        .action-menu .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 8px;
-        }
-
-        .action-menu button,
-        .action-menu a {
-            width: 100%;
-            height: auto; /* Высота под контент */
-            min-height: 50px; /* Минимальная высота */
-            font-size: 0.83rem;
-            padding: 6px 8px;
-            text-align: center;
-            white-space: normal; /* разрешаем перенос строк */
-            line-height: 1.2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-wrap: balance;
-        }
-
-</style>
-
-<style>
-    tbody tr.selected-row td {
-        background-color: #d1ecf1 !important;
-    }
-
-    tbody tr.selected-row td {
-        font-weight: bold;
-    }
-</style>
 
 
 @{
@@ -154,8 +25,8 @@
                 <div class="action-header">📞 Основные операции</div>
                 <div class="action-menu">
                     <div class=" grid">
-                        <button class="btn btn-outline-warning btn-sm">⏸️ Установка на паузу</button>
-                        <button class="btn btn-outline-success btn-sm">▶️ Снятие с паузы</button>
+                        <button class="btn btn-outline-warning btn-sm btn-set-pause">⏸️ Установка на паузу</button>
+                        <button class="btn btn-outline-success btn-sm btn-remove-pause">▶️ Снятие с паузы</button>
                         <button class="btn btn-outline-primary btn-sm">🔁 Восстановление</button>
                         <button class="btn btn-outline-info btn-sm">💳 Изменение лимита</button>
                         <button class="btn btn-outline-info btn-sm">📄 Запрос детализации</button>
@@ -184,7 +55,7 @@
                 <div class="action-header">👥 Выдача/Перевод</div>
                 <div class="action-menu">
                     <div class=" grid">
-                        <button class="btn btn-outline-success btn-sm">👤 Выдача сотруднику</button>
+                        <button class="btn btn-outline-success btn-sm btn-issue-phone">👤 Выдача сотруднику</button>
                         <button class="btn btn-outline-warning btn-sm">🕒 Выдача временных</button>
                         <button class="btn btn-outline-secondary btn-sm">🧍‍♂️ Выдача прочим</button>
                         <button class="btn btn-outline-secondary btn-sm">📞 Выдача стационар.</button>
@@ -255,11 +126,8 @@
     <div class="container-fluid mt-1 mx-1">
         <!--Вынесенная кнопка незаконченные операции-->
         <div class="mt-3">
-            <button class="btn @operBtnClass">
-                ❗ Невыполненные операции (@operCount)
-            </button>
             <a class="btn btn-outline-dark " asp-controller="Employee" asp-action="EmployeeIndex">🏢 ОсОО "Алтынкен"</a>
-            <button class="btn btn-outline-info ">📡 Роутеры</button>
+            <a class="btn btn-outline-info " asp-controller="Routers" asp-action="RoutersIndex">📡 Роутеры</a>
         </div>
 
 
@@ -343,7 +211,7 @@
                     {
                         foreach (var phone in Model)
                         {
-                            <tr class="phone-row" data-id="@phone.CodePhone">
+                            <tr class="phone-row" data-id="@phone.CodePhone" data-status="@phone.StatusCode">
                                 <td>@phone.CodePhone</td>
                                 <td><a href="#">@phone.Number</a></td>
                                 <td>@phone.ICCID</td>
@@ -571,6 +439,10 @@
         </div>
     </div>
 
+
+@await Html.PartialAsync("_ModalSetOnPause", Model.FirstOrDefault())
+@await Html.PartialAsync("_ModalPauseOff" , Model.FirstOrDefault()))
+@await Html.PartialAsync("_IssueNumberModal", Model)
     <!-- Парсер -->
     <div class="modal fade" id="parseMenuModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -899,6 +771,10 @@
             });
         });
     </script>
+
+    <script src="~/js/AdminScripts/ModalSetOnPauseScript.js"></script>
+    <script src="~/js/AdminScripts/ModalPauseOffScript.js"></script>
+    <script src="~/js/AdminScripts/IssueNumberScript.js"></script>
 }
 
 
